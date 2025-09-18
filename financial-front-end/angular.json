@@ -22,7 +22,15 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
+            ],
+            "scripts": [
+              "node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ],
+            "polyfills": [
+              "@angular/localize/init"
             ]
           },
           "configurations": {
@@ -59,7 +67,7 @@
               "buildTarget": "financial-front-end:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development"          
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
@@ -75,7 +83,11 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css"
+            ],
+            "polyfills": [
+              "@angular/localize/init"
             ]
           }
         }

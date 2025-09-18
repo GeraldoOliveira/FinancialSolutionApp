@@ -8,10 +8,10 @@ import { NotFound } from './navigation/not-found/not-found';
 @Component({
   selector: 'app-root',
   imports: [
-    Home,
     Footer,
     Menu,
-    RouterOutlet
+    RouterOutlet,
+    NotFound
 ],
   templateUrl: './app.html',
   styleUrl: './app.css'
