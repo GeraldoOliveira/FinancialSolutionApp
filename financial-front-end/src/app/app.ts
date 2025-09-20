@@ -1,17 +1,14 @@
 import { Component, computed, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Home } from './navigation/home/home';
 import { Footer } from './navigation/footer/footer';
 import { Menu } from './navigation/menu/menu';
-import { NotFound } from './navigation/not-found/not-found';
 
 @Component({
   selector: 'app-root',
   imports: [
     Footer,
     Menu,
-    RouterOutlet,
-    NotFound
+    RouterOutlet
 ],
   templateUrl: './app.html',
   styleUrl: './app.css'

@@ -12,6 +12,6 @@ export class Menu {
   public isCollapsed: boolean;
 
   constructor() {
-    this.isCollapsed = false;
+    this.isCollapsed = true;
   }
 }

@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { ReactiveFormsModule } from "@angular/forms";
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -8,5 +9,5 @@ import { RouterOutlet } from '@angular/router';
 })
 
 export class AccountApp {
-
+    
 }

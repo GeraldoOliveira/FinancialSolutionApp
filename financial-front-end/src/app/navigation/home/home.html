@@ -28,16 +28,16 @@
                                     <label class="form-check-label" for="rememberMe">Lembrar-me</label>
                                 </div>
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary btn-lg">Entrar</button>
+                                    <button type="submit" class="btn btn-primary btn-lg" [routerLink]="['/login']" >Entrar</button>
                                 </div>
                                 <p class="text-center mt-3 mb-0">
-                                    <a href="#" class="text-decoration-none">Esqueceu a senha?</a>
+                                    <a class="text-decoration-none">Esqueceu a senha?</a>
                                 </p>
                             </form>
                             <hr class="my-4">
                             <p class="text-center mb-0">Não tem uma conta?</p>
                             <div class="d-grid">
-                                <a href="#" class="btn btn-outline-success mt-2">Criar nova conta</a>
+                                <a class="btn btn-outline-success mt-2" [routerLink]="['/register']" >Criar nova conta</a>
                             </div>
                         </div>
                     </div>
