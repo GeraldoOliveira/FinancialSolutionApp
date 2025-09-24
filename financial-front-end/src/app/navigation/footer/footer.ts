@@ -3,7 +3,7 @@ import { NgbAccordionItem } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-footer',
-  imports: [NgbAccordionItem],
+  imports: [],
   templateUrl: './footer.html'
 })
 export class Footer {

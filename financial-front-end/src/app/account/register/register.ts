@@ -1,8 +1,11 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ElementRef, ViewChildren } from '@angular/core';
+import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
 import { User } from '../models/user';
 import { AccountService } from '../services/account.service';
 import { DisplayMessage, GenericValidator, ValidationMessages } from '../../utils/generic-form-validation';
+import { CustomValidators } from 'ng2-validation';
+import { fromEvent, merge, Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-register',
@@ -12,7 +15,7 @@ import { DisplayMessage, GenericValidator, ValidationMessages } from '../../util
 })
 export class Register {
   
-  @ViewChildren(FormControlName,  { read: ElementRef }) formInputElements: ElementRef[];
+  @ViewChildren(FormControlName,  { read: ElementRef }) formInputElements!: ElementRef[];
 
   errors: any[] = [];
   registerForm!: FormGroup;
@@ -44,24 +47,31 @@ export class Register {
         rangeLength: 'A senha deve possuir entre 6 e 20 caracteres',
         equalTo: 'As senhas não conferem'
       }
-    }
+    };
+
+    this.genericValidator = new GenericValidator(this.validationMessages);
   }
 
   ngOnInit() {
 
-    this.password = new FormControl('',  [Validators.required, CustomValidators.rangeLength([6,20])])
-    this.confirmPassword = new FormControl('', [Validators.required,CustomValidators.rangeLength([6,20]), CustomValidators.equalTo(password)])
+    let passwordControl = new FormControl('', [Validators.required, CustomValidators.rangeLength([6,20])]);
+    let confirmPasswordControl = new FormControl('', [Validators.required, CustomValidators.rangeLength([6,20]), CustomValidators.equalTo(passwordControl)]);
 
     this.registerForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(60)]],
       email: ['', [Validators.required, Validators.email]],
-      password: password 
-      confirmPassword: confirmPassword
+      password: passwordControl,
+      confirmPassword: confirmPasswordControl
     }); 
   }
 
-  afterViewInit(){
+  afterViewInit(): void{
+    let controlBlurs: Observable<any>[] = this.formInputElements
+      .map((formControl: ElementRef) => fromEvent(formControl.nativeElement, 'blur'));
 
+    merge(...controlBlurs).subscribe(() => {
+      this.displayMessage = this.genericValidator.processMessages(this.registerForm);
+    });
   }
 
   registerUser() {
