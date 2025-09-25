@@ -5,17 +5,19 @@ import { AccountService } from '../services/account.service';
 import { DisplayMessage, GenericValidator, ValidationMessages } from '../../utils/generic-form-validation';
 import { CustomValidators } from 'ng2-validation';
 import { fromEvent, merge, Observable } from 'rxjs';
+import { CommonModule  } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-register',
-  imports: [],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
 export class Register {
   
-  @ViewChildren(FormControlName,  { read: ElementRef }) formInputElements!: ElementRef[];
+  @ViewChildren(FormControlName,  { read: ElementRef }) formInputElements: ElementRef[];
 
   errors: any[] = [];
   registerForm!: FormGroup;
@@ -23,7 +25,7 @@ export class Register {
 
   validationMessages!: ValidationMessages;
   genericValidator!: GenericValidator;
-  displayMessage!: DisplayMessage;
+  displayMessage: DisplayMessage = {name: '', email: '', password: '', confirmPassword: ''};
 
   constructor (private fb: FormBuilder,
                private accountService: AccountService) { 
@@ -65,7 +67,7 @@ export class Register {
     }); 
   }
 
-  afterViewInit(): void{
+  ngAfterViewInit(): void {
     let controlBlurs: Observable<any>[] = this.formInputElements
       .map((formControl: ElementRef) => fromEvent(formControl.nativeElement, 'blur'));
 

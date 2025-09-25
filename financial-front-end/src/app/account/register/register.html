@@ -5,26 +5,64 @@
     <div class="container">
         <div class="register-container">
             <h2 class="text-center mb-4">Registro de Usuário</h2>
-            <form>
-                <div class="mb-3">
-                    <label for="nome" class="form-label">Nome</label>
-                    <input type="text" class="form-control" id="nome" placeholder="Digite seu nome completo" required>
+            <form novalidate (ngSubmit)="registerUser()" [formGroup]="registerForm">
+
+                @if (errors.length > 0){
+                    <div class="alert alert-danger">
+                        <h3 id="returnMessage">Ocorreu um erro ao tentar registrar:</h3>
+                        <ul>
+                            @for (error of errors; track error) {
+                                <li> {{ error }} </li>
+                            }
+                        </ul>
+                    </div>
+                }   
+                <div class="form-group">
+                    <div class="mb-3">
+                        <label for="name" class="col-md-2 control-label">Nome:</label>
+                        <input type="text" class="form-control" id="name" placeholder="Digite seu nome completo" formControlName="name" [ngClass]="{'is-invalid': displayMessage.name } "/>
+                        @if(displayMessage.name) {
+                            <span class="text-danger">
+                                <p [innerHTML]="displayMessage.name"></p>
+                            </span>
+                        }
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">E-mail</label>
-                    <input type="email" class="form-control" id="email" placeholder="nome@exemplo.com" required>
+                <div class="form-group">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="text" class="form-control" id="email" placeholder="Digite seu email" formControlName="email" ngClass="{'is-invalid': displayMessage.email } "/>
+                         @if(displayMessage.email){
+                            <span class="text-danger">
+                                <p [innerHTML]="displayMessage.email"></p>
+                            </span>
+                        }
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="senha" class="form-label">Senha</label>
-                    <input type="password" class="form-control" id="senha" placeholder="Crie uma senha" required>
+                <div class="form-group">
+                    <div class="mb-3">
+                        <label class="col-md-2 control-label" for="password">Senha:</label>
+                        <input type="password" class="form-control" id="password" placeholder="Digite sua senha" formControlName="password" ngClass="{'is-invalid': displayMessage.password } "/>
+                         @if(displayMessage.password){
+                            <span class="text-danger">
+                                <p [innerHTML]="displayMessage.password"></p>
+                            </span>
+                        }
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="confirmarSenha" class="form-label">Confirmar Senha</label>
-                    <input type="password" class="form-control" id="confirmarSenha" placeholder="Confirme sua senha"
-                        required>
+                <div class="form-group">
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Repita a senha:</label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Digite a senha novamente" formControlName="confirmPassword" ngClass="{'is-invalid': displayMessage.confirmPassword } "/>
+                         @if(displayMessage.confirmPassword) {
+                            <span class="text-danger">
+                                <p [innerHTML]="displayMessage.confirmPassword"></p>
+                            </span>
+                        }
+                    </div>
                 </div>
                 <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary">Registrar</button>
+                    <button type="submit" id="submit" class="btn btn-primary" [disabled]="!registerForm.valid">Registrar</button>
                 </div>
             </form>
         </div>
