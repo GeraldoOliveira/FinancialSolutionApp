@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChildren } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, ViewChildren } from '@angular/core';
 import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
 import { User } from '../models/user';
 import { AccountService } from '../services/account.service';
@@ -7,6 +7,8 @@ import { CustomValidators } from 'ng2-validation';
 import { fromEvent, merge, Observable } from 'rxjs';
 import { CommonModule  } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -28,7 +30,8 @@ export class Register {
   displayMessage: DisplayMessage = {name: '', email: '', password: '', confirmPassword: ''};
 
   constructor (private fb: FormBuilder,
-               private accountService: AccountService) { 
+               private accountService: AccountService,
+               private router: Router) { 
     this.validationMessages = {
       name: {
         required: 'Informe o nome',
@@ -52,6 +55,7 @@ export class Register {
     };
 
     this.genericValidator = new GenericValidator(this.validationMessages);
+
   }
 
   ngOnInit() {
@@ -79,8 +83,35 @@ export class Register {
   registerUser() {
     if (this.registerForm.dirty && this.registerForm.valid) {
       this.user = Object.assign({}, this.user, this.registerForm.value);
-      this.accountService.registerUser(this.user);
+      this.accountService.registerUser(this.user)
+      .pipe(
+        takeUntilDestroyed(inject(DestroyRef))
+      )
+      .subscribe({
+        next: (success) => {
+          this.processSuccess(success)
+        },
+        error: (fail) => {
+          this.processFail(fail)
+        },
+        complete: () => {
+          console.log('Registro de usuário completo.');
+        }
+      }) 
     }
+  }
+
+  processSuccess(response: any) {
+    this.registerForm.reset(); //limpa o form
+    this.errors = [];
+
+    this.accountService.LocalStorage.saveLocalUser(response);
+
+    this.router.navigate(['/home']);
+  }
+
+  processFail(fail: any) {
+    this.errors = fail.error.errors;
   }
 
 }
