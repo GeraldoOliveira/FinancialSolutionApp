@@ -2,13 +2,15 @@ import { Component, computed, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Footer } from './navigation/footer/footer';
 import { Menu } from './navigation/menu/menu';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-root',
   imports: [
     Footer,
     Menu,
-    RouterOutlet
+    RouterOutlet,
+    NgbModule
 ],
   templateUrl: './app.html',
   styleUrl: './app.css'

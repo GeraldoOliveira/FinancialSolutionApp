@@ -31,7 +31,8 @@ export class Register {
 
   constructor (private fb: FormBuilder,
                private accountService: AccountService,
-               private router: Router) { 
+               private router: Router,
+               private destroyRef: DestroyRef) { 
     this.validationMessages = {
       name: {
         required: 'Informe o nome',
@@ -55,6 +56,10 @@ export class Register {
     };
 
     this.genericValidator = new GenericValidator(this.validationMessages);
+
+    this.destroyRef.onDestroy(() => {
+      console.log('Componente _Register está sendo destruído.');
+    });
 
   }
 
@@ -85,7 +90,7 @@ export class Register {
       this.user = Object.assign({}, this.user, this.registerForm.value);
       this.accountService.registerUser(this.user)
       .pipe(
-        takeUntilDestroyed(inject(DestroyRef))
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: (success) => {
