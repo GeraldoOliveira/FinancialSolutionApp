@@ -116,7 +116,7 @@ export class Register {
   }
 
   processFail(fail: any) {
-    this.errors = fail.error.errors;
+      this.errors = fail.error.error;
   }
 
 }

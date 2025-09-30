@@ -1,10 +1,25 @@
 {
   "users": [
     {
-      "id": "63ff",
-      "nome": "Neto",
+      "name": "Neto",
+      "email": "gevo",
+      "password": "1234",
+      "createdAt": "2025-09-30T01:44:13.525Z",
+      "id": 1
+    },
+    {
+      "name": "Geraldo Vitório de Oliveira Neto",
       "email": "gevo.neto@hotmail.com",
-      "senha": "Hhea9gr"
+      "password": "Hheya9gr",
+      "createdAt": "2025-09-30T01:48:02.440Z",
+      "id": 2
+    },
+    {
+      "name": "Geraldo Vitório de Oliveira Neto",
+      "email": "gevo.neto@hotmail.com",
+      "password": "Hheya9gr",
+      "createdAt": "2025-09-30T01:48:28.631Z",
+      "id": 3
     }
   ]
 }
