@@ -27,12 +27,12 @@ export abstract class BaseService {
         if (response instanceof HttpErrorResponse) {
             if (response.statusText === "Unknown Error") {
                 customError.push("Ocorreu um erro desconhecido. Verifique a sua conexão com a internet.");
-                response.error.errors = customError;
+                response.error.error = customError;
             }
         }
  
         console.error(response);
-        return throwError(() => new Error(response));
+        return throwError(response);
     }
     
 }

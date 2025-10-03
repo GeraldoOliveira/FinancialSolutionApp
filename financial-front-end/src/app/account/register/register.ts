@@ -108,7 +108,7 @@ export class Register {
 
   processSuccess(response: any) {
     this.registerForm.reset(); //limpa o form
-    this.errors = [];
+    this.errors = [] ; //limpa os erros
 
     this.accountService.LocalStorage.saveLocalUser(response);
 
@@ -116,7 +116,8 @@ export class Register {
   }
 
   processFail(fail: any) {
-      this.errors = fail.error.error;
+      this.errors = [] ; //limpa os erros
+      this.errors.push(fail.error.error);
   }
 
 }
