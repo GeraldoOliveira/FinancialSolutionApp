@@ -1,29 +1,78 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="#">My Financial Solution</a>
-        <button class="navbar-toggler" type="button" (click)="isCollapsed = !isCollapsed" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse d-sm-inline-flex flex-sm-row-reverse" id="navbarNav"
-            [ngbCollapse]="isCollapsed">
-            <ul class="navbar-nav ms-auto d-flex">
-                <li class="nav-item me-5">
-                    <a class="nav-link" href="#">Lançamentos</a>
-                </li>
-                <li class="nav-item me-5">
-                    <a class="nav-link" href="#">Contas</a>
-                </li>
-                <li class="nav-item me-5">
-                    <a class="nav-link" href="#">Metas</a>
-                </li>
-                <li class="nav-item me-5">
-                    <a class="nav-link" href="#">Relatórios</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Configurações</a>
-                </li>
-            </ul>
-        </div>
+        @if (userLogged()){
+            <button class="navbar-toggler" type="button" (click)="isCollapsed = !isCollapsed" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse d-sm-inline-flex flex-sm-row-reverse" id="navbarNav"
+                [ngbCollapse]="isCollapsed">
+                <ul class="navbar-nav ms-auto d-flex">
+                    
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="lancamentosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Lançamentos
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="lancamentosDropdown">
+                            <li><a class="dropdown-item" href="#">Novo Lançamento</a></li>
+                            <li><a class="dropdown-item" href="#">Extrato</a></li>
+                            <li><a class="dropdown-item" href="#">Transações Recentes</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="contasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Contas
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="contasDropdown">
+                            <li><a class="dropdown-item" href="#">Ver Contas</a></li>
+                            <li><a class="dropdown-item" href="#">Nova Conta</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="metasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Metas
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="metasDropdown">
+                            <li><a class="dropdown-item" href="#">Minhas Metas</a></li>
+                            <li><a class="dropdown-item" href="#">Criar Meta</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="relatoriosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Relatórios
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="relatoriosDropdown">
+                            <li><a class="dropdown-item" href="#">Por Categoria</a></li>
+                            <li><a class="dropdown-item" href="#">Fluxo de Caixa</a></li>
+                            <li><a class="dropdown-item" href="#">Anual</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="configDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Configurações
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="configDropdown">
+                            <li><a class="dropdown-item" href="#">Perfil</a></li>
+                            <li><a class="dropdown-item" href="#">Segurança</a></li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item me-5">
+                        <a class="nav-link" id="userName" href="javascript:void(0)" >{{ user.name }}</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="btn btn-secondary" href="javascript:void(0)" (click)="logout()">
+                            Sair <span class="fas fa-right-from-bracket"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        }
     </div>
 </nav>

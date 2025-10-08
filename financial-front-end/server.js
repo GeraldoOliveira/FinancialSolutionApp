@@ -10,7 +10,6 @@ server.use(jsonServer.bodyParser); // Essencial para ler o corpo (body) do POST
 
 // --- ROTA GET: BUSCAR TODOS OS USUÁRIOS ---
 server.get('/api/v1/user', (req, res) => {
-    // CORRIGIDO: Busca na coleção 'users'
     res.jsonp(router.db.get('users').value());
 });
 
@@ -20,19 +19,13 @@ const db = router.db.get('users');
 server.post('/api/v1/new-user', (req, res, next) => {
     const { name, email, password, confirmPassword } = req.body;
 
-    // -----------------------------------------------------
-    // 1. VALIDAÇÃO DE SENHAS (Passa/Não Passa)
-    // -----------------------------------------------------
     if (password !== confirmPassword) {
-        // Retorna um erro 400 (Bad Request)
+        // Retorna um erro 400 (Bad Request) se as senhas não coincidirem
         return res.status(400).jsonp({
             error: 'As senhas não coincidem. Por favor, verifique a confirmação.'
         });
     }
 
-    // -----------------------------------------------------
-    // 2. VERIFICAÇÃO DE DUPLICIDADE (Email)
-    // -----------------------------------------------------
     const existingUser = db.find({ email: email }).value();
 
     if (existingUser) {
@@ -43,21 +36,24 @@ server.post('/api/v1/new-user', (req, res, next) => {
     }
     
     const userToSave = { 
-        // Não inclua 'confirmPassword' no objeto final
+        accessToken: '1', // Gera um token único
+        userToken: "1",
         name, 
         email, 
         password, // Em um ambiente real, você faria o HASH dessa senha!
         createdAt: new Date().toISOString() 
     };
-    
+        
     // Anexa a requisição com o objeto final
     req.body = userToSave;
 
     // Mapeia a requisição para a coleção 'users' do JSON Server para que ele salve
     req.url = '/users'; 
     
-    // Permite que o JSON Server salve
-    next();
+    const newUser = db.insert(userToSave).write(); 
+    return res.status(201).jsonp({ data: newUser });
+    // next();
+
 });
 
 server.use(router); // Usa o roteador padrão do JSON Server

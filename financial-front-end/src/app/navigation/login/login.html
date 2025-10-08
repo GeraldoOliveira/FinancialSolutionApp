@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<body>
+    <section class="hero-section bg-dark">
+        <div class="container ">
+            <div class="row align-items-center justify-content-center">
+                
+                <div class="col-lg-6 col-md-8 mb-4 mb-lg-0 text-center">
+                    <img src="https://img.freepik.com/vetores-premium/familia-paga-servicos-publicos-por-meio-de-aplicativo-online-no-conceito-de-smartphone-personagem-masculino-aponta-contas-necessarias-mulher-faz-transferencias-de-dinheiro-pela-web-para-contas-pessoais-de-smartphone_241107-574.jpg" class="img-fluid login-image " alt="Imagem Ilustrativa">
+                    <p class="text-light mt-3 ">Gerencie suas finanças de forma inteligente.</p>
+                </div>
+
+                <div class="col-lg-4 col-md-8">
+                    <div class="card login-card">
+                        <div class="card-body">
+                            <h2 class="card-title text-center mb-4">Bem-vindo(a) de volta!</h2>
+                            <form>
+                                <div class="mb-3">
+                                    <label for="inputEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="inputEmail" placeholder="seu.email@exemplo.com" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="inputPassword" class="form-label">Senha</label>
+                                    <input type="password" class="form-control" id="inputPassword" placeholder="********" required>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">Lembrar-me</label>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg" [routerLink]="['/login']" >Entrar</button>
+                                </div>
+                                <p class="text-center mt-3 mb-0">
+                                    <a class="text-decoration-none">Esqueceu a senha?</a>
+                                </p>
+                            </form>
+                            <hr class="my-4">
+                            <p class="text-center mb-0">Não tem uma conta?</p>
+                            <div class="d-grid">
+                                <a class="btn btn-outline-success mt-2" [routerLink]="['/register']" >Criar nova conta</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

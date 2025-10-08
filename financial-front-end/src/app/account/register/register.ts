@@ -106,12 +106,11 @@ export class Register {
     }
   }
 
-  processSuccess(response: any) {
+  processSuccess(response: User) {
     this.registerForm.reset(); //limpa o form
     this.errors = [] ; //limpa os erros
-
     this.accountService.LocalStorage.saveLocalUser(response);
-
+    this.accountService.LocalStorage.setUser(response);
     this.router.navigate(['/home']);
   }
 

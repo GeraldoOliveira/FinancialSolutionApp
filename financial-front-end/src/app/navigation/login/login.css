@@ -1,0 +1,27 @@
+    body, html {
+        height: 100%;
+        margin: 0;
+        font-family: 'Inter', sans-serif; /* Adicionando uma fonte mais moderna se desejar */
+    }
+    .hero-section {
+        min-height: calc(100vh - 56px); /* 100vh menos a altura de um navbar, se houver */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa; /* Um fundo claro para a seção */
+    }
+    .login-card {
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+        border-radius: 0.75rem;
+        padding: 2rem;
+    }
+    .login-image {
+        max-height: 500px; /* Limita a altura da imagem */
+        object-fit: contain; /* Garante que a imagem se encaixe sem cortar */
+    }
+    .bg-dark {
+        background-color: #343a40 !important; /* Cor de fundo escura */
+    }
+    .login-image {
+        border-radius: 0.75rem;
+    }

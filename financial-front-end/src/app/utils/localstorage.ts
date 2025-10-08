@@ -28,4 +28,10 @@ export class LocalStorageUtils {
     public saveUserToken(userToken: any) {
         return localStorage.setItem('mfs.userToken', userToken);
     }
+
+    public clearLocalUser() {
+        localStorage.removeItem('mfs.accessToken');
+        localStorage.removeItem('mfs.userToken');
+        localStorage.removeItem('mfs.user');
+    }
 }
