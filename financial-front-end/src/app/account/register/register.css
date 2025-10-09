@@ -1,0 +1,8 @@
+form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+button[type="submit"] {
+    max-width: 600px;
+}

@@ -1,17 +1,17 @@
 
 <html lang="pt-br">
 
-<body>
-    <div class="container">
-        <div class="register-container">
-            <h2 class="text-center mb-4">Registro de Usuário</h2>
+<body class="bg-color-actual">
+    <div class="container text-white">
+        <div class="register-container col-md-6 offset-md-3">
+            <h2 class="text-center mb-4 pt-4">Registro de Usuário</h2>
             <form novalidate (ngSubmit)="registerUser()" [formGroup]="registerForm">
 
-                @if (errors.length > 0) {
+                @if (errors().length > 0) {
                     <div class="alert alert-danger">
                         <h3 id="returnMessage">Ocorreu um erro ao tentar registrar:</h3>
                         <ul>
-                            @for (error of errors; track $index) {
+                            @for (error of errors(); track $index) {
                                 <li> {{ error }} </li>
                             }
                         </ul>
@@ -41,7 +41,7 @@
                 </div>
                 <div class="form-group">
                     <div class="mb-3">
-                        <label class="col-md-2 control-label" for="password">Senha:</label>
+                        <label class="control-label" for="password">Senha:</label>
                         <input type="password" class="form-control" id="password" placeholder="Digite sua senha" formControlName="password" ngClass="{'is-invalid': displayMessage.password } "/>
                          @if(displayMessage.password){
                             <span class="text-danger">
@@ -61,7 +61,7 @@
                         }
                     </div>
                 </div>
-                <div class="d-grid gap-2 mt-4">
+                <div class="d-grid mt-4">
                     <button type="submit" id="submit" class="btn btn-primary" [disabled]="!registerForm.valid">Registrar</button>
                 </div>
             </form>

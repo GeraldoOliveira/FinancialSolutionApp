@@ -8,7 +8,6 @@ const middlewares = jsonServer.defaults();
 server.use(middlewares);
 server.use(jsonServer.bodyParser); // Essencial para ler o corpo (body) do POST
 
-// --- ROTA GET: BUSCAR TODOS OS USUÁRIOS ---
 server.get('/api/v1/user', (req, res) => {
     res.jsonp(router.db.get('users').value());
 });
@@ -34,24 +33,58 @@ server.post('/api/v1/new-user', (req, res, next) => {
             error: 'Este email já está cadastrado. Tente fazer login ou use outro email.'
         });
     }
-    
-    const userToSave = { 
+
+    const userToSave = {
         accessToken: '1', // Gera um token único
         userToken: "1",
-        name, 
-        email, 
-        password, // Em um ambiente real, você faria o HASH dessa senha!
-        createdAt: new Date().toISOString() 
+        name,
+        email,
+        password,
+        createdAt: new Date().toISOString()
     };
-        
+
     // Anexa a requisição com o objeto final
     req.body = userToSave;
 
     // Mapeia a requisição para a coleção 'users' do JSON Server para que ele salve
-    req.url = '/users'; 
-    
-    const newUser = db.insert(userToSave).write(); 
-    return res.status(201).jsonp({ data: newUser });
+    req.url = '/users';
+
+    const newUser = db.insert(userToSave).write();
+    return res.status(201).jsonp({
+        data: {
+            accessToken: userToSave.accessToken,
+            userToken: userToSave.userToken,
+            user: {
+                name: userToSave.name,
+                email: userToSave.email
+            }
+        }
+    });
+    // next();
+
+});
+
+server.post('/api/v1/login', (req, res, next) => {
+    const { email, password } = req.body;
+
+    const existingUser = db.find({ email: email }).value();
+
+    if (existingUser) {
+        // Retorna um erro 409 (Conflict) pois o recurso já existe
+        return res.status(200).jsonp({
+            data: {
+                accessToken: existingUser.accessToken,
+                userToken: existingUser.userToken,
+                user: {
+                    name: existingUser.name,
+                    email: existingUser.email
+                }
+            }
+        });
+    }
+    return res.status(409).jsonp({
+        error: 'Usuario ou senha inválidos, tente novamente.'
+    });
     // next();
 
 });

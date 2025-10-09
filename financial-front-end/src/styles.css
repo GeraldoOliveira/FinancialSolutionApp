@@ -1,3 +1,4 @@
+
 a.navbar-brand {
     white-space: normal;
     text-align: center;
@@ -14,11 +15,10 @@ a.navbar-brand {
     overflow: hidden;
 }
 
-/* Sticky footer styles
-  -------------------------------------------------- */
-
 html {
     font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -44,18 +44,13 @@ button.accept-policy {
     line-height: inherit;
 }
 
-
-/* Sticky footer styles
-  -------------------------------------------------- */
-
-html {
-    position: relative;
-    min-height: 100%;
-}
-
 body {
     /* Margin bottom by footer height */
     margin-bottom: 60px;
+    min-height: 100vh; 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
 }
 
 .footer {
@@ -63,16 +58,27 @@ body {
     bottom: 0;
     width: 100%;
     white-space: nowrap;
-    /* Set the fixed height of the footer here */
     height: 50px;
     line-height: 50px;
-    /* Vertically center the text there */
 }
 
 input,
 select,
 file,
 textarea {
-    max-width: 400px;
+    max-width: 600px;
 }
 
+.bg-color-actual {
+    background-color: #000000 !important;
+}
+
+/* Defina a variável principal do corpo */
+:root {
+    --bs-font-sans-serif: 'Roboto', sans-serif;
+}
+
+/* Aplique a regra ao body (como fallback) */
+body {
+    font-family: 'Roboto', sans-serif; 
+}

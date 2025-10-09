@@ -1,19 +1,21 @@
 export class LocalStorageUtils {
 
+    public saveLocalUser(response: any) {
+        this.saveAccessToken(response.accessToken);
+        this.saveUserToken(response.userToken);
+        this.saveUser(response.user);
+
+    }
+
     public getUser() {
         return JSON.parse(localStorage.getItem('mfs.user') || '{}');
     }
 
-    public setUser(user: any) {
-        localStorage.setItem('mfs.user', JSON.stringify(user));
+    public saveUser(user: any) {
+        return localStorage.setItem('mfs.user', JSON.stringify(user));
     }
 
-    public saveLocalUser(response: any) {
-        this.saveAccessToken(response.accessToken);
-        this.saveUserToken(response.userToken);
-    }   
-
-    public getAccessToken() { 
+    public getAccessToken() {
         return localStorage.getItem('mfs.accessToken');
     }
 
