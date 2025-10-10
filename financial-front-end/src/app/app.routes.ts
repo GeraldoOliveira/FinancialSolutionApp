@@ -1,20 +1,25 @@
 import { Routes } from '@angular/router';
-import { accountActivateGuard, accountDeactivateGuard } from './guards/account.guard';
-import { navigationActivateGuard } from './guards/navigation.guard';
+import { loginActivateGuard } from './features/auth/guards/login.guard';
+import { registerActivateGuard, registerDeactivateGuard } from './features/auth/guards/register.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full' },
-    { path: 'home', loadComponent: () => import('./navigation/home/home').then(c => c.Home) },
+    { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard').then(c => c.Dashboard) },
     { 
       path: 'login', 
-      loadComponent: () => import('./navigation/login/login').then(c => c.Login),
-      canActivate: [navigationActivateGuard]
+      loadComponent: () => import('./features/auth/login/login').then(c => c.Login),
+      canActivate: [loginActivateGuard]
     },
     { 
-      path: 'account/register', 
-      loadComponent: () => import('./account/register/register').then(c => c.Register),
-      canActivate: [accountActivateGuard],
-      canDeactivate: [accountDeactivateGuard]
+      path: 'register', 
+      loadComponent: () => import('./features/auth/register/register').then(c => c.Register),
+      canActivate: [registerActivateGuard],
+      canDeactivate: [registerDeactivateGuard]
     },
-    { path: "**", loadComponent: () => import('./navigation/not-found/not-found').then(c => c.NotFound) }
+    { 
+      path: 'expense-transaction', 
+      loadComponent: () => import('./features/expense-transaction/expense-transaction').then(c => c.ExpenseTransaction),
+      // canActivate: [registerActivateGuard]
+    },
+    { path: "**", loadComponent: () => import('./shared/components/not-found/not-found').then(c => c.NotFound) }
 ];

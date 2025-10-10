@@ -10,16 +10,17 @@ import { fromEvent, merge, Observable } from 'rxjs';
 
 import { ToastrService } from 'ngx-toastr';
 
-import { DisplayMessage, GenericValidator, ValidationMessages } from '../../utils/generic-form-validation';
-import { AccountService } from '../services/account.service';
-import { User } from '../models/user';
+import { DisplayMessage, GenericValidator, ValidationMessages } from '../../../shared/utils/generic-form-validation';
+import { User } from '../../../shared/models/user';
+import { RegisterService } from '../services/register.service';
 
 
 @Component({
   selector: 'app-register',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './register.html',
-  styleUrl: './register.css'
+  styleUrl: './register.css',
+  providers: [RegisterService]
 })
 export class Register {
   
@@ -36,7 +37,7 @@ export class Register {
   changesNotSaved: boolean;
 
   constructor (private fb: FormBuilder,
-               private accountService: AccountService,
+               private registerService: RegisterService,
                private router: Router,
                private destroyRef: DestroyRef,
                private toastr: ToastrService, 
@@ -97,7 +98,7 @@ export class Register {
   registerUser() {
     if (this.registerForm.dirty && this.registerForm.valid) {
       this.user = Object.assign({}, this.user, this.registerForm.value);
-      this.accountService.registerUser(this.user)
+      this.registerService.registerUser(this.user)
       .pipe(
         takeUntilDestroyed(this.destroyRef)
       )
@@ -118,7 +119,7 @@ export class Register {
   processSuccess(response: User) {
     this.registerForm.reset();
     this.errors.set([]);
-    this.accountService.LocalStorage.saveLocalUser(response);
+    this.registerService.LocalStorage.saveLocalUser(response);
     let toastr = this.toastr.success('Registro realizado com sucesso!', 'Bem vindo!!!', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
     if (toastr) {
       toastr.onHidden.subscribe(() => {

@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpHeaders } from "@angular/common/http"
 import { throwError } from "rxjs";
-import { LocalStorageUtils } from "../utils/localstorage";
-import { environment } from "../../environments/environment";
+import { LocalStorageUtils } from "../../shared/utils/localstorage";
+import { environment } from "../../../environments/environment";
 
 export abstract class BaseService {
 

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Home } from '../home/home';
+import { Dashboard } from '../../../features/dashboard/dashboard';
 import { NgbCollapse } from "@ng-bootstrap/ng-bootstrap";
 import { LocalStorageUtils } from '../../utils/localstorage';
 import { Router, RouterLink } from '@angular/router';

@@ -69,7 +69,7 @@ server.post('/api/v1/login', (req, res, next) => {
 
     const existingUser = db.find({ email: email }).value();
 
-    if (existingUser) {
+    if (existingUser && existingUser.password === password) {
         // Retorna um erro 409 (Conflict) pois o recurso já existe
         return res.status(200).jsonp({
             data: {

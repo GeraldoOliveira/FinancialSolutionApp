@@ -1,7 +1,7 @@
 import { Component, computed, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Footer } from './navigation/footer/footer';
-import { Menu } from './navigation/menu/menu';
+import { Footer } from './shared/components/footer/footer';
+import { Menu } from './shared/components/menu/menu';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({

@@ -2,16 +2,16 @@
     <div class="container">
         <a class="navbar-brand" [routerLink]="['/login']">Family Control Solution</a>
         @if (userLogged()){
-            <h1 class="nav-link text-light" id="userName">{{ user.name }}</h1>
-             <h1 class="nav-link text-light" id="userEmail">{{ user.email  }}</h1>
-            <a class="btn btn-dark" [routerLink]="['/login']" (click)="logout()">
-                Sair <span class="fas fa-sign-out ms-2"></span>
-            </a>
+        <h1 class="nav-link text-light" id="userName">{{ user.name }}</h1>
+        <h1 class="nav-link text-light" id="userEmail">{{ user.email }}</h1>
+        <a class="btn btn-dark" [routerLink]="['/login']" (click)="logout()">
+            Sair <span class="fas fa-sign-out ms-2"></span>
+        </a>
         } @else {
-            <h1 class="nav-link text-light"> REALIZE O LOGIN </h1>
-            <a class="btn btn-dark" [routerLink]="['/login']" >
-                Login <span class="fas fa-sign-in ms-2"></span>
-            </a>
+        <h1 class="nav-link text-light"> REALIZE O LOGIN </h1>
+        <a class="btn btn-dark" [routerLink]="['/login']">
+            Login <span class="fas fa-sign-in ms-2"></span>
+        </a>
         }
     </div>
 </nav>
@@ -24,7 +24,7 @@
     </div>
 </nav>
 @if (userLogged()){
-<nav class="navbar navbar-expand-lg navbar-dark bg-cinza-personalizado">
+<nav class="navbar navbar-expand-lg navbar-dark bg-cinza-personalizado flex-sm-row-reverse">
     <div>
         <button class="navbar-toggler" type="button" (click)="isCollapsed = !isCollapsed" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,14 +32,20 @@
         </button>
         <div class="collapse navbar-collapse d-sm-inline-flex flex-sm-row-reverse" id="navbarNav"
             [ngbCollapse]="isCollapsed">
-            <ul class="navbar-nav ms-auto d-flex">
-                <li class="nav-item dropdown me-5 ">
+            <ul class="navbar-nav ms-auto d-flex align-items-center">
+                <li class="nav-item dropdown me-5">
+                    <a class="nav-link" [routerLink]="['/dashboard']" id="dashboard" role="button"
+                        aria-expanded="false">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item dropdown me-5">
                     <a class="nav-link dropdown-toggle" href="#" id="lancamentosDropdown" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         Lançamentos
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="lancamentosDropdown">
-                        <li><a class="dropdown-item" href="#">Novo Lançamento</a></li>
+                        <li><a class="dropdown-item" [routerLink]="['/expense-transaction']">Novo Lançamento</a></li>
                         <li><a class="dropdown-item" href="#">Extrato</a></li>
                         <li><a class="dropdown-item" href="#">Transações Recentes</a></li>
                     </ul>
@@ -85,7 +91,10 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="configDropdown">
                         <li><a class="dropdown-item" href="#">Perfil</a></li>
-                        <li><a class="dropdown-item" href="#">Segurança</a></li>
+                        <li><a class="dropdown-item" href="#">Cartoes de Credito</a></li>
+                        <li><a class="dropdown-item" href="#">Formas de Pagamento</a></li>
+                        <li><a class="dropdown-item" href="#">Responsáveis</a></li>
+                        <li><a class="dropdown-item" href="#">Tipos de Despesas</a></li>
                     </ul>
                 </li>
             </ul>

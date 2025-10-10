@@ -11,16 +11,17 @@ import { fromEvent, merge, Observable } from 'rxjs';
 
 import { ToastrService } from 'ngx-toastr';
 
-import { DisplayMessage, GenericValidator, ValidationMessages } from '../../utils/generic-form-validation';
-import { User } from '../../account/models/user';
-import { AccountService } from '../../account/services/account.service';
+import { DisplayMessage, GenericValidator, ValidationMessages } from '../../../shared/utils/generic-form-validation';
+import { User } from '../../../shared/models/user';
+import { LoginService } from '../services/login.service';
 
 
 @Component({
   selector: 'app-login',
   imports: [RouterLink, ReactiveFormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrl: './login.css',
+  providers: [LoginService]
 })
 export class Login {
 
@@ -37,7 +38,7 @@ export class Login {
   changesNotSaved: boolean;
 
   constructor(private fb: FormBuilder,
-    private accountService: AccountService,
+    private loginService: LoginService,
     private router: Router,
     private destroyRef: DestroyRef,
     private toastr: ToastrService,
@@ -81,7 +82,7 @@ export class Login {
   loginUser() {
     if (this.loginForm.dirty && this.loginForm.valid) {
       this.user = Object.assign({}, this.user, this.loginForm.value);
-      this.accountService.loginUser(this.user)
+      this.loginService.loginUser(this.user)
         .pipe(
           takeUntilDestroyed(this.destroyRef)
         )
@@ -101,14 +102,14 @@ export class Login {
   processSuccess(response: User) {
     this.loginForm.reset();
     this.errors.set([]);
-    this.accountService.LocalStorage.saveLocalUser(response);
+    this.loginService.LocalStorage.saveLocalUser(response);
     let toastr = this.toastr.success('Login realizado com sucesso!', 'Bem vindo!!!', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
     if (toastr) {
       toastr.onHidden.subscribe(() => {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/dashboard']);
       }),
         toastr.onTap.subscribe(() => {
-          this.router.navigate(['/home']);
+          this.router.navigate(['/dashboard']);
         })
     }
   }
