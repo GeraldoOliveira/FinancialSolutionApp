@@ -4,6 +4,7 @@ const jsonServer = require('json-server');
 const server = jsonServer.create();
 const router = jsonServer.router('db.json');
 const middlewares = jsonServer.defaults();
+const { body, validationResult } = require('express-validator');
 
 server.use(middlewares);
 server.use(jsonServer.bodyParser); // Essencial para ler o corpo (body) do POST
@@ -62,6 +63,38 @@ server.post('/api/v1/new-user', (req, res, next) => {
     });
     // next();
 
+});
+
+const validateExpense = [
+    // Validação de campos de nível superior
+    body('totalValue').notEmpty().isNumeric().withMessage('totalValue é obrigatório e deve ser um número.'),
+    body('methodList').notEmpty().withMessage('methodList é obrigatório.'),
+    body('creditCardList').notEmpty().withMessage('creditCardList é obrigatório.'),
+    body('installments').notEmpty().isInt({ min: 1 }).withMessage('installments é obrigatório e deve ser um número inteiro maior que zero.'),
+    body('categoryList').notEmpty().withMessage('categoryList é obrigatório.'),
+    body('date').notEmpty().isISO8601().withMessage('date é obrigatório e deve ser uma data ISO válida.'),
+
+    // Validação de campos aninhados: expenseOrigin
+    body('expenseOrigin.name').notEmpty().withMessage('expenseOrigin.name é obrigatório.'),
+    body('expenseOrigin.description').notEmpty().withMessage('expenseOrigin.description é obrigatório.'),
+
+    // Validação de campos aninhados: expenseResponsible
+    body('expenseResponsible.responsibleList').notEmpty().withMessage('expenseResponsible.responsibleList é obrigatório.'),
+    body('expenseResponsible.proratedValue').notEmpty().isNumeric().withMessage('expenseResponsible.proratedValue é obrigatório e deve ser um número.'),
+];
+
+server.post('/expense', validateExpense, (req, res, next) => {
+    // Verifica se há erros de validação
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // Se houver erros, retorna 400 Bad Request com os detalhes dos erros
+        return res.status(400).json({ 
+            errors: errors.array(),
+            message: "Falha na validação dos dados da despesa." 
+        });
+    }
+    
+    next();
 });
 
 server.post('/api/v1/login', (req, res, next) => {

@@ -18,7 +18,7 @@ export class ExpenseTransactionService extends BaseService {
 
     registerExpense(expenseTransaction: Expense): Observable<Expense> {
         let response = this.http
-            .post(this.UrlServiceV1 + 'new-expense', expenseTransaction, this.GetHeadersJson())
+            .post(this.UrlServiceV1 + 'expense', expenseTransaction, this.GetAuthHeaderJson())
             .pipe(
                 map(this.ExtractData),
                 catchError(this.ServiceError)

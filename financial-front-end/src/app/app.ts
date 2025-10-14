@@ -3,6 +3,8 @@ import { RouterOutlet } from '@angular/router';
 import { Footer } from './shared/components/footer/footer';
 import { Menu } from './shared/components/menu/menu';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgxBrazil } from 'ngx-brazil';
+
 
 @Component({
   selector: 'app-root',
@@ -10,7 +12,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     Footer,
     Menu,
     RouterOutlet,
-    NgbModule
+    NgbModule,
+    NgxBrazil
 ],
   templateUrl: './app.html',
   styleUrl: './app.css'

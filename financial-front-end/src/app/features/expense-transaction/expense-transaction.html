@@ -17,37 +17,59 @@
                 </div>
                 }
 
-                <div class="form-group">
-                    <label for="description" class="control-label mb-2">Descrição:</label>
+                <div class="form-group" formGroupName="expenseOrigin">
+                    <label for="description" class="control-label mb-2">Nome e Descrição:</label>
                     <div class="row g-2">
-                        <div class="col-md-10 col-lg-11 col-10">
-                            <input class="form-control" formControlName="description" list="descriptionListOptions"
-                                id="descriptionList" placeholder="Digite para pesquisar...">
-                            <datalist id="descriptionListOptions">
-                                <option value="Supermercado - Frango"></option>
-                                <option value="Real - Frango"></option>
-                                <option value="Real - Carne"></option>
-                                <option value="Supermercado - Carne"></option>
-                                <option value="Supermercado - Banana"></option>
-                            </datalist>
+                        <div class="col-md-5 col-lg-6 col-5">
+                            @if(!isWritableDescription()){
+                            <select class="form-select" id="nameList" formControlName="name">
+                                <!-- <option selected>Selecione o nome..</option> -->
+                                <option value="Supermercado">Supermercado</option>
+                                <option value="Real">Real</option>
+                            </select>
+                            } @else {
+                            <input type="text" class="form-control" id="nameList" placeholder="Digite o nome do gasto"
+                                formControlName="name" ngClass="{'is-invalid': displayMessage.name}">
+                            }
+                            @if(displayMessage.name){
+                            <div class="col-12"> <span class="text-danger">
+                                    <p [innerHTML]="displayMessage.name"></p>
+                                </span>
+                            </div>
+                            }
                         </div>
-                        <div class="col-md-2 col-lg-1  col-2"> <button class="btn btn-danger w-100"> <i
+                        <div class="col-md-5 col-lg-5 col-5">
+                            @if(!isWritableDescription()){
+                            <select class="form-select" id="descriptionList" formControlName="description">
+                                <!-- <option selected>Selecione a descrição..</option> -->
+                                <option value="Frango">Frango</option>
+                                <option value="Carne">Carne</option>
+                                <option value="Banana">Banana</option>
+                            </select>
+                            }@else {
+                            <input type="text" class="form-control" id="descriptionList" placeholder="Digite a descrição"
+                                formControlName="description" ngClass="{'is-invalid': displayMessage.description}">
+                            }
+                            @if(displayMessage.description){
+                            <div class="col-12"> <span class="text-danger">
+                                    <p [innerHTML]="displayMessage.description"></p>
+                                </span>
+                            </div>
+                            }
+                        </div>
+                        <div class="col-md-2 col-lg-1  col-2">
+                            <button class="btn btn-danger w-100" (click)="changeWritableDescription()"> <i
                                     class="bi bi-plus fas fa-plus-circle"></i>
                             </button>
                         </div>
-                        @if(displayMessage.description){
-                        <div class="col-12"> <span class="text-danger">
-                                <p [innerHTML]="displayMessage.description"></p>
-                            </span>
-                        </div>
-                        }
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="mb-3 row g-2">
                         <label for="totalValue" class="form-label">Valor Total:</label>
-                        <input type="number" class="form-control" id="totalValue" placeholder="Digite o valor total"
-                            formControlName="totalValue" ngClass="{'is-invalid': displayMessage.totalValue } " />
+                        <input type="text" class="form-control" id="totalValue" placeholder="Digite o valor total"
+                            formControlName="totalValue" number [textMask]="{mask: MASKS.number.textMask}"
+                            ngClass="{'is-invalid': displayMessage.totalValue}">
                         @if(displayMessage.totalValue){
                         <span class="text-danger">
                             <p [innerHTML]="displayMessage.totalValue"></p>
@@ -55,17 +77,23 @@
                         }
                     </div>
                 </div>
-                <div class="form-group ">
+                <div class="form-group">
                     <div class="mb-3 row g-2">
                         <label for="method" class="control-label mb-2">Método de Pagamento:</label>
-                        <input class="form-control" list="methodListOptions" id="methodList"
-                            formControlName="methodList" placeholder="Digite para pesquisar...">
-                        <datalist id="methodListOptions">
-                            <option value="Crédito">
-                            <option value="Débito">
-                            <option value="Pix">
-                            <option value="Boleto">
-                        </datalist>
+                        <div class="form-check">
+                            <input class="form-check-input" value="1" type="radio" name="methodList" id="methodList"
+                                formControlName="methodList">
+                            <label class="form-check-label" for="methodList">
+                                Crédito
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" value="2" type="radio" name="methodList"
+                                formControlName="methodList" id="methodList">
+                            <label class="form-check-label" for="methodList">
+                                Pix
+                            </label>
+                        </div>
                         @if(displayMessage.methodList){
                         <div class="col-12"> <span class="text-danger">
                                 <p [innerHTML]="displayMessage.methodList"></p>
@@ -74,25 +102,26 @@
                         }
                     </div>
                 </div>
-                @if(expenseForm.get('methodList')?.value === 'Crédito'){
+
+                @if(expenseForm.get('methodList')?.value === '1'){
                 <div class="form-group ">
                     <div class="mb-3">
                         <label for="credit-card" class="control-label mb-2">Cartão de Crédito:</label>
                         <div class="row g-2">
                             <div class=" col-md-8 col-lg-8 col-8">
-                                <input class="form-control" list="creditCardListOptions" id="creditCardList"
-                                    formControlName="creditCardList" placeholder="Digite para pesquisar...">
-                                <datalist id="creditCardListOptions">
-                                    <option value="Infinite - 4195">
-                                    <option value="Infinite - 1880">
-                                    <option value="Nubank - 2020">
-                                </datalist>
+                                <select class="form-select" id="creditCardList" formControlName="creditCardList">
+                                    <!-- <option selected>Selecione o cartão..</option> -->
+                                    <option value="1">Infinite - 4195</option>
+                                    <option value="2">Infinite - 1880</option>
+                                    <option value="3">Nubank - 2020</option>
+                                </select>
                                 @if(displayMessage.creditCardList){
                                 <div class="col-12"> <span class="text-danger">
                                         <p [innerHTML]="displayMessage.creditCardList"></p>
                                     </span>
                                 </div>
                                 }
+
                             </div>
                             <div class="col-md-4 col-lg-4 col-4">
                                 <input type="number" class="form-control" id="installments" placeholder="Parcelas"
@@ -109,17 +138,16 @@
                     </div>
                 </div>
                 }
-                <div class="form-group">
+                <div class="form-group" formGroupName="expenseResponsible">
                     <div class="mb-3">
                         <label for="responsible" class="control-label mb-2">Responsável:</label>
-                        <div class="row g-2">
+                        <div class="row g-2 ">
                             <div class="col-md-6 col-lg-8 col-7">
-                                <input class="form-control" list="responsibleListOptions" id="responsibleList"
-                                    placeholder="Digite para pesquisar..." formControlName="responsibleList">
-                                <datalist id="responsibleListOptions">
-                                    <option value="Anelise"></option>
-                                    <option value="Neto"></option>
-                                </datalist>
+                                <select class="form-select" id="responsibleList" formControlName="responsibleList">
+                                    <!-- <option selected>Selecione o responsável..</option> -->
+                                    <option value="Anelise">Anelise</option>
+                                    <option value="Neto">Neto</option>
+                                </select>
                                 @if(displayMessage.responsibleList){
                                 <div class="col-12"> <span class="text-danger">
                                         <p [innerHTML]="displayMessage.responsibleList"></p>
@@ -128,8 +156,8 @@
                                 }
                             </div>
                             <div class="col-md-4 col-lg-3 col-3">
-                                <input type="number" class="form-control" id="proratedValue"
-                                    placeholder="Valor dividido" formControlName="proratedValue"
+                                <input type="text" class="form-control" id="proratedValue" placeholder="Valor dividido"
+                                    formControlName="proratedValue" number [textMask]="{mask: MASKS.number.textMask}"
                                     [ngClass]="{'is-invalid': displayMessage.proratedValue }" />
                                 @if(displayMessage.proratedValue){
                                 <div class="col-12"> <span class="text-danger">
@@ -138,8 +166,11 @@
                                 </div>
                                 }
                             </div>
-                            <div class="col-md-2 col-lg-1 col-2"> <button class="btn btn-danger w-100"> <i
-                                        class="bi bi-plus fas fa-plus-circle"></i>
+
+                            <div class="col-md-2 col-lg-1 col-2">
+                                <button class="btn btn-danger w-100">
+                                    <i class="bi bi-plus fas fa-plus-circle">
+                                    </i>
                                 </button>
                             </div>
                         </div>
@@ -148,13 +179,12 @@
                 <div class="form-group ">
                     <div class="mb-2 row g-2">
                         <label for="categoryList" class="control-label mb-2">Categoria:</label>
-                        <input class="form-control" list="categoryListOptions" id="categoryList"
-                            placeholder="Digite para pesquisar..." formControlName="categoryList">
-                        <datalist id="categoryListOptions">
-                            <option value="Alimentacao">
-                            <option value="Carro">
-                            <option value="Viagem">
-                        </datalist>
+                        <select class="form-select" id="categoryList" formControlName="categoryList">
+                            <!-- <option selected>Selecione a categoria..</option> -->
+                            <option value="Alimentacao">Alimentacao</option>
+                            <option value="Carro">Carro</option>
+                            <option value="Viagem">Viagem</option>
+                        </select>
                         @if(displayMessage.categoryList){
                         <div class="col-12"> <span class="text-danger">
                                 <p [innerHTML]="displayMessage.categoryList"></p>
@@ -163,12 +193,25 @@
                         }
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="mb-3 row g-2">
+                        <label for="date" class="form-label">Data:</label>
+                        <input type="datetime-local" class="form-control" id="date" formControlName="date"
+                            ngClass="{'is-invalid': displayMessage.date } " />
+                        @if(displayMessage.date){
+                        <span class="text-danger">
+                            <p [innerHTML]="displayMessage.date"></p>
+                        </span>
+                        }
+                    </div>
+                </div>
                 <div class="d-grid mt-4">
-                    <button type="submit" id="submit" class="btn btn-primary"
+                    <button type="submit" id="submit" class="btn btn-danger"
                         [disabled]="!expenseForm.valid">Registrar</button>
                 </div>
             </form>
         </div>
     </div>
 </body>
+
 </html>

@@ -4,7 +4,7 @@ import { ExpenseResponsible } from "./expense-responsible";
 export interface Expense {
     id: number;
     expenseOrigin: ExpenseOrigin;
-    totalValue: number;
+    totalValue: string;
     paymentMethod: string;
     creditCardId: number;
     expenseResponsible: ExpenseResponsible;
