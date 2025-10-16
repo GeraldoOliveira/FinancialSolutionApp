@@ -1,11 +1,11 @@
-import { ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, ViewChildren, signal, WritableSignal } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, ViewChildren, signal, WritableSignal, QueryList } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
-import { fromEvent, merge, Observable } from 'rxjs';
+import { fromEvent, merge, Observable, of, Subscription, switchMap } from 'rxjs';
 
 import { ToastrService } from 'ngx-toastr';
 
@@ -17,11 +17,6 @@ import { ExpenseResponsible } from './models/expense-responsible';
 import { NgxBrazilValidators, NgxBrazilMASKS, MaskedInputDirective } from 'ngx-brazil';
 import { StringUtils } from '../../shared/utils/string-utils';
 
-interface Item {
-  id: number;
-  name: string;
-}
-
 @Component({
   selector: 'app-expense-transaction',
   imports: [CommonModule, ReactiveFormsModule, MaskedInputDirective],
@@ -31,11 +26,21 @@ interface Item {
 })
 export class ExpenseTransaction {
 
-  @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: ElementRef[];
+  @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: QueryList<ElementRef>;
 
   MASKS = NgxBrazilMASKS;
 
+  private itemSubscriptions: Map<number, Subscription> = new Map();
+
   errors: WritableSignal<any[]> = signal([]);
+  isWritableDescription: WritableSignal<boolean> = signal(false);
+  expenseResposiblesArray: WritableSignal<FormArray> = signal(
+    new FormArray<any>([])
+  );
+
+
+  controlBlurs: Observable<any>[];
+
   expenseTransaction: Expense;
   expenseOrigin: ExpenseOrigin;
   expenseResposible: ExpenseResponsible;
@@ -43,10 +48,10 @@ export class ExpenseTransaction {
 
   validationMessages!: ValidationMessages;
   genericValidator!: GenericValidator;
-  displayMessage: DisplayMessage = { name: '', description: '', totalValue: '', methodList: '', creditCardList: '', installments: '', responsibleList: '', proratedValue: '', categoryList: '', date: '' };
+  displayMessage: DisplayMessage = { name: '', description: '', totalValue: '', methodList: '', creditCardList: '', installments: '', responsible: '', proratedValue: '', categoryList: '', date: '' };
 
   changesNotSaved: boolean;
-  isWritableDescription: WritableSignal<boolean> = signal(false);
+  // $index: number = 0;
 
   constructor(private fb: FormBuilder,
     private expenseTransactionService: ExpenseTransactionService,
@@ -74,7 +79,7 @@ export class ExpenseTransaction {
       installments: {
         required: 'Informe o parcelamento',
       },
-      responsibleList: {
+      responsible: {
         required: 'Informe o responsável',
       },
       proratedValue: {
@@ -103,14 +108,13 @@ export class ExpenseTransaction {
         name: ['', [Validators.required]],
         description: ['', [Validators.required]]
       }),
-      totalValue: ['', [Validators.required], Validators.min(0.01)],
+      totalValue: ['', [Validators.required]],
       methodList: ['', [Validators.required]],
       creditCardList: ['', [Validators.required]],
       installments: ['', [Validators.required]],
-      expenseResponsible: this.fb.group({
-        responsibleList: ['', [Validators.required]],
-        proratedValue: ['', [Validators.required], Validators.min(0.01)]
-      }),
+      expenseResponsibles: this.fb.array([
+        this.createExpenseResponsibleGroup()
+      ]),
       categoryList: ['', [Validators.required]],
       date: ['', [Validators.required]],
     });
@@ -126,16 +130,64 @@ export class ExpenseTransaction {
         this.handleCreditCardListChange(value);
       });
 
-    this.expenseForm.get('totalValue')?.valueChanges
+    this.expenseForm.get('totalValue').valueChanges
       .subscribe(value => {
         this.handleProratedValueChange(value);
       });
+
+    const initialFormArray = this.expenseForm.get('expenseResponsibles') as FormArray;
+    this.expenseResposiblesArray.set(initialFormArray);
+    this.setupAllSubscriptions();
+
   }
 
-  getFormChild(childName: string): AbstractControl {
+  expenseResposiblesArrayItem(): FormArray {
+    return this.expenseForm.get('expenseResponsibles') as FormArray;
+  }
+
+  private unsubscribeAllItems(): void {
+    this.itemSubscriptions.forEach(sub => sub.unsubscribe());
+    this.itemSubscriptions.clear();
+  }
+
+  private subscribeToFormGroup(index: number): void {
+    const formGroup = this.expenseResposiblesArray().at(index) as FormGroup;
+
+    const sub = formGroup.valueChanges.subscribe(value => {
+      const differenceValue = this.differenceValueTotalWithProrated(index);
+
+      if (value.proratedValue > differenceValue) {
+        const proratedControl = formGroup.get('proratedValue');
+        proratedControl.setValue(differenceValue, { emitEvent: false });
+      }
+
+    });
+
+    this.itemSubscriptions.set(index, sub);
+  }
+
+  private setupAllSubscriptions(): void {
+    this.unsubscribeAllItems();
+    this.expenseResposiblesArray().controls.forEach((_, index) => {
+      this.subscribeToFormGroup(index);
+    });
+  }
+
+  ngAfterViewInit(): void {
+    this.setupControlBlurObservable();
+
+    this.formInputElements.changes
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.setupControlBlurObservable();
+      });
+  }
+
+  private getFormChild(childName: string): AbstractControl {
     return this.expenseForm.get(childName);
   }
-  handleCreditCardListChange(methodList: string): void {
+
+  private handleCreditCardListChange(methodList: string): void {
     if (methodList === '1') {
       this.getFormChild("creditCardList")?.setValidators(Validators.required);
       this.getFormChild("installmentsControl")?.setValidators(Validators.required);
@@ -148,22 +200,113 @@ export class ExpenseTransaction {
     this.getFormChild("creditCardList")?.updateValueAndValidity();
     this.getFormChild("installmentsControl")?.updateValueAndValidity();
   }
-  handleProratedValueChange(totalValue: number): void {
-    const proratedValue = this.expenseForm.get('expenseResponsible.proratedValue');
 
-    if (totalValue && totalValue > 0) {
-      proratedValue?.setValue(totalValue);
+  private handleProratedValueChange(totalValue: string): void {
+    const proratedGroup = this.expenseResposiblesArray();
+    let cleanValue: number = parseFloat(StringUtils.justNumbers(totalValue));
+    cleanValue = parseFloat(cleanValue.toFixed(0)) / parseFloat(proratedGroup.length.toString());
+
+    if (proratedGroup.length > 0) {
+      for (let i = 0; i < proratedGroup.length; i++) {
+        const proratedChild = proratedGroup.at(i) as FormGroup;
+
+        const proratedControl = proratedChild.get('proratedValue');
+        if (totalValue && cleanValue > 0) {
+          proratedControl.setValue((Math.round(cleanValue * 100) / 100), { emitEvent: false });
+        } else {
+          proratedControl.setValue(0, { emitEvent: false });
+        }
+      }
     }
   }
 
-  ngAfterViewInit(): void {
-    let controlBlurs: Observable<any>[] = this.formInputElements
-      .map((formControl: ElementRef) => fromEvent(formControl.nativeElement, 'blur'));
+  private createExpenseResponsibleGroup(): FormGroup {
+    return this.fb.group({
+      responsible: ['', [Validators.required]],
+      proratedValue: ['0', [Validators.required]]
+    });
+  }
 
-    merge(...controlBlurs).subscribe(() => {
+  addExpenseResponsible(): void {
+    if (this.differenceValueTotalWithProrated() > 0) {
+      const arrayControl = this.expenseResposiblesArray();
+      arrayControl.push(this.createExpenseResponsibleGroup());
+      this.setupAllSubscriptions();
+      this.completeValueAddExpenseResponsible();
+    } else {
+      this.toastr.error('Não há valores disponível para novos rateios!', 'Adicionar responsável', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
+    }
+
+  }
+
+  removeExpenseResponsible(): void {
+    const arrayControl = this.expenseResposiblesArray();
+    if (arrayControl.length > 1) {
+      arrayControl.removeAt(arrayControl.length - 1);
+      this.setupAllSubscriptions();
+    }
+  }
+
+  private completeValueAddExpenseResponsible(): void {
+    const arrayControl = this.expenseResposiblesArray();
+    const lastProratedControl = arrayControl.at(arrayControl.length - 1)?.get('proratedValue');
+
+    if (lastProratedControl) {
+      lastProratedControl.setValue(this.differenceValueTotalWithProrated(), { emitEvent: false });
+    }
+  }
+
+  private differenceValueTotalWithProrated(index: number = -1): number {
+    const arrayControl = this.expenseResposiblesArray();
+    let valueTotalCompleted: number = 0;
+
+    const totalValueRaw = this.expenseForm.get('totalValue')?.getRawValue() as string;
+    const totalNumericValue = parseFloat(StringUtils.justNumbers(totalValueRaw)) || 0;
+
+    if (arrayControl.length > 0) {
+      for (let i = 0; i < arrayControl.length; i++) {
+        const proratedChild = arrayControl.at(i) as FormGroup;
+        const proratedControl = proratedChild.get('proratedValue');
+
+        if (proratedControl && i != index) {
+          const proratedRaw = proratedControl.getRawValue() as string;
+          const proratedNumericValue = parseFloat(proratedRaw) || 0;
+          valueTotalCompleted += proratedNumericValue;
+        }
+      }
+
+      let remainingValue = totalNumericValue - valueTotalCompleted;
+      const finalValueToSet: number = Math.round(remainingValue * 100) / 100;
+
+      return finalValueToSet;
+    } else {
+      return 0;
+    }
+
+
+
+  }
+
+  private setupControlBlurObservable() {
+
+    const elementsChange$ = merge(
+      of(this.formInputElements),
+      this.formInputElements.changes
+    ).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      switchMap((list: QueryList<ElementRef>) => {
+        const controlBlurs = list.toArray()
+          .map((formControl: ElementRef) => fromEvent(formControl.nativeElement, 'blur'));
+
+        return merge(...controlBlurs);
+      })
+    );
+
+    elementsChange$.subscribe(() => {
       this.displayMessage = this.genericValidator.processMessages(this.expenseForm);
       this.changesNotSaved = true;
     });
+
   }
 
   changeWritableDescription(): void {
@@ -174,9 +317,7 @@ export class ExpenseTransaction {
     if (this.expenseForm.dirty && this.expenseForm.valid) {
 
       this.expenseTransaction = Object.assign({}, this.expenseTransaction, this.expenseForm.value);
-
       this.expenseTransaction.totalValue = StringUtils.justNumbers(this.expenseTransaction.totalValue);
-      this.expenseTransaction.expenseResponsible.proratedValue = StringUtils.justNumbers(this.expenseTransaction.expenseResponsible.proratedValue);
 
       this.expenseTransactionService.registerExpense(this.expenseTransaction)
         .pipe(
@@ -190,6 +331,7 @@ export class ExpenseTransaction {
             this.processFail(fail)
           },
           complete: () => {
+            console.log(this.expenseTransaction)
             this.changesNotSaved = false;
           }
         })

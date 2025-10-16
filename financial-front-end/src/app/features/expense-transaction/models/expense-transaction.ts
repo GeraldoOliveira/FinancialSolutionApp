@@ -7,7 +7,7 @@ export interface Expense {
     totalValue: string;
     paymentMethod: string;
     creditCardId: number;
-    expenseResponsible: ExpenseResponsible;
+    expenseResponsibles: ExpenseResponsible;
     categoryId: number;
     installments: number;
     userId: number;

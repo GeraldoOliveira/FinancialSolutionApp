@@ -17,12 +17,13 @@
                 </div>
                 }
 
-                <div class="form-group" formGroupName="expenseOrigin">
+                <div class="form-group">
                     <label for="description" class="control-label mb-2">Nome e Descrição:</label>
-                    <div class="row g-2">
+                    <div class="row g-2" formGroupName="expenseOrigin">
                         <div class="col-md-5 col-lg-6 col-5">
                             @if(!isWritableDescription()){
-                            <select class="form-select" id="nameList" formControlName="name">
+                            <select class="form-select" id="nameList" formControlName="name"
+                                ngClass="{'is-invalid': displayMessage.name}">
                                 <!-- <option selected>Selecione o nome..</option> -->
                                 <option value="Supermercado">Supermercado</option>
                                 <option value="Real">Real</option>
@@ -40,15 +41,17 @@
                         </div>
                         <div class="col-md-5 col-lg-5 col-5">
                             @if(!isWritableDescription()){
-                            <select class="form-select" id="descriptionList" formControlName="description">
+                            <select class="form-select" id="descriptionList" formControlName="description"
+                                ngClass="{'is-invalid': displayMessage.description}">
                                 <!-- <option selected>Selecione a descrição..</option> -->
                                 <option value="Frango">Frango</option>
                                 <option value="Carne">Carne</option>
                                 <option value="Banana">Banana</option>
                             </select>
                             }@else {
-                            <input type="text" class="form-control" id="descriptionList" placeholder="Digite a descrição"
-                                formControlName="description" ngClass="{'is-invalid': displayMessage.description}">
+                            <input type="text" class="form-control" id="descriptionList"
+                                placeholder="Digite a descrição" formControlName="description"
+                                ngClass="{'is-invalid': displayMessage.description}">
                             }
                             @if(displayMessage.description){
                             <div class="col-12"> <span class="text-danger">
@@ -59,7 +62,7 @@
                         </div>
                         <div class="col-md-2 col-lg-1  col-2">
                             <button class="btn btn-danger w-100" (click)="changeWritableDescription()"> <i
-                                    class="bi bi-plus fas fa-plus-circle"></i>
+                                    class="fas fa-pencil"></i>
                             </button>
                         </div>
                     </div>
@@ -138,42 +141,60 @@
                     </div>
                 </div>
                 }
-                <div class="form-group" formGroupName="expenseResponsible">
+                <div class="form-group">
                     <div class="mb-3">
                         <label for="responsible" class="control-label mb-2">Responsável:</label>
-                        <div class="row g-2 ">
-                            <div class="col-md-6 col-lg-8 col-7">
-                                <select class="form-select" id="responsibleList" formControlName="responsibleList">
-                                    <!-- <option selected>Selecione o responsável..</option> -->
-                                    <option value="Anelise">Anelise</option>
-                                    <option value="Neto">Neto</option>
-                                </select>
-                                @if(displayMessage.responsibleList){
-                                <div class="col-12"> <span class="text-danger">
-                                        <p [innerHTML]="displayMessage.responsibleList"></p>
-                                    </span>
-                                </div>
-                                }
-                            </div>
-                            <div class="col-md-4 col-lg-3 col-3">
-                                <input type="text" class="form-control" id="proratedValue" placeholder="Valor dividido"
-                                    formControlName="proratedValue" number [textMask]="{mask: MASKS.number.textMask}"
-                                    [ngClass]="{'is-invalid': displayMessage.proratedValue }" />
-                                @if(displayMessage.proratedValue){
-                                <div class="col-12"> <span class="text-danger">
-                                        <p [innerHTML]="displayMessage.proratedValue"></p>
-                                    </span>
-                                </div>
-                                }
-                            </div>
+                        <div formArrayName="expenseResponsibles">
+                            @for(groupResponsible of expenseResposiblesArray().controls; track $index) {
+                            <div [formGroupName]="$index" class="row mb-2 gx-1">
+                                <div class="col-md-9 col-lg-9 col-9">
+                                    <select class="form-select" id="responsible_{{$index}}"
+                                        formControlName="responsible">
+                                        <option value="Anelise">Anelise</option>
+                                        <option value="Neto">Neto</option>
+                                    </select>
 
-                            <div class="col-md-2 col-lg-1 col-2">
-                                <button class="btn btn-danger w-100">
-                                    <i class="bi bi-plus fas fa-plus-circle">
-                                    </i>
-                                </button>
+                                    @if(displayMessage['responsible_' + $index]){
+                                    <div class="col-12">
+                                        <span class="text-danger">
+                                            <p [innerHTML]="displayMessage['responsible_' + $index]"></p>
+                                        </span>
+                                    </div>
+                                    }
+                                </div>
+
+                                <div class="col-md-3 col-lg-3 col-3">
+                                    <input type="text" class="form-control" id="proratedValue_{{$index}}"
+                                        placeholder="Valor dividido" formControlName="proratedValue" number
+                                        [textMask]="{mask: MASKS.number.textMask}"
+                                        [ngClass]="{'is-invalid': displayMessage['proratedValue_' + $index] }" />
+
+                                    @if(displayMessage['proratedValue_' + $index]){
+                                    <div class="col-12">
+                                        <span class="text-danger">
+                                            <p [innerHTML]="displayMessage['proratedValue_' + $index]"></p>
+                                        </span>
+                                    </div>
+                                    }
+                                </div>
+
                             </div>
+                            }
                         </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center align-items-center">
+                    <div class="col-md-2 col-lg-2 col-2 me-2">
+                        <button class="btn btn-danger w-100" (click)="this.addExpenseResponsible();">
+                            <i class="bi bi-plus fas fa-plus-circle">
+                            </i>
+                        </button>
+                    </div>
+                    <div class="col-md-2 col-lg-2 col-2">
+                        <button class="btn btn-danger w-100" (click)="this.removeExpenseResponsible();">
+                            <i class="bi bi-plus fas fa-minus-circle">
+                            </i>
+                        </button>
                     </div>
                 </div>
                 <div class="form-group ">

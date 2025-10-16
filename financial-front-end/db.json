@@ -11,5 +11,77 @@
     }
   ],
   "expense": [
+    {
+      "expenseOrigin": {
+        "name": "Supermercado",
+        "description": "Frango"
+      },
+      "totalValue": "1",
+      "methodList": "1",
+      "creditCardList": "1",
+      "installments": "1",
+      "expenseResponsibles": [
+        {
+          "responsible": "Anelise",
+          "proratedValue": "11"
+        },
+        {
+          "responsible": "Anelise",
+          "proratedValue": "11"
+        }
+      ],
+      "categoryList": "Alimentacao",
+      "date": "2025-10-23T18:59",
+      "apiId": "v1",
+      "id": 1
+    },
+    {
+      "expenseOrigin": {
+        "name": "Real",
+        "description": "Frango"
+      },
+      "totalValue": "1",
+      "methodList": "2",
+      "creditCardList": "None",
+      "installments": "1",
+      "expenseResponsibles": [
+        {
+          "responsible": "Anelise",
+          "proratedValue": 1
+        }
+      ],
+      "categoryList": "Alimentacao",
+      "date": "2025-10-01T19:04",
+      "apiId": "v1",
+      "id": 2
+    },
+    {
+      "expenseOrigin": {
+        "name": "Real",
+        "description": "Frango"
+      },
+      "totalValue": "90",
+      "methodList": "1",
+      "creditCardList": "2",
+      "installments": 1,
+      "expenseResponsibles": [
+        {
+          "responsible": "Neto",
+          "proratedValue": 90
+        },
+        {
+          "responsible": "Anelise",
+          "proratedValue": "80"
+        },
+        {
+          "responsible": "Anelise",
+          "proratedValue": "50"
+        }
+      ],
+      "categoryList": "Carro",
+      "date": "2025-10-15T19:05",
+      "apiId": "v1",
+      "id": 3
+    }
   ]
 }
