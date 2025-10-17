@@ -2,6 +2,6 @@ export interface ExpenseResponsible {
     id: number;
     expenseId: number;
     responsibleId: number;
-    proratedValue: string;
+    proratedValue: number;
     userId: number;
 }

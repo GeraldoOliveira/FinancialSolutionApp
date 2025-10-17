@@ -84,3 +84,20 @@ textarea {
 body {
     font-family: 'Roboto', sans-serif; 
 }
+
+/* styles.css */
+.bg-vermelho-personalizado {
+    /* Escolha o seu tom de vermelho */
+    background-color: #B4121B !important; 
+}
+
+/* styles.css */
+.bg-preto-personalizado {
+    /* Escolha o seu tom de vermelho */
+    background-color: #000000 !important; 
+}
+
+.bg-cinza-personalizado {
+    /* Escolha o seu tom de vermelho */
+    background-color: #201f1f !important; 
+}

@@ -61,7 +61,7 @@
                             }
                         </div>
                         <div class="col-md-2 col-lg-1  col-2">
-                            <button class="btn btn-danger w-100" (click)="changeWritableDescription()"> <i
+                            <button class="btn btn-danger w-100" type="button" (click)="changeWritableDescription()"> <i
                                     class="fas fa-pencil"></i>
                             </button>
                         </div>
@@ -71,7 +71,7 @@
                     <div class="mb-3 row g-2">
                         <label for="totalValue" class="form-label">Valor Total:</label>
                         <input type="text" class="form-control" id="totalValue" placeholder="Digite o valor total"
-                            formControlName="totalValue" number [textMask]="{mask: MASKS.number.textMask}"
+                            formControlName="totalValue" [textMask]="{mask: MASKS.currency.textMask}"
                             ngClass="{'is-invalid': displayMessage.totalValue}">
                         @if(displayMessage.totalValue){
                         <span class="text-danger">
@@ -113,7 +113,6 @@
                         <div class="row g-2">
                             <div class=" col-md-8 col-lg-8 col-8">
                                 <select class="form-select" id="creditCardList" formControlName="creditCardList">
-                                    <!-- <option selected>Selecione o cartão..</option> -->
                                     <option value="1">Infinite - 4195</option>
                                     <option value="2">Infinite - 1880</option>
                                     <option value="3">Nubank - 2020</option>
@@ -143,15 +142,16 @@
                 }
                 <div class="form-group">
                     <div class="mb-3">
-                        <label for="responsible" class="control-label mb-2">Responsável:</label>
+                        <label for="responsibleId" class="control-label mb-2">Responsável:</label>
                         <div formArrayName="expenseResponsibles">
-                            @for(groupResponsible of expenseResposiblesArray().controls; track $index) {
+                            @for(groupResponsible of expenseResposiblesArraySignal().controls; track $index) {
                             <div [formGroupName]="$index" class="row mb-2 gx-1">
                                 <div class="col-md-9 col-lg-9 col-9">
                                     <select class="form-select" id="responsible_{{$index}}"
-                                        formControlName="responsible">
-                                        <option value="Anelise">Anelise</option>
-                                        <option value="Neto">Neto</option>
+                                        formControlName="responsibleId">
+                                        <option value="1">Anelise</option>
+                                        <option value="2">Neto</option>
+                                        <option value="3">Yah</option>
                                     </select>
 
                                     @if(displayMessage['responsible_' + $index]){
@@ -166,7 +166,7 @@
                                 <div class="col-md-3 col-lg-3 col-3">
                                     <input type="text" class="form-control" id="proratedValue_{{$index}}"
                                         placeholder="Valor dividido" formControlName="proratedValue" number
-                                        [textMask]="{mask: MASKS.number.textMask}"
+                                        [textMask]="{mask: MASKS.currency.textMask}"
                                         [ngClass]="{'is-invalid': displayMessage['proratedValue_' + $index] }" />
 
                                     @if(displayMessage['proratedValue_' + $index]){
@@ -185,13 +185,13 @@
                 </div>
                 <div class="d-flex justify-content-center align-items-center">
                     <div class="col-md-2 col-lg-2 col-2 me-2">
-                        <button class="btn btn-danger w-100" (click)="this.addExpenseResponsible();">
+                        <button class="btn btn-danger w-100" type="button" (click)="this.addExpenseResponsible();">
                             <i class="bi bi-plus fas fa-plus-circle">
                             </i>
                         </button>
                     </div>
                     <div class="col-md-2 col-lg-2 col-2">
-                        <button class="btn btn-danger w-100" (click)="this.removeExpenseResponsible();">
+                        <button class="btn btn-danger w-100" type="button" (click)="this.removeExpenseResponsible();">
                             <i class="bi bi-plus fas fa-minus-circle">
                             </i>
                         </button>
@@ -201,7 +201,6 @@
                     <div class="mb-2 row g-2">
                         <label for="categoryList" class="control-label mb-2">Categoria:</label>
                         <select class="form-select" id="categoryList" formControlName="categoryList">
-                            <!-- <option selected>Selecione a categoria..</option> -->
                             <option value="Alimentacao">Alimentacao</option>
                             <option value="Carro">Carro</option>
                             <option value="Viagem">Viagem</option>

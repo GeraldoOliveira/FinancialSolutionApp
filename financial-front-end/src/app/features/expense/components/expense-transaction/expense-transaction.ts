@@ -1,28 +1,26 @@
-import { ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, ViewChildren, signal, WritableSignal, QueryList } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
+import { Component, DestroyRef, ElementRef, ViewChildren, signal, WritableSignal, QueryList } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormControlName, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
-
 import { fromEvent, merge, Observable, of, Subscription, switchMap } from 'rxjs';
 
 import { ToastrService } from 'ngx-toastr';
 
-import { DisplayMessage, GenericValidator, ValidationMessages } from '../../shared/utils/generic-form-validation';
-import { ExpenseTransactionService } from './services/expense-transaction.service';
-import { Expense } from './models/expense-transaction';
-import { ExpenseOrigin } from './models/expense-origin';
-import { ExpenseResponsible } from './models/expense-responsible';
-import { NgxBrazilValidators, NgxBrazilMASKS, MaskedInputDirective } from 'ngx-brazil';
-import { StringUtils } from '../../shared/utils/string-utils';
+import { DisplayMessage, GenericValidator, ValidationMessages } from '../../../../shared/utils/generic-form-validation';
+import { ExpenseService } from '../../services/expense.service';
+import { Expense } from '../../../../shared/models/expense-transaction';
+import { ExpenseOrigin } from '../../../../shared/models/expense-origin';
+import { ExpenseResponsible } from '../../../../shared/models/expense-responsible';
+import { NgxBrazilMASKS, MaskedInputDirective } from 'ngx-brazil';
+import { StringUtils } from '../../../../shared/utils/string-utils';
 
 @Component({
   selector: 'app-expense-transaction',
   imports: [CommonModule, ReactiveFormsModule, MaskedInputDirective],
   templateUrl: './expense-transaction.html',
   styleUrl: './expense-transaction.css',
-  providers: [ExpenseTransactionService]
+  providers: []
 })
 export class ExpenseTransaction {
 
@@ -34,7 +32,7 @@ export class ExpenseTransaction {
 
   errors: WritableSignal<any[]> = signal([]);
   isWritableDescription: WritableSignal<boolean> = signal(false);
-  expenseResposiblesArray: WritableSignal<FormArray> = signal(
+  expenseResposiblesArraySignal: WritableSignal<FormArray> = signal(
     new FormArray<any>([])
   );
 
@@ -51,14 +49,11 @@ export class ExpenseTransaction {
   displayMessage: DisplayMessage = { name: '', description: '', totalValue: '', methodList: '', creditCardList: '', installments: '', responsible: '', proratedValue: '', categoryList: '', date: '' };
 
   changesNotSaved: boolean;
-  // $index: number = 0;
 
   constructor(private fb: FormBuilder,
-    private expenseTransactionService: ExpenseTransactionService,
-    private router: Router,
+    private expenseTransactionService: ExpenseService,
     private destroyRef: DestroyRef,
-    private toastr: ToastrService,
-    private changeDetectorRef: ChangeDetectorRef) {
+    private toastr: ToastrService) {
     this.validationMessages = {
       name: {
         required: 'Informe o nome do gasto',
@@ -136,7 +131,7 @@ export class ExpenseTransaction {
       });
 
     const initialFormArray = this.expenseForm.get('expenseResponsibles') as FormArray;
-    this.expenseResposiblesArray.set(initialFormArray);
+    this.expenseResposiblesArraySignal.set(initialFormArray);
     this.setupAllSubscriptions();
 
   }
@@ -151,7 +146,7 @@ export class ExpenseTransaction {
   }
 
   private subscribeToFormGroup(index: number): void {
-    const formGroup = this.expenseResposiblesArray().at(index) as FormGroup;
+    const formGroup = this.expenseResposiblesArraySignal().at(index) as FormGroup;
 
     const sub = formGroup.valueChanges.subscribe(value => {
       const differenceValue = this.differenceValueTotalWithProrated(index);
@@ -168,7 +163,7 @@ export class ExpenseTransaction {
 
   private setupAllSubscriptions(): void {
     this.unsubscribeAllItems();
-    this.expenseResposiblesArray().controls.forEach((_, index) => {
+    this.expenseResposiblesArraySignal().controls.forEach((_, index) => {
       this.subscribeToFormGroup(index);
     });
   }
@@ -202,7 +197,7 @@ export class ExpenseTransaction {
   }
 
   private handleProratedValueChange(totalValue: string): void {
-    const proratedGroup = this.expenseResposiblesArray();
+    const proratedGroup = this.expenseResposiblesArraySignal();
     let cleanValue: number = parseFloat(StringUtils.justNumbers(totalValue));
     cleanValue = parseFloat(cleanValue.toFixed(0)) / parseFloat(proratedGroup.length.toString());
 
@@ -222,33 +217,35 @@ export class ExpenseTransaction {
 
   private createExpenseResponsibleGroup(): FormGroup {
     return this.fb.group({
-      responsible: ['', [Validators.required]],
-      proratedValue: ['0', [Validators.required]]
+      responsibleId: ['', [Validators.required]],
+      proratedValue: [0, [Validators.required]]
     });
   }
 
   addExpenseResponsible(): void {
     if (this.differenceValueTotalWithProrated() > 0) {
-      const arrayControl = this.expenseResposiblesArray();
+      const arrayControl = this.expenseResposiblesArraySignal();
       arrayControl.push(this.createExpenseResponsibleGroup());
       this.setupAllSubscriptions();
       this.completeValueAddExpenseResponsible();
     } else {
-      this.toastr.error('Não há valores disponível para novos rateios!', 'Adicionar responsável', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
+      this.toastr.error('Não há valores disponíveis para novos rateios!', 'Adição de responsável', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
     }
 
   }
 
   removeExpenseResponsible(): void {
-    const arrayControl = this.expenseResposiblesArray();
+    const arrayControl = this.expenseResposiblesArraySignal();
     if (arrayControl.length > 1) {
       arrayControl.removeAt(arrayControl.length - 1);
       this.setupAllSubscriptions();
+    } else {
+      this.toastr.error('É necessário ao menos um responsável.', 'Remoção de responsável', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
     }
   }
 
   private completeValueAddExpenseResponsible(): void {
-    const arrayControl = this.expenseResposiblesArray();
+    const arrayControl = this.expenseResposiblesArraySignal();
     const lastProratedControl = arrayControl.at(arrayControl.length - 1)?.get('proratedValue');
 
     if (lastProratedControl) {
@@ -257,7 +254,7 @@ export class ExpenseTransaction {
   }
 
   private differenceValueTotalWithProrated(index: number = -1): number {
-    const arrayControl = this.expenseResposiblesArray();
+    const arrayControl = this.expenseResposiblesArraySignal();
     let valueTotalCompleted: number = 0;
 
     const totalValueRaw = this.expenseForm.get('totalValue')?.getRawValue() as string;
@@ -269,8 +266,8 @@ export class ExpenseTransaction {
         const proratedControl = proratedChild.get('proratedValue');
 
         if (proratedControl && i != index) {
-          const proratedRaw = proratedControl.getRawValue() as string;
-          const proratedNumericValue = parseFloat(proratedRaw) || 0;
+          const proratedRaw: string = proratedControl.getRawValue() as string;
+          const proratedNumericValue = parseFloat(StringUtils.justNumbers(proratedRaw.toString())) || 0;
           valueTotalCompleted += proratedNumericValue;
         }
       }
@@ -282,9 +279,6 @@ export class ExpenseTransaction {
     } else {
       return 0;
     }
-
-
-
   }
 
   private setupControlBlurObservable() {
@@ -297,7 +291,6 @@ export class ExpenseTransaction {
       switchMap((list: QueryList<ElementRef>) => {
         const controlBlurs = list.toArray()
           .map((formControl: ElementRef) => fromEvent(formControl.nativeElement, 'blur'));
-
         return merge(...controlBlurs);
       })
     );
@@ -319,6 +312,11 @@ export class ExpenseTransaction {
       this.expenseTransaction = Object.assign({}, this.expenseTransaction, this.expenseForm.value);
       this.expenseTransaction.totalValue = StringUtils.justNumbers(this.expenseTransaction.totalValue);
 
+      this.expenseTransaction.expenseResponsibles.forEach(element => {
+        element.proratedValue = parseFloat(StringUtils.justNumbers(element.proratedValue.toString()));
+        element.responsibleId = parseFloat(StringUtils.justNumbers(element.responsibleId.toString()));
+      })
+
       this.expenseTransactionService.registerExpense(this.expenseTransaction)
         .pipe(
           takeUntilDestroyed(this.destroyRef)
@@ -339,16 +337,31 @@ export class ExpenseTransaction {
   }
 
   processSuccess(response: Expense) {
-    this.expenseForm.reset();
+
+    const arrayControl = this.expenseResposiblesArraySignal();
+    arrayControl.clear();
+    arrayControl.push(this.createExpenseResponsibleGroup());
+
+    this.expenseForm.setControl('expenseResponsibles', arrayControl);
+
+    this.setupAllSubscriptions();
+
+    this.expenseForm.reset({
+      creditCardList: null,
+      installments: '1',
+      methodList: '1',
+      totalValue: '0'
+    });
+
     this.errors.set([]);
-    this.toastr.success('Registro realizado com sucesso!', 'Bem vindo!!!', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
+    this.toastr.success('Gasto registrado com sucesso!', 'Lançamento de transação', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
 
   }
 
   processFail(fail: any) {
     this.errors.set([]);
     this.errors.set([fail.error.error]);
-    this.toastr.error('Ocorreu um erro!', 'Registro de Usuário', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
+    this.toastr.error('Ocorreu um erro!', 'Lançamento de transação', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
   }
 
 }

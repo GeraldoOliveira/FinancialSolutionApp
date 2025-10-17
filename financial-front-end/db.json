@@ -16,22 +16,26 @@
         "name": "Supermercado",
         "description": "Frango"
       },
-      "totalValue": "1",
+      "totalValue": "122",
       "methodList": "1",
       "creditCardList": "1",
       "installments": "1",
       "expenseResponsibles": [
         {
-          "responsible": "Anelise",
-          "proratedValue": "11"
+          "responsibleId": 1,
+          "proratedValue": 42
         },
         {
-          "responsible": "Anelise",
-          "proratedValue": "11"
+          "responsibleId": 3,
+          "proratedValue": 12
+        },
+        {
+          "responsibleId": 2,
+          "proratedValue": 68
         }
       ],
       "categoryList": "Alimentacao",
-      "date": "2025-10-23T18:59",
+      "date": "2025-10-16T21:48",
       "apiId": "v1",
       "id": 1
     },
@@ -41,47 +45,19 @@
         "description": "Frango"
       },
       "totalValue": "1",
-      "methodList": "2",
-      "creditCardList": "None",
+      "methodList": "1",
+      "creditCardList": "2",
       "installments": "1",
       "expenseResponsibles": [
         {
-          "responsible": "Anelise",
+          "responsibleId": 1,
           "proratedValue": 1
         }
       ],
       "categoryList": "Alimentacao",
-      "date": "2025-10-01T19:04",
+      "date": "2025-10-16T22:38",
       "apiId": "v1",
       "id": 2
-    },
-    {
-      "expenseOrigin": {
-        "name": "Real",
-        "description": "Frango"
-      },
-      "totalValue": "90",
-      "methodList": "1",
-      "creditCardList": "2",
-      "installments": 1,
-      "expenseResponsibles": [
-        {
-          "responsible": "Neto",
-          "proratedValue": 90
-        },
-        {
-          "responsible": "Anelise",
-          "proratedValue": "80"
-        },
-        {
-          "responsible": "Anelise",
-          "proratedValue": "50"
-        }
-      ],
-      "categoryList": "Carro",
-      "date": "2025-10-15T19:05",
-      "apiId": "v1",
-      "id": 3
     }
   ]
 }

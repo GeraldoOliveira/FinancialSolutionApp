@@ -13,6 +13,21 @@ server.get('/api/v1/user', (req, res) => {
     res.jsonp(router.db.get('users').value());
 });
 
+server.post('/api/v1/expense/:id', (req, res) => {
+    const expenseId = parseInt(req.params.id); 
+    const expense = router.db.get('expense').find({ id: expenseId }).value();
+
+    if (expense) {
+        res.jsonp(expense);
+    } else {
+        res.status(404).jsonp({ error: 'User not found' });
+    }
+});
+
+server.get('/api/v1/expenses', (req, res) => {
+    res.jsonp(router.db.get('expense').value());
+});
+
 // Acesso ao banco de dados interno do json-server
 const db = router.db.get('users');
 
