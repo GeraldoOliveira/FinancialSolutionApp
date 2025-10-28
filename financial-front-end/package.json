@@ -32,7 +32,7 @@
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
     "express": "^5.1.0",
-    "express-validator": "^7.2.1",
+    "express-validator": "^7.3.0",
     "json-server": "^0.17.4",
     "ng2-validation": "^3.9.1",
     "ngx-brazil": "^20.0.4",
