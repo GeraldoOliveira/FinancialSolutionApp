@@ -1,0 +1,19 @@
+/* Sua classe personalizada para a cor #201f1f */
+.table-custom-dark {
+  /* Define o fundo principal da tabela */
+  background-color: #201f1f;
+  /* Define a variável interna do Bootstrap para o fundo, garantindo prioridade */
+  --bs-table-bg: #201f1f;
+  /* Garante que o texto seja branco para legibilidade */
+  color: #f8f9fa;
+  /* Define a cor de fundo quando o mouse passar por cima (hover) */
+  --bs-table-hover-bg: #333232;
+}
+
+  /* Garante que os elementos internos (células e cabeçalhos) herdem a cor de texto correta */
+  .table-custom-dark th,
+  .table-custom-dark td {
+    color: #f8f9fa;
+    /* Define a cor da borda interna para harmonizar com o fundo escuro */
+    border-color: #333232;
+  }
