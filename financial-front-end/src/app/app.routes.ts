@@ -37,5 +37,13 @@ export const routes: Routes = [
     }
     // canDeactivate: [expenseTransactionDeactivateGuard]
   },
+  {
+    path: 'expense/details/:id',
+    loadComponent: () => import('./features/expense/components/expense-details/expense-details').then(c => c.ExpenseDetails),
+    resolve: {
+      expense: ExpenseResolve
+    }
+    // canDeactivate: [expenseTransactionDeactivateGuard]
+  },
   { path: "**", loadComponent: () => import('./shared/components/not-found/not-found').then(c => c.NotFound) }
 ];

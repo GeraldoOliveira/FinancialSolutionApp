@@ -113,6 +113,43 @@ server.post('/expense', validateExpense, (req, res, next) => {
     next();
 });
 
+server.put('/api/v1/expense/:id',  (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            errors: errors.array(),
+            message: "Falha na validação dos dados da despesa." 
+        });
+    }
+
+    const expenseId = parseInt(req.params.id);
+    const updatedExpenseData = req.body
+    
+    updatedExpenseData.id = expenseId; 
+
+    const updatedExpense = router.db
+        .get('expense') 
+        .find({ id: expenseId }) 
+        .assign(updatedExpenseData)
+        .write();
+
+    if (updatedExpense && updatedExpense.id === expenseId) {
+
+        return res.status(200).jsonp({ 
+            message: `Despesa com ID ${expenseId} atualizada com sucesso.`,
+            expense: updatedExpense
+        });
+    } else {
+        const existingExpense = router.db.get('expense').find({ id: expenseId }).value();
+        
+        if (!existingExpense) {
+             return res.status(404).jsonp({ message: `Despesa com ID ${expenseId} não encontrada.` });
+        }
+        return res.status(500).jsonp({ message: "Erro interno ao atualizar a despesa." });
+    }
+});
+
 server.post('/api/v1/login', (req, res, next) => {
     const { email, password } = req.body;
 

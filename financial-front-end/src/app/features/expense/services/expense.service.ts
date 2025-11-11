@@ -42,4 +42,15 @@ export class ExpenseService extends BaseService {
 
         return response;
     }
+
+    updateExpense(id: string, expenseTransaction: Expense): Observable<Expense> {
+        let response = this.http
+            .put<any>(this.UrlServiceV1 + 'expense/' + id, expenseTransaction, this.GetAuthHeaderJson())
+            .pipe(
+                map(this.ExtractData),
+                catchError(this.ServiceError)
+            );
+
+        return response;
+    }
 }

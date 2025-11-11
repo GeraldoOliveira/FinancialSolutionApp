@@ -1,1 +1,141 @@
-<p>expense-details works!</p>
+<html lang="pt-br">
+
+<body class="bg-color-actual">
+    <div class="container text-white pt-2">
+        <div class="card bg-cinza-personalizado text-white p-4 rounded-3 register-card col-md-6 offset-md-3">
+            <h2 class="text-center mb-4 pt-1">Detalhes da Transação</h2>
+
+            <div [formGroup]="expenseForm">
+
+                @if (errors().length > 0) {
+                <div class="alert alert-danger">
+                    <h3 id="returnMessage">Ocorreu um erro ao carregar os detalhes:</h3>
+                    <ul>
+                        @for (error of errors(); track $index) {
+                        <li> {{ error }} </li>
+                        }
+                    </ul>
+                </div>
+                }
+
+                <div class="form-group mb-3">
+                    <label class="control-label mb-2 fw-bold">Nome e Descrição:</label>
+                    <div class="row g-2" formGroupName="expenseOrigin">
+                        <div class="col-6">
+                            <p class="form-control-plaintext text-white bg-white-50 px-2 py-1 rounded">
+                                {{ expenseForm.get('expenseOrigin.name')?.value }}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="form-control-plaintext text-white bg-white-50 px-2 py-1 rounded">
+                                {{ expenseForm.get('expenseOrigin.description')?.value }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="form-label fw-bold">Valor Total:</label>
+                    <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
+                        {{ expenseForm.get('totalValue')?.value | currency:'BRL' }}
+                    </p>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="control-label mb-2 fw-bold">Método de Pagamento:</label>
+                    <p class="text-white ms-3 mb-0">
+                        <i class="fas fa-dot-circle me-2"
+                            [class.text-danger]="expenseForm.get('methodList')?.value === '1'"></i>
+                        {{ expenseForm.get('methodList')?.value === '1' ? 'Crédito' : 'Pix' }}
+                    </p>
+                </div>
+
+                @if(expenseForm.get('methodList')?.value === '1'){
+                <div class="form-group mb-3">
+                    <label class="control-label mb-2 fw-bold">Cartão de Crédito:</label>
+                    <div class="row g-2">
+                        <div class="col-8">
+                            <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
+                                {{
+                                expenseForm.get('creditCardList')?.value === '1' ? 'Infinite - 4195' :
+                                expenseForm.get('creditCardList')?.value === '2' ? 'Infinite - 1880' :
+                                'Nubank - 2020'
+                                }}
+                            </p>
+                        </div>
+                        <div class="col-4">
+                            <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
+                                {{ expenseForm.get('installments')?.value }}x
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <div class="form-group mb-4">
+                    <label class="control-label mb-2 fw-bold">Responsáveis:</label>
+                    <div formArrayName="expenseResponsibles">
+                        @for(groupResponsible of expenseResposiblesArraySignal().controls; track $index) {
+                        <div [formGroupName]="$index" class="row mb-1 gx-2 align-items-center">
+                            <div class="col-9">
+                                <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded mb-0">
+                                    {{
+                                    groupResponsible.get('responsibleId')?.value === '1' ? 'Anelise' :
+                                    groupResponsible.get('responsibleId')?.value === '2' ? 'Neto' :
+                                    'Yah'
+                                    }}
+                                </p>
+                            </div>
+                            <div class="col-3">
+                                <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded mb-0">
+                                    {{ groupResponsible.get('proratedValue')?.value | currency:'BRL' }}
+                                </p>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="categoryList" class="control-label mb-2 fw-bold">Categoria:</label>
+                    <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
+                        {{ expenseForm.get('categoryList')?.value }}
+                    </p>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="date" class="form-label fw-bold">Data:</label>
+                    <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
+                        {{ expenseForm.get('date')?.value | date:'dd/MM/yyyy HH:mm' }}
+                    </p>
+                </div>
+
+                <div class="d-grid gap-2">
+
+
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="col-md-2 col-lg-2 col-2 me-2">
+                            <button class="btn btn-sm btn-outline-info w-100" type="button">
+                                <i class="fas fa-arrow-left me-2"></i> Voltar
+                            </button>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-2 me-2">
+                            <button class="btn btn-sm btn-outline-warning w-100" type="button" [routerLink]="['/expense/edit',expense.id]">
+                                <i class="fas fa-pen-to-square me-2"></i>
+                                Editar
+                            </button>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-2 me-2" >
+                            <button class="btn btn-sm btn-danger w-100" type="button">
+                                <i class="fas fa-trash me-2"></i>
+                                Excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

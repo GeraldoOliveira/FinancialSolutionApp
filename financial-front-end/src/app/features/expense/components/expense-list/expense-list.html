@@ -50,14 +50,14 @@
                     </td>
 
                     <td class="text-center">
-                        <a class="btn btn-sm btn-outline-info" [routerLink]="['/fornecedores/detalhes',transaction.id]">
+                        <a class="btn btn-sm btn-outline-info" [routerLink]="['/expense/details/',transaction.id]">
                             <span class="fa fa-search"></span> Detalhes
                         </a>&nbsp;
                         <a class="btn btn-sm btn-outline-warning"
                             [routerLink]="['/expense/edit',transaction.id]">
                             <span class="fa fa-pencil-alt"></span> Editar
                         </a>&nbsp;
-                        <a class="btn btn-sm btn-danger" [routerLink]="['/fornecedores/excluir',transaction.id]">
+                        <a class="btn btn-sm btn-danger" [routerLink]="['/expense/delete',transaction.id]">
                             <span class="fa fa-trash"></span> Excluir
                         </a>
                     </td>

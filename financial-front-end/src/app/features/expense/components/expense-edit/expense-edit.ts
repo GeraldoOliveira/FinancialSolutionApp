@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent, merge, Observable, of, Subscription, switchMap } from 'rxjs';
+import { Router } from '@angular/router';
 
 import { ToastrService } from 'ngx-toastr';
 
@@ -55,6 +56,7 @@ export class ExpenseEdit {
     private destroyRef: DestroyRef,
     private toastr: ToastrService,
     private route: ActivatedRoute,
+    private router: Router,
   ) {
     this.validationMessages = {
       name: {
@@ -173,7 +175,6 @@ export class ExpenseEdit {
     const arrayControl = this.expenseForm.get('expenseResponsibles') as FormArray;
 
     if (!responsibles || responsibles.length === 0) {
-      // Se a lista estiver vazia (embora improvável em edição), adicione o grupo padrão.
       arrayControl.push(this.createExpenseResponsibleGroup());
       return;
     }
@@ -334,7 +335,7 @@ export class ExpenseEdit {
     this.isWritableDescription.update(value => !value);
   }
 
-  registerExpense() {
+  updateExpense() {
     if (this.expenseForm.dirty && this.expenseForm.valid) {
 
       this.expenseTransaction = Object.assign({}, this.expenseTransaction, this.expenseForm.value);
@@ -345,7 +346,8 @@ export class ExpenseEdit {
         element.responsibleId = parseFloat(StringUtils.justNumbers(element.responsibleId.toString()));
       })
 
-      this.expenseTransactionService.registerExpense(this.expenseTransaction)
+      this.expenseTransactionService.updateExpense(this.expense.id.toString(),
+                                                   this.expenseTransaction)
         .pipe(
           takeUntilDestroyed(this.destroyRef)
         )
@@ -366,29 +368,17 @@ export class ExpenseEdit {
 
   processSuccess(response: Expense) {
 
-    const arrayControl = this.expenseResposiblesArraySignal();
-    arrayControl.clear();
-    arrayControl.push(this.createExpenseResponsibleGroup());
-
-    this.expenseForm.setControl('expenseResponsibles', arrayControl);
-
-    this.setupAllSubscriptions();
-
-    this.expenseForm.reset({
-      creditCardList: null,
-      installments: '1',
-      methodList: '1',
-      totalValue: '0'
-    });
-
     this.errors.set([]);
-    this.toastr.success('Gasto registrado com sucesso!', 'Lançamento de transação', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
+    this.toastr.success('Gasto atualizado com sucesso!', 'Ataulização de transação', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
+
+    this.router.navigate(['/expense/list']);
 
   }
 
   processFail(fail: any) {
+
     this.errors.set([]);
-    this.errors.set([fail.error.error]);
+    this.errors.set(fail.error.errors.map((error: any) => error['msg']));
     this.toastr.error('Ocorreu um erro!', 'Lançamento de transação', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
   }
 }
