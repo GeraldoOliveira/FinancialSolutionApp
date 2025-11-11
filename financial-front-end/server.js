@@ -13,7 +13,8 @@ server.get('/api/v1/user', (req, res) => {
     res.jsonp(router.db.get('users').value());
 });
 
-server.post('/api/v1/expense/:id', (req, res) => {
+server.get('/api/v1/expense/:id', (req, res) => {
+    console.log(req.params.id);
     const expenseId = parseInt(req.params.id); 
     const expense = router.db.get('expense').find({ id: expenseId }).value();
 

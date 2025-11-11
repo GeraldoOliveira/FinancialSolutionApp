@@ -25,10 +25,10 @@ export class ExpenseService extends BaseService {
 
     getById(id: string): Observable<Expense> {
         return this.http
-            .post<Expense[]>(this.UrlServiceV1 + 'expense/' + id, super.GetAuthHeaderJson())
+            .get<Expense>(this.UrlServiceV1 + 'expense/' + id)
             .pipe(
-                map(this.ExtractData),
-                catchError(this.ServiceError)
+                catchError(this.ServiceError),
+                shareReplay({ bufferSize: 1, refCount: true })
             );
     }
 

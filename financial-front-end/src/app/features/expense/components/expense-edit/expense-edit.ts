@@ -40,7 +40,7 @@ export class ExpenseEdit {
 
   expenseTransaction: Expense;
   expenseOrigin: ExpenseOrigin;
-  expenseResposible: ExpenseResponsible;
+  expenseResponsibles: ExpenseResponsible;
   expenseForm!: FormGroup;
 
   validationMessages!: ValidationMessages;
@@ -110,20 +110,20 @@ export class ExpenseEdit {
       methodList: ['', [Validators.required]],
       creditCardList: ['', [Validators.required]],
       installments: ['', [Validators.required]],
-      expenseResponsibles: this.fb.array([
-        this.createExpenseResponsibleGroup()
-      ]),
+      expenseResponsibles: this.fb.array([]),
       categoryList: ['', [Validators.required]],
       date: ['', [Validators.required]],
     });
 
+    this.setExpenseResponsiblesForEdit(this.expense.expenseResponsibles);
+
     this.expenseForm.patchValue({
-      expenseOrigin : this.expense.expenseOrigin,
+      expenseOrigin: this.expense.expenseOrigin,
       totalValue: this.expense.totalValue,
       methodList: this.expense.methodList,
       creditCardList: this.expense.creditCardList,
       installments: this.expense.installments,
-      expenseResposible: this.expenseResposible,
+      expenseResponsibles: this.expense.expenseResponsibles,
       categoryList: this.expense.categoryList,
       date: this.expense.date
     });
@@ -167,6 +167,26 @@ export class ExpenseEdit {
     });
 
     this.itemSubscriptions.set(index, sub);
+  }
+
+  private setExpenseResponsiblesForEdit(responsibles: ExpenseResponsible[]): void {
+    const arrayControl = this.expenseForm.get('expenseResponsibles') as FormArray;
+
+    if (!responsibles || responsibles.length === 0) {
+      // Se a lista estiver vazia (embora improvável em edição), adicione o grupo padrão.
+      arrayControl.push(this.createExpenseResponsibleGroup());
+      return;
+    }
+
+    responsibles.forEach(responsible => {
+      const responsibleGroup = this.createExpenseResponsibleGroup();
+      responsibleGroup.patchValue({
+        responsibleId: responsible.responsibleId,
+        proratedValue: responsible.proratedValue
+      });
+      arrayControl.push(responsibleGroup);
+
+    });
   }
 
   private setupAllSubscriptions(): void {
