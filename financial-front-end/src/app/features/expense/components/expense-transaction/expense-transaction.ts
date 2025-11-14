@@ -146,20 +146,22 @@ export class ExpenseTransaction {
   }
 
   private subscribeToFormGroup(index: number): void {
-    const formGroup = this.expenseResposiblesArraySignal().at(index) as FormGroup;
+  const formGroup = this.expenseResposiblesArraySignal().at(index) as FormGroup;
 
-    const sub = formGroup.valueChanges.subscribe(value => {
-      const differenceValue = this.differenceValueTotalWithProrated(index);
+  const sub = formGroup.valueChanges.subscribe(value => {
 
-      if (value.proratedValue > differenceValue) {
-        const proratedControl = formGroup.get('proratedValue');
-        proratedControl.setValue(differenceValue, { emitEvent: false });
-      }
+    const newProratedRaw: string = value.proratedValue?.toString() || '0';
+    const newProratedNumericValue = parseFloat(StringUtils.justNumbers(newProratedRaw)) || 0;
+    const maxProratedValue = this.differenceValueTotalWithProrated(index);
 
-    });
+    if (newProratedNumericValue > maxProratedValue) {
+      const proratedControl = formGroup.get('proratedValue');
+      proratedControl.setValue(maxProratedValue, { emitEvent: false });
+    }
+  });
 
-    this.itemSubscriptions.set(index, sub);
-  }
+  this.itemSubscriptions.set(index, sub);
+}
 
   private setupAllSubscriptions(): void {
     this.unsubscribeAllItems();
@@ -307,7 +309,7 @@ export class ExpenseTransaction {
   }
 
   registerExpense() {
-    if (this.expenseForm.dirty && this.expenseForm.valid) {
+    if (this.expenseForm.dirty && this.expenseForm.valid && this.differenceValueTotalWithProrated() === 0) {
 
       this.expenseTransaction = Object.assign({}, this.expenseTransaction, this.expenseForm.value);
       this.expenseTransaction.totalValue = StringUtils.justNumbers(this.expenseTransaction.totalValue);
@@ -333,6 +335,8 @@ export class ExpenseTransaction {
             this.changesNotSaved = false;
           }
         })
+    } else {
+      this.toastr.error('Valor de rateio dos responsáveis deve ser igual ao valor total do gasto.', 'Lançamento de transação', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
     }
   }
 
