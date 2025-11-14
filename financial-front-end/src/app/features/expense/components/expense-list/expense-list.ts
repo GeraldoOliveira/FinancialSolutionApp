@@ -38,8 +38,10 @@ export class ExpenseList {
   public errorMessageSignal = signal('');
 
   constructor(private expenseTransactionService: ExpenseService,
-              private spinner: NgxSpinnerService
-              ) {
+    private spinner: NgxSpinnerService
+  ) {
+
+    this.spinner.show();
 
     this.transactionsSignal = toSignal(
       this.expenseTransactionService.getAllTransactions(),
@@ -55,7 +57,6 @@ export class ExpenseList {
   }
 
   ngOnInit() {
-    this.spinner.show();
     setTimeout(() => {
       this.spinner.hide();
     }, 2000);

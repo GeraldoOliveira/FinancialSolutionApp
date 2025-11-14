@@ -1,14 +1,13 @@
 <body class="bg-color-actual">
-    <ngx-spinner bdColor = "rgba(0,0,0,0.8)" size = "large" color = "#B4121B" type = "square-jelly-box" [fullScreen] = "true"><p style="color: rgb(228, 17, 17)" > Loading... </p></ngx-spinner>
+    <ngx-spinner bdColor="rgba(0,0,0,0.8)" size="medium" color="#B4121B" type="square-loader" [fullScreen]="true">
+        <p style="color: rgb(228, 17, 17)"> Loading... </p>
+    </ngx-spinner>
     <div class="container main-container text-white">
-        
 
         <h1>Lista de Transações</h1>
-
         <p>
             <a class="btn btn-danger" [routerLink]="['/expense/new']">Nova Transação</a>
         </p>
-
         <table class="table table-hover table-custom-dark rounded-3 overflow-hidden">
             <thead>
                 <tr class="text-center">
@@ -55,8 +54,7 @@
                         <a class="btn btn-sm btn-outline-info" [routerLink]="['/expense/details/',transaction.id]">
                             <span class="fa fa-search"></span> Detalhes
                         </a>&nbsp;
-                        <a class="btn btn-sm btn-outline-warning"
-                            [routerLink]="['/expense/edit',transaction.id]">
+                        <a class="btn btn-sm btn-outline-warning" [routerLink]="['/expense/edit',transaction.id]">
                             <span class="fa fa-pencil-alt"></span> Editar
                         </a>&nbsp;
                         <a class="btn btn-sm btn-danger" [routerLink]="['/expense/delete',transaction.id]">

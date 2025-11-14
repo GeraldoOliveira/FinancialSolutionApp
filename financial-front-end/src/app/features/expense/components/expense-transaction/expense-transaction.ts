@@ -146,22 +146,22 @@ export class ExpenseTransaction {
   }
 
   private subscribeToFormGroup(index: number): void {
-  const formGroup = this.expenseResposiblesArraySignal().at(index) as FormGroup;
+    const formGroup = this.expenseResposiblesArraySignal().at(index) as FormGroup;
 
-  const sub = formGroup.valueChanges.subscribe(value => {
+    const sub = formGroup.valueChanges.subscribe(value => {
 
-    const newProratedRaw: string = value.proratedValue?.toString() || '0';
-    const newProratedNumericValue = parseFloat(StringUtils.justNumbers(newProratedRaw)) || 0;
-    const maxProratedValue = this.differenceValueTotalWithProrated(index);
+      const newProratedRaw: string = value.proratedValue?.toString() || '0';
+      const newProratedNumericValue = parseFloat(StringUtils.justNumbers(newProratedRaw)) || 0;
+      const maxProratedValue = this.differenceValueTotalWithProrated(index);
 
-    if (newProratedNumericValue > maxProratedValue) {
-      const proratedControl = formGroup.get('proratedValue');
-      proratedControl.setValue(maxProratedValue, { emitEvent: false });
-    }
-  });
+      if (newProratedNumericValue > maxProratedValue) {
+        const proratedControl = formGroup.get('proratedValue');
+        proratedControl.setValue(maxProratedValue, { emitEvent: false });
+      }
+    });
 
-  this.itemSubscriptions.set(index, sub);
-}
+    this.itemSubscriptions.set(index, sub);
+  }
 
   private setupAllSubscriptions(): void {
     this.unsubscribeAllItems();
@@ -202,6 +202,9 @@ export class ExpenseTransaction {
     const proratedGroup = this.expenseResposiblesArraySignal();
     let cleanValue: number = parseFloat(StringUtils.justNumbers(totalValue));
     cleanValue = parseFloat(cleanValue.toFixed(0)) / parseFloat(proratedGroup.length.toString());
+    if(cleanValue.toString().includes(".")){
+      cleanValue = cleanValue * 10
+    }
 
     if (proratedGroup.length > 0) {
       for (let i = 0; i < proratedGroup.length; i++) {
@@ -209,7 +212,7 @@ export class ExpenseTransaction {
 
         const proratedControl = proratedChild.get('proratedValue');
         if (totalValue && cleanValue > 0) {
-          proratedControl.setValue((Math.round(cleanValue * 100) / 100), { emitEvent: false });
+          proratedControl.setValue(cleanValue, { emitEvent: false });
         } else {
           proratedControl.setValue(0, { emitEvent: false });
         }
