@@ -7,5 +7,11 @@ import { Component } from '@angular/core';
   styleUrl: './expense-delete.css'
 })
 export class ExpenseDelete {
+  cancelDelete() {
+    window.history.back();
+  }
 
+  confirmDelete() {
+    // Implement delete logic here
+  }
 }

@@ -6,18 +6,6 @@
             <h2 class="text-center mb-4 pt-1">Detalhes da Transação</h2>
 
             <div [formGroup]="expenseForm">
-
-                @if (errors().length > 0) {
-                <div class="alert alert-danger">
-                    <h3 id="returnMessage">Ocorreu um erro ao carregar os detalhes:</h3>
-                    <ul>
-                        @for (error of errors(); track $index) {
-                        <li> {{ error }} </li>
-                        }
-                    </ul>
-                </div>
-                }
-
                 <div class="form-group mb-3">
                     <label class="control-label mb-2 fw-bold">Nome e Descrição:</label>
                     <div class="row g-2" formGroupName="expenseOrigin">
@@ -33,14 +21,12 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="form-group mb-3">
                     <label class="form-label fw-bold">Valor Total:</label>
                     <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
                         {{ expenseForm.get('totalValue')?.value | currency:'BRL' }}
                     </p>
                 </div>
-
                 <div class="form-group mb-3">
                     <label class="control-label mb-2 fw-bold">Método de Pagamento:</label>
                     <p class="text-white ms-3 mb-0">
@@ -49,29 +35,6 @@
                         {{ expenseForm.get('methodList')?.value === '1' ? 'Crédito' : 'Pix' }}
                     </p>
                 </div>
-
-                @if(expenseForm.get('methodList')?.value === '1'){
-                <div class="form-group mb-3">
-                    <label class="control-label mb-2 fw-bold">Cartão de Crédito:</label>
-                    <div class="row g-2">
-                        <div class="col-8">
-                            <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
-                                {{
-                                expenseForm.get('creditCardList')?.value === '1' ? 'Infinite - 4195' :
-                                expenseForm.get('creditCardList')?.value === '2' ? 'Infinite - 1880' :
-                                'Nubank - 2020'
-                                }}
-                            </p>
-                        </div>
-                        <div class="col-4">
-                            <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
-                                {{ expenseForm.get('installments')?.value }}x
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                }
-
                 <div class="form-group mb-4">
                     <label class="control-label mb-2 fw-bold">Responsáveis:</label>
                     <div formArrayName="expenseResponsibles">
@@ -95,24 +58,19 @@
                         }
                     </div>
                 </div>
-
                 <div class="form-group mb-3">
                     <label for="categoryList" class="control-label mb-2 fw-bold">Categoria:</label>
                     <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
                         {{ expenseForm.get('categoryList')?.value }}
                     </p>
                 </div>
-
                 <div class="form-group mb-4">
                     <label for="date" class="form-label fw-bold">Data:</label>
                     <p class="form-control-plaintext text-dark bg-white px-3 py-2 rounded">
                         {{ expenseForm.get('date')?.value | date:'dd/MM/yyyy HH:mm' }}
                     </p>
                 </div>
-
                 <div class="d-grid gap-2">
-
-
                     <div class="d-flex justify-content-center align-items-center">
                         <div class="col-md-2 col-lg-2 col-2 me-2">
                             <button class="btn btn-sm btn-outline-info w-100" type="button">
@@ -137,5 +95,4 @@
         </div>
     </div>
 </body>
-
 </html>
