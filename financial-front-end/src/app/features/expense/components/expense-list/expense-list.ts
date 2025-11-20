@@ -1,10 +1,13 @@
 import { Component, Pipe, PipeTransform, signal, Signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
 
 import { Expense } from '../../../../shared/models/expense-transaction'
 import { ExpenseService } from '../../services/expense.service';
+import { ExpenseDelete } from '../expense-delete/expense-delete';
+
 import { toSignal } from '@angular/core/rxjs-interop';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 
 @Pipe({
@@ -38,7 +41,9 @@ export class ExpenseList {
   public errorMessageSignal = signal('');
 
   constructor(private expenseTransactionService: ExpenseService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private modalService: NgbModal,
+    private router: Router,
   ) {
 
     this.spinner.show();
@@ -60,5 +65,23 @@ export class ExpenseList {
     setTimeout(() => {
       this.spinner.hide();
     }, 2000);
+  }
+
+  openDeleteModal(transaction: Expense): void {
+    const modalRef = this.modalService.open(ExpenseDelete);
+
+    modalRef.componentInstance.transaction = transaction;
+
+    modalRef.result.then((result) => {
+      if (result === true) {
+        this.router.navigateByUrl('/', { skipLocationChange: true })
+          .then(() => {
+            this.router.navigate(['/expense/list']);
+          });
+      }
+    }, (reason) => {
+      console.log(`Exclusão do item ${transaction.id} cancelada.`, reason);
+    }
+    );
   }
 }

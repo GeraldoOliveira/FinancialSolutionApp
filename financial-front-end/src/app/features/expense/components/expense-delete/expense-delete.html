@@ -1,34 +1,37 @@
-<div class="modal-container bg-dark text-light p-4 text-center">
-    
-    <div class="mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="#dc3545" class="bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
-            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.91.995l-.35 3.507a.552.552 0 1 1-1.1 0l-.35-3.507A.901.901 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-        </svg>
-    </div>
-    
-    <h5 class="modal-title fw-bold mb-3">Confirmar Exclusão</h5>
-    
-    <p class="mb-4 text-muted">
-        Você tem certeza que deseja excluir esta transação? <br>
-        Esta ação não pode ser desfeita.
-    </p>
 
-    <div class="bg-dark p-3 rounded mb-4 border border-secondary border-opacity-25">
-        <p class="text-start mb-1">
-            <span class="fw-bold">Descrição:</span> **{{ '1' }}**
+    <div class="modal-header bg-dark text-light border-0">
+    <h5 class="modal-title fw-bold" id="modalTitle">Confirmar Exclusão</h5>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="activeModal.dismiss()"></button>
+    </div>
+
+    <div class="modal-body bg-dark text-light p-4 text-center">
+        
+        <div class="mb-3">
+            <i class="fa-solid fa-triangle-exclamation" style="color: #dc3545; font-size: 60px;"></i>
+        </div>
+        <p class="mb-4 fw-bold">
+            Você tem certeza que deseja excluir esta transação? <br>
+            Esta ação não pode ser desfeita.
         </p>
-        <p class="text-start mb-0">
-            <span class="fw-bold">Valor:</span> **{{ '1' }}**
-        </p>
-    </div>
+ 
+        <div class="bg-dark p-3 rounded border border-secondary border-opacity-25">
+            <p class="text-start mb-1 ms-2">
+                <span class="fw-bold">Descrição:</span> {{ this.transaction.expenseOrigin.name + ' - ' + this.transaction.expenseOrigin.description}}
+            </p>
+            <p class="text-start mb-0 ms-2">
+                <span class="fw-bold">Data:</span> {{ this.transaction.date | date:'dd/MM/yyyy HH:mm' }}
+            </p>
+            <p class="text-start mb-0 ms-2">
+                <span class="fw-bold">Valor:</span> {{ this.transaction.totalValue | currency:'BRL':'symbol':'1.2-2' }}
+            </p>
+        </div>
 
-    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-        <button type="button" class="btn btn-danger btn-lg text-white px-4 py-2 fw-bold" (click)="confirmDelete()">
-            Confirmar Exclusão
-        </button>
-        <button type="button" class="btn btn-secondary btn-lg px-4 py-2" (click)="cancelDelete()">
-            Cancelar
-        </button>
     </div>
-
-</div>
+    <div class="modal-footer bg-dark border-0">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center w-100">
+            <button type="button" class="btn btn-danger btn-lg text-white px-4 py-2 fw-bold" (click)="confirmDelete()">
+                <i class="fa-solid fa-trash-can"></i>
+                Confirmar Exclusão
+            </button>
+        </div>
+    </div>

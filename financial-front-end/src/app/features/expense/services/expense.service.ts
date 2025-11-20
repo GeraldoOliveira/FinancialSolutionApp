@@ -53,4 +53,15 @@ export class ExpenseService extends BaseService {
 
         return response;
     }
+
+    deleteExpense(id: string): Observable<Expense> {
+        let response = this.http
+            .delete<any>(this.UrlServiceV1 + 'expense/' + id, this.GetAuthHeaderJson())
+            .pipe(
+                map(this.ExtractData),
+                catchError(this.ServiceError)
+            );
+
+        return response;
+    }
 }

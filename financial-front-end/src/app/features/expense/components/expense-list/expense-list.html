@@ -57,7 +57,7 @@
                         <a class="btn btn-sm btn-outline-warning" [routerLink]="['/expense/edit',transaction.id]">
                             <span class="fa fa-pencil-alt"></span> Editar
                         </a>&nbsp;
-                        <a class="btn btn-sm btn-danger" [routerLink]="['/expense/delete',transaction.id]">
+                        <a class="btn btn-sm btn-danger" (click)="openDeleteModal(transaction)">
                             <span class="fa fa-trash"></span> Excluir
                         </a>
                     </td>

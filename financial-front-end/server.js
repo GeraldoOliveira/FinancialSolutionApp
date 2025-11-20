@@ -25,6 +25,22 @@ server.get('/api/v1/expense/:id', (req, res) => {
     }
 });
 
+server.delete('/api/v1/expense/:id', (req, res) => {
+    console.log(req.params.id);
+    const expenseId = parseInt(req.params.id); 
+    const expense = router.db.get('expense').find({ id: expenseId }).value();
+
+    if (expense) {
+        router.db.get('expense').remove({ id: expenseId }).write();
+        res.status(200).jsonp({ 
+            message: `Despesa com ID ${expenseId} deletada com sucesso.`,
+            id: expenseId // Opcional: retornar o ID deletado
+        });
+    } else {
+        res.status(404).jsonp({ error: 'User not found' });
+    }
+});
+
 server.get('/api/v1/expenses', (req, res) => {
     res.jsonp(router.db.get('expense').value());
 });

@@ -1,33 +1,50 @@
-import { Component, DestroyRef, ElementRef, ViewChildren, signal, WritableSignal, QueryList } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControlName, FormGroup, Validators } from '@angular/forms';
+import { Component, ElementRef, ViewChildren, signal, WritableSignal, QueryList, PipeTransform, Pipe } from '@angular/core';
+import { FormArray, FormBuilder, FormControlName, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { fromEvent, merge, Observable, of, Subscription, switchMap } from 'rxjs';
-import { Router, RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 
 import { ToastrService } from 'ngx-toastr';
+import { NgxBrazilMASKS } from 'ngx-brazil';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { DisplayMessage, GenericValidator, ValidationMessages } from '../../../../shared/utils/generic-form-validation';
-import { ExpenseService } from '../../services/expense.service';
+import { GenericValidator, ValidationMessages } from '../../../../shared/utils/generic-form-validation';
 import { Expense } from '../../../../shared/models/expense-transaction';
 import { ExpenseOrigin } from '../../../../shared/models/expense-origin';
 import { ExpenseResponsible } from '../../../../shared/models/expense-responsible';
-import { NgxBrazilMASKS, MaskedInputDirective } from 'ngx-brazil';
-import { StringUtils } from '../../../../shared/utils/string-utils';
-import { ActivatedRoute } from '@angular/router';
+import { ExpenseDelete } from '../expense-delete/expense-delete';
+
+@Pipe({
+  name: 'creditCard',
+  standalone: true
+})
+export class CreditCardPipe implements PipeTransform {
+  transform(id: string): string {
+    switch (id) {
+      case '1':
+        return 'Infinite - 4195';
+      case '2':
+        return 'Infinite - 1880';
+      case '3':
+        return 'Nubank - 2020';
+      default:
+        return `ID Desconhecido`;
+    }
+  }
+}
 
 @Component({
   selector: 'app-expense-edit',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, CreditCardPipe],
   templateUrl: './expense-details.html',
   styleUrl: './expense-details.css'
 })
+
 export class ExpenseDetails {
+
   @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: QueryList<ElementRef>;
 
   MASKS = NgxBrazilMASKS;
-
 
   errors: WritableSignal<any[]> = signal([]);
   isWritableDescription: WritableSignal<boolean> = signal(false);
@@ -45,14 +62,15 @@ export class ExpenseDetails {
 
   validationMessages!: ValidationMessages;
   genericValidator!: GenericValidator;
-  
+
   expense: any;
 
   constructor(private fb: FormBuilder,
-              private toastr: ToastrService,
-              private route: ActivatedRoute,
+    private toastr: ToastrService,
+    private route: ActivatedRoute,
+    private modalService: NgbModal,
   ) {
-      this.expense = this.route.snapshot.data['expense'];
+    this.expense = this.route.snapshot.data['expense'];
   }
 
   ngOnInit() {
@@ -85,7 +103,7 @@ export class ExpenseDetails {
 
     const initialFormArray = this.expenseForm.get('expenseResponsibles') as FormArray;
     this.expenseResposiblesArraySignal.set(initialFormArray);
-    
+
   }
 
   expenseResposiblesArrayItem(): FormArray {
@@ -110,11 +128,27 @@ export class ExpenseDetails {
 
     });
   }
-  
+
   private createExpenseResponsibleGroup(): FormGroup {
     return this.fb.group({
       responsibleId: ['', [Validators.required]],
       proratedValue: [0, [Validators.required]]
     });
+  }
+
+  openDeleteModal(transaction: Expense): void {
+    const modalRef = this.modalService.open(ExpenseDelete);
+
+    modalRef.componentInstance.transaction = transaction;
+
+    modalRef.result.then((result) => {
+      if (result === true) {
+        // Lógica de exclusão aqui
+        console.log(`Exclusão do item ${transaction.id} confirmada.`);
+      }
+    }, (reason) => {
+      console.log(`Exclusão do item ${transaction.id} cancelada.`, reason);
+    }
+    );
   }
 }

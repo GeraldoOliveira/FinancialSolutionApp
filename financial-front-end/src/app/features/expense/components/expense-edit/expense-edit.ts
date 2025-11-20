@@ -347,7 +347,7 @@ export class ExpenseEdit {
       })
 
       this.expenseTransactionService.updateExpense(this.expense.id.toString(),
-                                                   this.expenseTransaction)
+        this.expenseTransaction)
         .pipe(
           takeUntilDestroyed(this.destroyRef)
         )
@@ -369,7 +369,7 @@ export class ExpenseEdit {
   processSuccess(response: Expense) {
 
     this.errors.set([]);
-    this.toastr.success('Gasto atualizado com sucesso!', 'Ataulização de transação', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
+    this.toastr.success('Gasto atualizado com sucesso!', 'Atualização de transação', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
 
     this.router.navigate(['/expense/list']);
 
