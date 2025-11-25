@@ -21,7 +21,7 @@ server.get('/api/v1/expense/:id', (req, res) => {
     if (expense) {
         res.jsonp(expense);
     } else {
-        res.status(404).jsonp({ error: 'User not found' });
+        res.status(404).jsonp({ error: 'Expense not found' });
     }
 });
 

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Dashboard } from '../../../features/dashboard/dashboard';
 import { NgbCollapse } from "@ng-bootstrap/ng-bootstrap";
-import { LocalStorageUtils } from '../../utils/localstorage';
+import { LocalStorageUtils } from '../../utils/local-storage';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({
@@ -25,7 +25,7 @@ export class Menu {
 
     this.token = this.LocalStorageUtils.getUserToken();
     this.user = this.LocalStorageUtils.getUser();
-    
+
     return this.token !== null && this.token !== '';
 
   }

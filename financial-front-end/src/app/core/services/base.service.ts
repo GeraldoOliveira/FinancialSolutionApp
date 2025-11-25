@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpHeaders } from "@angular/common/http"
 import { throwError } from "rxjs";
-import { LocalStorageUtils } from "../../shared/utils/localstorage";
+import { LocalStorageUtils } from "../../shared/utils/local-storage";
 import { environment } from "../../../environments/environment";
 
 export abstract class BaseService {
@@ -12,7 +12,7 @@ export abstract class BaseService {
     protected GetHeadersJson() {
         return {
             headers: new HttpHeaders({
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             })
         };
     }
@@ -20,8 +20,8 @@ export abstract class BaseService {
     protected GetAuthHeaderJson() {
         return {
             headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.LocalStorage.getUserToken()}`
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.LocalStorage.getUserToken()}`
             })
         };
     }
@@ -39,9 +39,9 @@ export abstract class BaseService {
                 response.error.error = customError;
             }
         }
- 
+
         console.error(response);
         return throwError(response);
     }
-    
+
 }

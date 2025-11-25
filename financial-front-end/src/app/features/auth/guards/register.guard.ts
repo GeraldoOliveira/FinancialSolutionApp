@@ -1,9 +1,9 @@
 import { CanActivateFn, CanDeactivateFn, Router } from '@angular/router';
-import { LocalStorageUtils } from '../../../shared/utils/localstorage';
+import { LocalStorageUtils } from '../../../shared/utils/local-storage';
 import { inject } from '@angular/core';
 
 interface ComponentWithUnsavedChanges {
-  changesNotSaved: boolean;
+    changesNotSaved: boolean;
 }
 
 export const registerDeactivateGuard: CanDeactivateFn<ComponentWithUnsavedChanges> = (component) => {
@@ -21,6 +21,6 @@ export const registerActivateGuard: CanActivateFn = () => {
     if (localStorageUtils.getUserToken()) {
         return router.createUrlTree(['/login']);
     }
-    
+
     return true;
 };
