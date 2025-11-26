@@ -13,6 +13,7 @@ import { Expense } from '../../../../shared/models/expense-transaction';
 import { ExpenseOrigin } from '../../../../shared/models/expense-origin';
 import { ExpenseResponsible } from '../../../../shared/models/expense-responsible';
 import { ExpenseDelete } from '../expense-delete/expense-delete';
+import { LocalStorageUtils } from '../../../../shared/utils/local-storage';
 
 @Pipe({
   name: 'creditCard',
@@ -52,6 +53,7 @@ export class ExpenseDetails {
     new FormArray<any>([])
   );
 
+  deleteClaimCheck: boolean = this.setDeleteClaimCheck();
 
   controlBlurs: Observable<any>[];
 
@@ -137,6 +139,12 @@ export class ExpenseDetails {
   }
 
   openDeleteModal(transaction: Expense): void {
+
+    if (!this.deleteClaimCheck) {
+      this.toastr.error('Você não tem permissão para excluir despesas.', 'Acesso Negado');
+      return;
+    }
+
     const modalRef = this.modalService.open(ExpenseDelete);
 
     modalRef.componentInstance.transaction = transaction;
@@ -150,5 +158,18 @@ export class ExpenseDetails {
       console.log(`Exclusão do item ${transaction.id} cancelada.`, reason);
     }
     );
+  }
+
+  private setDeleteClaimCheck(): boolean {
+    const localStorage = new LocalStorageUtils();
+    const requiredClaims = { type: 'Expense', value: 'Delete' };
+
+    let userClaims = localStorage.getUserClaims();
+
+    let claimsValues = userClaims[0].value.split(',');
+    if (!claimsValues.includes(requiredClaims.value)) {
+      return false;
+    }
+    return true;
   }
 }

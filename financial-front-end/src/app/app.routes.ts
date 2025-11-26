@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { loginActivateGuard } from './features/auth/guards/login.guard';
 import { registerActivateGuard, registerDeactivateGuard } from './features/auth/guards/register.guard';
-import { expenseTransactionDeactivateGuard } from './features/expense/guards/expense-transaction.guard';
+import { expenseTransactionActivateGuard, expenseTransactionDeactivateGuard } from './features/expense/guards/expense-transaction.guard';
 import { ExpenseResolve } from './features/expense/services/expense.resolve';
 
 
@@ -22,7 +22,10 @@ export const routes: Routes = [
   {
     path: 'expense/new',
     loadComponent: () => import('./features/expense/components/expense-transaction/expense-transaction').then(c => c.ExpenseTransaction),
-    canDeactivate: [expenseTransactionDeactivateGuard]
+    canDeactivate: [expenseTransactionDeactivateGuard],
+    canActivate: [expenseTransactionActivateGuard],
+    data: [{ claim: { type: 'Expense', value: 'Create' } }]
+
   },
   {
     path: 'expense/list',
@@ -34,19 +37,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/expense/components/expense-edit/expense-edit').then(c => c.ExpenseEdit),
     resolve: {
       expense: ExpenseResolve
-    }
-    // canDeactivate: [expenseTransactionDeactivateGuard]
+    },
+    canActivate: [expenseTransactionActivateGuard],
+    data: [{ claim: { type: 'Expense', value: 'Edit' } }]
   },
   {
     path: 'expense/details/:id',
     loadComponent: () => import('./features/expense/components/expense-details/expense-details').then(c => c.ExpenseDetails),
-    resolve: {
-      expense: ExpenseResolve
-    }
-  },
-  {
-    path: 'expense/delete/:id',
-    loadComponent: () => import('./features/expense/components/expense-delete/expense-delete').then(c => c.ExpenseDelete),
     resolve: {
       expense: ExpenseResolve
     }

@@ -180,7 +180,8 @@ server.post('/api/v1/login', (req, res, next) => {
                 user: {
                     name: existingUser.name,
                     email: existingUser.email
-                }
+                },
+                claims: existingUser.claims
             }
         });
     }

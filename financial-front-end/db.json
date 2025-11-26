@@ -7,58 +7,16 @@
       "email": "gevo.neto@hotmail.com",
       "password": "Hheya9gr",
       "createdAt": "2025-10-07T16:20:52.534Z",
-      "id": 1
+      "id": 1,
+      "claims": [
+      {
+        "type": "Expense",
+        "value": "Create,Edit,Delete" 
+      }
+    ]
     }
   ],
   "expense": [
-    {
-      "expenseOrigin": {
-        "name": "Supermercado",
-        "description": "Frango"
-      },
-      "totalValue": "122",
-      "methodList": "1",
-      "creditCardList": "1",
-      "installments": "1",
-      "expenseResponsibles": [
-        {
-          "responsibleId": 1,
-          "proratedValue": 42
-        },
-        {
-          "responsibleId": 3,
-          "proratedValue": 12
-        },
-        {
-          "responsibleId": 2,
-          "proratedValue": 68
-        }
-      ],
-      "categoryList": "Alimentacao",
-      "date": "2025-10-16T21:48",
-      "apiId": "v1",
-      "id": 1
-    },
-    {
-      "expenseOrigin": {
-        "name": "Real",
-        "description": "Frango"
-      },
-      "totalValue": "1",
-      "methodList": "1",
-      "creditCardList": "2",
-      "installments": "1",
-      "expenseResponsibles": [
-        {
-          "responsibleId": 1,
-          "proratedValue": 1
-        }
-      ],
-      "categoryList": "Alimentacao",
-      "date": "2025-10-16T22:38",
-      "apiId": "v1",
-      "id": 2
-    },
     {
       "expenseOrigin": {
         "name": "Supermercado",
@@ -122,62 +80,6 @@
       "date": "2025-10-16T21:48",
       "apiId": "v1",
       "id": 4
-    },
-    {
-      "expenseOrigin": {
-        "name": "Real",
-        "description": "Frango"
-      },
-      "totalValue": "122",
-      "methodList": "1",
-      "creditCardList": "1",
-      "installments": "1",
-      "expenseResponsibles": [
-        {
-          "responsibleId": 1,
-          "proratedValue": 42
-        },
-        {
-          "responsibleId": 3,
-          "proratedValue": 12
-        },
-        {
-          "responsibleId": 2,
-          "proratedValue": 68
-        }
-      ],
-      "categoryList": "Alimentacao",
-      "date": "2025-10-16T21:48",
-      "apiId": "v1",
-      "id": 5
-    },
-    {
-      "expenseOrigin": {
-        "name": "Real",
-        "description": "Frango"
-      },
-      "totalValue": "122",
-      "methodList": "1",
-      "creditCardList": "1",
-      "installments": "1",
-      "expenseResponsibles": [
-        {
-          "responsibleId": 1,
-          "proratedValue": 42
-        },
-        {
-          "responsibleId": 3,
-          "proratedValue": 12
-        },
-        {
-          "responsibleId": 2,
-          "proratedValue": 68
-        }
-      ],
-      "categoryList": "Alimentacao",
-      "date": "2025-10-16T21:48",
-      "apiId": "v1",
-      "id": 6
     }
   ]
 }

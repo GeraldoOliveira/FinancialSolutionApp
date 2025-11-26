@@ -4,7 +4,7 @@ export class LocalStorageUtils {
         this.saveAccessToken(response.accessToken);
         this.saveUserToken(response.userToken);
         this.saveUser(response.user);
-
+        this.saveClaims(response.claims);
     }
 
     public getUser() {
@@ -31,9 +31,18 @@ export class LocalStorageUtils {
         return localStorage.setItem('mfs.userToken', userToken);
     }
 
+    public getUserClaims() {
+        return JSON.parse(localStorage.getItem('mfs.userClaims') || '{}');
+    }
+
+    public saveClaims(claims: any) {
+        return localStorage.setItem('mfs.userClaims', JSON.stringify(claims));
+    }
+
     public clearLocalUser() {
         localStorage.removeItem('mfs.accessToken');
         localStorage.removeItem('mfs.userToken');
         localStorage.removeItem('mfs.user');
+        localStorage.removeItem('mfs.userClaims');
     }
 }
