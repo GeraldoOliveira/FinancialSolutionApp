@@ -27,24 +27,22 @@ export const expenseTransactionActivateGuard: CanActivateFn = (route: ActivatedR
   let claim: any = route.data[0]
 
   if (claim !== undefined) {
-    let claim = route.data[0]['claim'];
     if (claim) {
       if (!userClaimsStorage) {
         return accessDeniedNavigate();
       }
 
-      let userClaims = userClaimsStorage.find(x => x.type === claim.type);
+      let userClaims = userClaimsStorage.find(x => x.type === claim.claim.type);
       if (!userClaims) {
         return accessDeniedNavigate();
       }
 
       let claimsValues = userClaims.value.split(',');
-      if (!claimsValues.includes(claim.value)) {
+      if (!claimsValues.includes(claim.claim.value)) {
         return accessDeniedNavigate();
       }
 
     }
-
     return true;
   } else {
     return false;

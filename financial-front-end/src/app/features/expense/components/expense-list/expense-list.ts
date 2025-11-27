@@ -9,6 +9,8 @@ import { ExpenseDelete } from '../expense-delete/expense-delete';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
+import { ToastrService } from 'ngx-toastr';
+import { ClaimsUtils } from '../../../../shared/utils/claims-utils';
 
 @Pipe({
   name: 'responsibleName',
@@ -40,10 +42,16 @@ export class ExpenseList {
   public transactionsSignal: Signal<Expense[]>
   public errorMessageSignal = signal('');
 
+  claimsUtils = new ClaimsUtils();
+
+  canDelete: boolean = this.claimsUtils.checkExpenseClain('Delete');
+  canEdit: boolean = this.claimsUtils.checkExpenseClain('Edit');
+
   constructor(private expenseTransactionService: ExpenseService,
     private spinner: NgxSpinnerService,
     private modalService: NgbModal,
     private router: Router,
+    private toastr: ToastrService
   ) {
 
     this.spinner.show();
@@ -68,6 +76,12 @@ export class ExpenseList {
   }
 
   openDeleteModal(transaction: Expense): void {
+
+    if (!this.canDelete) {
+      this.toastr.error('Você não tem permissão para excluir despesas.', 'Acesso Negado');
+      return;
+    }
+
     const modalRef = this.modalService.open(ExpenseDelete);
 
     modalRef.componentInstance.transaction = transaction;
@@ -83,5 +97,11 @@ export class ExpenseList {
       console.log(`Exclusão do item ${transaction.id} cancelada.`, reason);
     }
     );
+  }
+
+  navigateToEdit(id: number): void {
+    if (this.canEdit) {
+      this.router.navigate(['/expense/edit', id]);
+    }
   }
 }

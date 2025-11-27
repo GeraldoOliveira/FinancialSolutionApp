@@ -38,6 +38,7 @@ export const routes: Routes = [
     resolve: {
       expense: ExpenseResolve
     },
+    canDeactivate: [expenseTransactionDeactivateGuard],
     canActivate: [expenseTransactionActivateGuard],
     data: [{ claim: { type: 'Expense', value: 'Edit' } }]
   },

@@ -49,18 +49,37 @@
                         </ul>
 
                     </td>
-
                     <td class="text-center">
                         <a class="btn btn-sm btn-outline-info" [routerLink]="['/expense/details/',transaction.id]">
                             <span class="fa fa-search"></span> Detalhes
+                        </a>
+                        &nbsp;
+                        <button 
+                            class="btn btn-sm btn-outline-warning" 
+                            [disabled]="!canEdit" 
+                            [routerLink]="['/expense/edit',transaction.id]"> 
+                            <span class="fa fa-pencil-alt"></span> Editar
+                        </button>
+                        &nbsp;
+
+                        <button 
+                            class="btn btn-sm btn-danger" 
+                            [disabled]="!canDelete" 
+                            (click)="openDeleteModal(transaction)">
+                            <span class="fa fa-trash"></span> Excluir
+                        </button>
+                    </td>
+                    <!-- <td class="text-center">
+                        <a class="btn btn-sm btn-outline-info" [routerLink]="['/expense/details/',transaction.id]">
+                            <span class="fa fa-search"></span> Detalhes
                         </a>&nbsp;
-                        <a class="btn btn-sm btn-outline-warning" [routerLink]="['/expense/edit',transaction.id]">
+                        <a class="btn btn-sm btn-outline-warning" [routerLink]="['/expense/edit',transaction.id]" >
                             <span class="fa fa-pencil-alt"></span> Editar
                         </a>&nbsp;
                         <a class="btn btn-sm btn-danger" (click)="openDeleteModal(transaction)">
                             <span class="fa fa-trash"></span> Excluir
                         </a>
-                    </td>
+                    </td> -->
                 </tr>
                 }
                 @empty {

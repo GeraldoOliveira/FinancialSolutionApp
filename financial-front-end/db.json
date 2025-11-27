@@ -9,11 +9,11 @@
       "createdAt": "2025-10-07T16:20:52.534Z",
       "id": 1,
       "claims": [
-      {
-        "type": "Expense",
-        "value": "Create,Edit,Delete" 
-      }
-    ]
+        {
+          "type": "Expense",
+          "value": "Create,Edit,Delete"
+        }
+      ]
     }
   ],
   "expense": [
@@ -54,26 +54,26 @@
         "name": "Supermercado",
         "description": "Frango"
       },
-      "totalValue": "122",
+      "totalValue": "1222",
       "methodList": "1",
       "creditCardList": "1",
       "installments": "1",
       "expenseResponsibles": [
         {
           "responsibleId": 1,
-          "proratedValue": 42
+          "proratedValue": 3055
         },
         {
           "responsibleId": 3,
-          "proratedValue": 12
+          "proratedValue": 3055
         },
         {
           "responsibleId": 2,
-          "proratedValue": 42
+          "proratedValue": 3055
         },
         {
           "responsibleId": 3,
-          "proratedValue": 26
+          "proratedValue": 3055
         }
       ],
       "categoryList": "Alimentacao",
