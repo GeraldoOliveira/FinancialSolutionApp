@@ -49,5 +49,9 @@ export const routes: Routes = [
       expense: ExpenseResolve
     }
   },
+  {
+    path: 'profile/user',
+    loadComponent: () => import('./features/profile/components/profile-user/profile-user').then(c => c.ProfileUser),
+  },
   { path: "**", loadComponent: () => import('./shared/components/not-found/not-found').then(c => c.NotFound) }
 ];

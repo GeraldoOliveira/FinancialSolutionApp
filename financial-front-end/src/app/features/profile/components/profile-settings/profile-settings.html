@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Configurações de Perfil (Bootstrap 5)</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJj7Qn92tPzN92VpL/A2T8N3oA6K4T2F4F7v5F7X5I2C5Y8N9oD2F7Z5N6X5Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        /* Estilos customizados para simular o dark theme do Tailwind no Bootstrap */
+        body {
+            /* Cor de fundo dark customizada */
+            background-color: #121212; 
+            color: #d1d5db; /* text-gray-200 */
+            font-family: 'Manrope', sans-serif;
+        }
+        /* Cor primária customizada (E53935) */
+        .btn-danger, .text-danger, .form-check-input:checked {
+            --bs-btn-bg: #E53935 !important;
+            --bs-btn-border-color: #E53935 !important;
+            --bs-danger: #E53935 !important;
+            --bs-form-switch-checked-bg-color: #E53935 !important;
+        }
+        .bg-card-dark { 
+            background-color: #1E1E1E !important; 
+        }
+        .bg-black-simulated {
+            background-color: rgba(0, 0, 0, 0.3) !important;
+        }
+        .sidebar-item-active {
+            background-color: rgba(229, 57, 53, 0.2) !important; /* primary/20 */
+            color: #E53935 !important;
+        }
+        .nav-tabs .nav-link.active {
+            color: #E53935 !important;
+            border-bottom-color: #E53935 !important;
+            background-color: transparent !important;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<app-profile-tab-navigation></app-profile-tab-navigation>
+<div class="d-flex w-100 min-vh-100">
+    <main class="flex-grow-1 p-4 p-sm-4 p-lg-5">
+        <div class="mx-auto" style="max-width: 800px;">
+            <div class="mb-4">
+                <h1 class="h3 fw-bold text-white">Configurações de Perfil</h1>
+                <p class="text-secondary mt-1">Gerencie seu perfil e preferências.</p>
+            </div>
+
+            <ul class="nav nav-tabs border-bottom border-secondary mb-4">
+                <li class="nav-item">
+                    <a class="nav-link text-secondary" href="#">Perfil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active fw-medium" aria-current="page" href="#">Usuário</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-secondary" href="#">Segurança</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-secondary" href="#">Plano</a>
+                </li>
+            </ul>
+            
+            <div class="card bg-card-dark shadow-lg border-0 rounded-4">
+                <div class="card-body p-4 p-md-5 space-y-4">
+
+                    <section class="mb-4">
+                        <h3 class="fs-5 fw-semibold text-white mb-3">Configurações da Conta</h3>
+                        <div class="d-grid gap-3">
+                            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between p-3 bg-black-simulated rounded-3">
+                                <div>
+                                    <p class="fw-medium text-white mb-0">Alterar Senha</p>
+                                    <p class="small text-secondary m-0">Altere sua senha para manter sua conta segura.</p>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary text-white mt-3 mt-sm-0 px-4 py-2 fw-medium w-100 w-sm-auto">Alterar</button>
+                            </div>
+                            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between p-3 bg-black-simulated rounded-3 border border-danger">
+                                <div>
+                                    <p class="fw-medium text-danger mb-0">Deletar Conta</p>
+                                    <p class="small text-secondary m-0">Esta ação é permanente e não pode ser desfeita.</p>
+                                </div>
+                                <button class="btn btn-sm btn-danger mt-3 mt-sm-0 px-4 py-2 fw-medium w-100 w-sm-auto">Deletar</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="mb-4">
+                        <h3 class="fs-5 fw-semibold text-white mb-3">Notificações</h3>
+                        <div class="d-grid gap-1">
+                            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 hover-bg-black-simulated transition">
+                                <div>
+                                    <p class="fw-medium text-white mb-0">Notificações por Email</p>
+                                    <p class="small text-secondary m-0">Receba atualizações e alertas por email.</p>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input" type="checkbox" role="switch" checked>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 hover-bg-black-simulated transition">
+                                <div>
+                                    <p class="fw-medium text-white mb-0">Notificações Push</p>
+                                    <p class="small text-secondary m-0">Receba alertas em tempo real no seu dispositivo.</p>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input" type="checkbox" role="switch">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section>
+                        <h3 class="fs-5 fw-semibold text-white mb-3">Preferências de Idioma e Tema</h3>
+                        <div class="d-grid gap-3">
+                            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between p-3 bg-black-simulated rounded-3">
+                                <div>
+                                    <p class="fw-medium text-white mb-0">Idioma</p>
+                                    <p class="small text-secondary m-0">Selecione o idioma de sua preferência.</p>
+                                </div>
+                                <div class="mt-3 mt-sm-0" style="min-width: 200px;">
+                                    <select class="form-select bg-black-simulated text-white border-secondary small">
+                                        <option selected>Português (Brasil)</option>
+                                        <option value="US">English (US)</option>
+                                        <option value="ES">Español</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-black-simulated rounded-3">
+                                <div>
+                                    <p class="fw-medium text-white mb-0">Tema</p>
+                                    <p class="small text-secondary m-0">Alterne entre o tema claro e escuro.</p>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input" type="checkbox" role="switch" checked>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <div class="card-footer bg-transparent border-top border-secondary p-4 d-flex flex-column flex-sm-row justify-content-end gap-3">
+                    <button class="btn btn-secondary fw-bold py-2 px-4 order-2 order-sm-1">Cancelar</button>
+                    <button class="btn btn-danger fw-bold py-2 px-4 order-1 order-sm-2">Salvar Configurações</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+</body>
+</html>
