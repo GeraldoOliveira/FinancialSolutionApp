@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProfileTabNavigation } from './profile-tab-navigation';
+import { ProfileLayout } from './profile-layout';
 
-describe('ProfileTabNavigation', () => {
-  let component: ProfileTabNavigation;
-  let fixture: ComponentFixture<ProfileTabNavigation>;
+describe('ProfileLayout', () => {
+  let component: ProfileLayout;
+  let fixture: ComponentFixture<ProfileLayout>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProfileTabNavigation]
+      imports: [ProfileLayout]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ProfileTabNavigation);
+    fixture = TestBed.createComponent(ProfileLayout);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

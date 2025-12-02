@@ -50,8 +50,27 @@ export const routes: Routes = [
     }
   },
   {
-    path: 'profile/user',
-    loadComponent: () => import('./features/profile/components/profile-user/profile-user').then(c => c.ProfileUser),
+    path: 'profile',
+    loadComponent: () => import('./features/profile/components/profile-layout/profile-layout').then(c => c.ProfileLayout),
+    children: [
+      {
+        path: 'user',
+        loadComponent: () => import('./features/profile/components/profile-user/profile-user').then(m => m.ProfileUser)
+      },
+      {
+        path: 'edit',
+        loadComponent: () => import('./features/profile/components/profile-edit/profile-edit').then(m => m.ProfileEdit)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./features/profile/components/profile-settings/profile-settings').then(m => m.ProfileSettings)
+      },
+      {
+        path: '',
+        redirectTo: 'profile',
+        pathMatch: 'full'
+      }
+    ]
   },
   { path: "**", loadComponent: () => import('./shared/components/not-found/not-found').then(c => c.NotFound) }
 ];

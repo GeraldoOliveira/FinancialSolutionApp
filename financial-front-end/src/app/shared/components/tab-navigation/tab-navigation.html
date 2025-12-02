@@ -1,0 +1,16 @@
+<div class="mb-4 border-bottom border-light border-opacity-10">
+  <nav class="nav nav-tabs gap-3" aria-label="Tabs">
+    @for (tab of tabs; track tab.route) 
+    {
+      <a [routerLink]="tab.route"
+        [routerLinkActive]="['active']"
+        (click)="selectTab(tab.route)"
+        class="nav-link px-1 py-3 text-secondary"
+        [class.text-danger]="isTabActive(tab.route)"
+        [class.fw-medium]="isTabActive(tab.route)"
+        [class.text-secondary]="!isTabActive(tab.route)">
+        {{ tab.label }}
+      </a>
+    }
+  </nav>
+</div>
