@@ -1,0 +1,38 @@
+
+        /* ESTILOS DE COR MANTIDOS E DEFINIÇÕES DO CARD ORIGINAL */
+        .bg-color-actual { background-color: #121212 !important; } 
+        .bg-card-dark { background-color: #1E1E1E !important; } 
+        .text-white { color: white !important; } 
+
+        /* CORREÇÃO APLICADA: Esconde qualquer estouro horizontal */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Ajustes de input para harmonizar com o fundo escuro do card */
+        .form-control, .form-select {
+            background-color: #2a2a2a; 
+            color: #fff;
+            border-color: #3b3b3b;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: #2a2a2a;
+            color: #fff;
+            border-color: #E53935; 
+            box-shadow: 0 0 0 0.25rem rgba(229, 57, 53, 0.25);
+        }
+
+        .control-label {
+            color: #d1d5db;
+            font-weight: 500;
+        }
+        .form-control::placeholder { /* Para a maioria dos navegadores modernos (Chrome, Firefox) */
+    color: #b3b3b3; /* Um cinza claro legível */
+    opacity: 1; /* Garante que a opacidade não obscureça a cor (importante para Firefox) */
+}
+
+/* Estilos adicionais para o hover do avatar */
+        .cursor-pointer { cursor: pointer; }
+        .hover-opacity-100:hover { opacity: 1 !important; }
+        .transition-opacity { transition: opacity 0.2s; }

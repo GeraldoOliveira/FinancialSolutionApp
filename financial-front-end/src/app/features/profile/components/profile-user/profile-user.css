@@ -1,0 +1,29 @@
+/* Estilos customizados para simular o dark theme do Tailwind no Bootstrap */
+body {
+    /* Cor de fundo dark customizada */
+    background-color: #121212; 
+    color: #d1d5db; /* text-gray-200 */
+    font-family: 'Manrope', sans-serif;
+}
+/* Cor primária customizada (E53935) */
+.bg-danger, .text-danger, .border-danger {
+    --bs-danger: #E53935 !important;
+}
+.bg-card-dark { 
+    background-color: #1E1E1E !important; 
+}
+/* Estilo para as abas ativas/inativas */
+.nav-tabs .nav-link {
+    color: #6c757d; /* text-gray-400 */
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+.nav-tabs .nav-link:hover {
+    color: #adb5bd; /* hover:text-gray-300 */
+    border-bottom-color: #6c757d; /* hover:border-gray-500 */
+}
+.nav-tabs .nav-link.active {
+    color: #E53935 !important; /* text-primary */
+    border-bottom-color: #E53935 !important; /* border-primary */
+    background-color: transparent;
+}
