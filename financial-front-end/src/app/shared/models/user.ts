@@ -4,4 +4,6 @@ export interface User {
     email: string;
     password: string;
     confirmPassword: string;
+    image: string;
+    imageUplode: string;
 }
