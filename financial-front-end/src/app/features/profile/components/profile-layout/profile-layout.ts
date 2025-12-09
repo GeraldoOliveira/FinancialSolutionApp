@@ -11,7 +11,7 @@ import { RouterOutlet } from "@angular/router";
 export class ProfileLayout {
   settingsTabs: TabItem[] = [
     { label: 'Perfil', route: '/profile/user' },
-    { label: 'Editar Perfil', route: '/profile/edit' },
+    { label: 'Editar Perfil', route: '/profile/edit/1' },
     { label: 'Configurações', route: '/profile/settings' },
     // { label: 'Segurança', route: '/profile/security' },
   ];

@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, ViewChildren, signal, WritableSignal } from '@angular/core';
 import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from '@angular/forms';
-import { CommonModule  } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -23,8 +23,8 @@ import { RegisterService } from '../services/register.service';
   providers: [RegisterService]
 })
 export class Register {
-  
-  @ViewChildren(FormControlName,  { read: ElementRef }) formInputElements: ElementRef[];
+
+  @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: ElementRef[];
 
   errors: WritableSignal<any[]> = signal([]);
   registerForm!: FormGroup;
@@ -32,16 +32,16 @@ export class Register {
 
   validationMessages!: ValidationMessages;
   genericValidator!: GenericValidator;
-  displayMessage: DisplayMessage = {name: '', email: '', password: '', confirmPassword: ''};
+  displayMessage: DisplayMessage = { name: '', email: '', password: '', confirmPassword: '' };
 
   changesNotSaved: boolean;
 
-  constructor (private fb: FormBuilder,
-               private registerService: RegisterService,
-               private router: Router,
-               private destroyRef: DestroyRef,
-               private toastr: ToastrService, 
-               private changeDetectorRef: ChangeDetectorRef ) { 
+  constructor(private fb: FormBuilder,
+    private registerService: RegisterService,
+    private router: Router,
+    private destroyRef: DestroyRef,
+    private toastr: ToastrService,
+    private changeDetectorRef: ChangeDetectorRef) {
     this.validationMessages = {
       name: {
         required: 'Informe o nome',
@@ -74,15 +74,15 @@ export class Register {
 
   ngOnInit() {
 
-    let passwordControl = new FormControl('', [Validators.required, CustomValidators.rangeLength([6,20])]);
-    let confirmPasswordControl = new FormControl('', [Validators.required, CustomValidators.rangeLength([6,20]), CustomValidators.equalTo(passwordControl)]);
+    let passwordControl = new FormControl('', [Validators.required, CustomValidators.rangeLength([6, 20])]);
+    let confirmPasswordControl = new FormControl('', [Validators.required, CustomValidators.rangeLength([6, 20]), CustomValidators.equalTo(passwordControl)]);
 
     this.registerForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(60)]],
       email: ['', [Validators.required, Validators.email]],
       password: passwordControl,
       confirmPassword: confirmPasswordControl
-    }); 
+    });
   }
 
   ngAfterViewInit(): void {
@@ -99,20 +99,20 @@ export class Register {
     if (this.registerForm.dirty && this.registerForm.valid) {
       this.user = Object.assign({}, this.user, this.registerForm.value);
       this.registerService.registerUser(this.user)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (success) => {
-          this.processSuccess(success)
-        },
-        error: (fail) => {
-          this.processFail(fail)
-        },
-        complete: () => {
-          this.changesNotSaved = false;
-        }
-      }) 
+        .pipe(
+          takeUntilDestroyed(this.destroyRef)
+        )
+        .subscribe({
+          next: (success) => {
+            this.processSuccess(success)
+          },
+          error: (fail) => {
+            this.processFail(fail)
+          },
+          complete: () => {
+            this.changesNotSaved = false;
+          }
+        })
     }
   }
 
@@ -125,14 +125,14 @@ export class Register {
       toastr.onHidden.subscribe(() => {
         this.router.navigate(['/login']);
       }),
-      toastr.onTap.subscribe(() => {
-        this.router.navigate(['/login']);
-      })
+        toastr.onTap.subscribe(() => {
+          this.router.navigate(['/login']);
+        })
     }
   }
 
   processFail(fail: any) {
-    this.errors.set([]); 
+    this.errors.set([]);
     this.errors.set([fail.error.error]);
     this.toastr.error('Ocorreu um erro!', 'Registro de Usuário', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
   }

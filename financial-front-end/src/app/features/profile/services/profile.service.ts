@@ -3,36 +3,28 @@ import { Injectable } from "@angular/core";
 import { catchError, map, Observable, shareReplay } from "rxjs";
 
 import { BaseService } from "../../../core/services/base.service";
-import { Expense } from "../../../shared/models/expense-transaction";
+import { User } from "../../../shared/models/user";
+
 
 @Injectable({
     providedIn: 'root'
 })
-export class ExpenseService extends BaseService {
+export class ProfileService extends BaseService {
 
     constructor(private http: HttpClient) { super(); }
 
-    getAllTransactions(): Observable<Expense[]> {
+    getById(id: string): Observable<User> {
         return this.http
-            .get<Expense[]>(this.UrlServiceV1 + 'expenses')
+            .get<User>(this.UrlServiceV1 + 'user/' + id)
             .pipe(
                 catchError(this.ServiceError),
                 shareReplay({ bufferSize: 1, refCount: true })
             );
     }
 
-    getById(id: string): Observable<Expense> {
-        return this.http
-            .get<Expense>(this.UrlServiceV1 + 'expense/' + id)
-            .pipe(
-                catchError(this.ServiceError),
-                shareReplay({ bufferSize: 1, refCount: true })
-            );
-    }
-
-    registerExpense(expenseTransaction: Expense): Observable<Expense> {
+    registerProfile(userTransaction: User): Observable<User> {
         let response = this.http
-            .post(this.UrlServiceV1 + 'expense', expenseTransaction, this.GetAuthHeaderJson())
+            .post(this.UrlServiceV1 + 'profile', userTransaction, this.GetAuthHeaderJson())
             .pipe(
                 map(this.ExtractData),
                 catchError(this.ServiceError)
@@ -41,9 +33,9 @@ export class ExpenseService extends BaseService {
         return response;
     }
 
-    updateExpense(id: string, expenseTransaction: Expense): Observable<Expense> {
+    updateProfile(id: string, userTransaction: User): Observable<User> {
         let response = this.http
-            .put<any>(this.UrlServiceV1 + 'expense/' + id, expenseTransaction, this.GetAuthHeaderJson())
+            .put<any>(this.UrlServiceV1 + 'profile/' + id, userTransaction, this.GetAuthHeaderJson())
             .pipe(
                 map(this.ExtractData),
                 catchError(this.ServiceError)
@@ -52,9 +44,9 @@ export class ExpenseService extends BaseService {
         return response;
     }
 
-    deleteExpense(id: string): Observable<Expense> {
+    deleteProfile(id: string): Observable<User> {
         let response = this.http
-            .delete<any>(this.UrlServiceV1 + 'expense/' + id, this.GetAuthHeaderJson())
+            .delete<any>(this.UrlServiceV1 + 'profile/' + id, this.GetAuthHeaderJson())
             .pipe(
                 map(this.ExtractData),
                 catchError(this.ServiceError)

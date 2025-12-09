@@ -5,5 +5,5 @@ export interface User {
     password: string;
     confirmPassword: string;
     image: string;
-    imageUplode: string;
+    imageUpload: string;
 }

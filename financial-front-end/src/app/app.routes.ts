@@ -3,6 +3,7 @@ import { loginActivateGuard } from './features/auth/guards/login.guard';
 import { registerActivateGuard, registerDeactivateGuard } from './features/auth/guards/register.guard';
 import { expenseTransactionActivateGuard, expenseTransactionDeactivateGuard } from './features/expense/guards/expense-transaction.guard';
 import { ExpenseResolve } from './features/expense/services/expense.resolve';
+import { ProfileResolve } from './features/profile/services/profile.resolve';
 
 
 export const routes: Routes = [
@@ -58,8 +59,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/profile/components/profile-user/profile-user').then(m => m.ProfileUser)
       },
       {
-        path: 'edit',
-        loadComponent: () => import('./features/profile/components/profile-edit/profile-edit').then(m => m.ProfileEdit)
+        path: 'edit/:id',
+        loadComponent: () => import('./features/profile/components/profile-edit/profile-edit').then(m => m.ProfileEdit),
+        resolve: {
+          user: ProfileResolve
+        }
       },
       {
         path: 'settings',

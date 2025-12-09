@@ -13,6 +13,17 @@ server.get('/api/v1/user', (req, res) => {
     res.jsonp(router.db.get('users').value());
 });
 
+server.get('/api/v1/user/:id', (req, res) => {
+    const userId = req.params.id;
+    const user = router.db.get('users').find({ id: parseInt(userId) }).value();
+
+    if (user) {
+        res.jsonp(user);
+    } else {
+        res.status(404).jsonp({ error: 'User not found' });
+    }
+});
+
 server.get('/api/v1/expense/:id', (req, res) => {
     console.log(req.params.id);
     const expenseId = parseInt(req.params.id); 
@@ -73,6 +84,9 @@ server.post('/api/v1/new-user', (req, res, next) => {
         name,
         email,
         password,
+        image: '',
+        imageUpload: '',
+        claims: [],
         createdAt: new Date().toISOString()
     };
 
@@ -85,12 +99,15 @@ server.post('/api/v1/new-user', (req, res, next) => {
     const newUser = db.insert(userToSave).write();
     return res.status(201).jsonp({
         data: {
-            accessToken: userToSave.accessToken,
-            userToken: userToSave.userToken,
+            accessToken: newUser.accessToken,
+            userToken: newUser.userToken,
             user: {
-                name: userToSave.name,
-                email: userToSave.email
-            }
+                name: newUser.name,
+                email: newUser.email
+            },
+            image: newUser.image,
+            imageUpload: newUser.imageUpload,
+            claims: newUser.claims
         }
     });
     // next();
