@@ -31,7 +31,6 @@ export class ProfileEdit {
   userTransaction: User;
   user: any;
   profileForm!: FormGroup;
-  profileTransactionService: ProfileService;
 
   validationMessages!: ValidationMessages;
   genericValidator!: GenericValidator;
@@ -53,6 +52,7 @@ export class ProfileEdit {
     private toastr: ToastrService,
     private route: ActivatedRoute,
     private router: Router,
+    private profileTransactionService: ProfileService,
   ) {
     this.validationMessages = {
       name: {
@@ -66,11 +66,9 @@ export class ProfileEdit {
         email: 'Informe um e-mail válido'
       },
       password: {
-        required: 'Informe a senha',
         rangeLength: 'A senha deve possuir entre 6 e 20 caracteres'
       },
       confirmPassword: {
-        required: 'Informe a senha novamente',
         rangeLength: 'A senha deve possuir entre 6 e 20 caracteres',
         equalTo: 'As senhas não conferem'
       }
@@ -79,7 +77,7 @@ export class ProfileEdit {
     this.genericValidator = new GenericValidator(this.validationMessages);
 
     this.destroyRef.onDestroy(() => {
-      console.log('Componente _expenseTransaction está sendo destruído.');
+      console.log('Componente profileEdit está sendo destruído.');
     });
 
     this.user = this.route.snapshot.data['user'];
@@ -87,8 +85,8 @@ export class ProfileEdit {
 
   ngOnInit() {
 
-    let passwordControl = new FormControl('', [Validators.required, CustomValidators.rangeLength([6, 20])]);
-    let confirmPasswordControl = new FormControl('', [Validators.required, CustomValidators.rangeLength([6, 20]), CustomValidators.equalTo(passwordControl)]);
+    let passwordControl = new FormControl('', [CustomValidators.rangeLength([6, 20])]);
+    let confirmPasswordControl = new FormControl('', [CustomValidators.rangeLength([6, 20]), CustomValidators.equalTo(passwordControl)]);
 
     this.profileForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(60)]],
@@ -137,7 +135,7 @@ export class ProfileEdit {
     });
 
   }
-
+  //ADICIONAR ROTA DO JSON SERVER PRA ATUALIZAR USUARIO E INSERIR IMAGEM NA CHAMADA
   updateUser() {
     if (this.profileForm.dirty && this.profileForm.valid) {
 

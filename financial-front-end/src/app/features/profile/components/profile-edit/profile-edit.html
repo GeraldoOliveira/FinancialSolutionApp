@@ -71,6 +71,17 @@
                     </div>
 
                     <form novalidate (ngSubmit)="updateUser()" [formGroup]="profileForm">
+
+                        @if (errors().length > 0) {
+                            <div class="alert alert-danger">
+                            <h3 id="returnMessage">Ocorreu um erro ao tentar cadastrar:</h3>
+                            <ul>
+                                @for (error of errors(); track $index) {
+                                <li> {{ error }} </li>
+                                }
+                            </ul>
+                            </div>
+                        }
                         <div class="form-group">
                             <div class="form-group mb-3">
                                 <label for="fullName" class="control-label mb-2">Nome Completo:</label>
@@ -78,17 +89,32 @@
                                     id="fullName" 
                                     type="text" 
                                     value="John Doe" 
-                                    formControlName="name" /> 
+                                    formControlName="name" 
+                                    ngClass="{'is-invalid': displayMessage.name}">
+                                    @if(displayMessage.name){
+                                        <div class="col-12">
+                                            <span class="text-danger">
+                                            <p [innerHTML]="displayMessage.name"></p>
+                                            </span>
+                                        </div>
+                                    }
                             </div>
                             
                             <div class="form-group mb-3">
                                 <label for="email" class="control-label mb-2">Email:</label>
                                 <input class="form-control" 
                                     id="email" 
-                                    readonly 
                                     type="email" 
                                     value="john.doe@example.com" 
-                                    formControlName="email" /> 
+                                    formControlName="email"
+                                    ngClass="{'is-invalid': displayMessage.email}">
+                                    @if(displayMessage.email){
+                                        <div class="col-12">
+                                            <span class="text-danger">
+                                            <p [innerHTML]="displayMessage.email"></p>
+                                            </span>
+                                        </div>
+                                    }
                             </div>
                             <hr class="border-top border-secondary my-3"/>
                             <h3 class="text-white mb-3">Alterar Senha</h3>
@@ -99,7 +125,15 @@
                                     id="newPassword" 
                                     placeholder="Deixe vazio para não alterar" 
                                     type="password"
-                                    formControlName="password" /> 
+                                    formControlName="password"
+                                    ngClass="{'is-invalid': displayMessage.password}">
+                                    @if(displayMessage.password){
+                                        <div class="col-12">
+                                            <span class="text-danger">
+                                            <p [innerHTML]="displayMessage.password"></p>
+                                            </span>
+                                        </div>
+                                    } 
                             </div>
                             
                             <div class="form-group mb-3">
@@ -107,7 +141,15 @@
                                 <input class="form-control" 
                                     id="confirmPassword" 
                                     type="password"
-                                    formControlName="confirmPassword" /> 
+                                    formControlName="confirmPassword"
+                                    ngClass="{'is-invalid': displayMessage.confirmPassword}">
+                                    @if(displayMessage.confirmPassword){
+                                        <div class="col-12">
+                                            <span class="text-danger">
+                                            <p [innerHTML]="displayMessage.confirmPassword"></p>
+                                            </span>
+                                        </div>
+                                    } 
                             </div>
 
                             <div class="d-grid gap-2 d-sm-flex align-items-center mt-4">
