@@ -47,21 +47,19 @@ button.accept-policy {
 }
 
 body {
-    /* Margin bottom by footer height */
-    margin-bottom: 60px;
-    min-height: 100vh; 
+    min-height: 100vh;
     margin: 0;
     padding: 0;
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 .footer {
-    position: absolute;
-    bottom: 0;
     width: 100%;
-    white-space: nowrap;
-    height: 50px;
-    line-height: 50px;
+    /* white-space: nowrap; - Removed to allow wrapping if needed */
+    /* height: 50px; - Let content define height */
+    /* line-height: 50px; - Let padding define spacing */
 }
 
 input,

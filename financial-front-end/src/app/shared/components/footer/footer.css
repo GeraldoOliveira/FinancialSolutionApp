@@ -1,0 +1,15 @@
+.footer {
+    background-color: #201f1f; /* Matches bg-cinza-personalizado */
+}
+
+.footer-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+    color: #b4121b; /* Matches bg-vermelho-personalizado or a distinct highlight color */
+    text-decoration: underline;
+}
