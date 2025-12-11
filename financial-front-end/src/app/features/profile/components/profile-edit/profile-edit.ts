@@ -141,8 +141,7 @@ export class ProfileEdit {
 
       this.userTransaction = Object.assign({}, this.userTransaction, this.profileForm.value);
 
-      this.profileTransactionService.updateProfile(this.user.id.toString(),
-        this.userTransaction)
+      this.profileTransactionService.updateProfile(this.userTransaction)
         .pipe(
           takeUntilDestroyed(this.destroyRef)
         )

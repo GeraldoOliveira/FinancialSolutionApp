@@ -9,6 +9,7 @@ import { ProfileResolve } from './features/profile/services/profile.resolve';
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard').then(c => c.Dashboard) },
+  { path: 'access-denied', loadComponent: () => import('./shared/components/access-denied/access-denied').then(c => c.AccessDenied) },
   {
     path: 'login',
     loadComponent: () => import('./features/auth/login/login').then(c => c.Login),

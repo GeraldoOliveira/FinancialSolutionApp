@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
-import { Dashboard } from '../../../features/dashboard/dashboard';
-import { NgbCollapse } from "@ng-bootstrap/ng-bootstrap";
 import { LocalStorageUtils } from '../../utils/local-storage';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
-  imports: [NgbCollapse, RouterLink],
+  imports: [RouterLink],
   templateUrl: './menu.html',
   styleUrl: './menu.css'
 })

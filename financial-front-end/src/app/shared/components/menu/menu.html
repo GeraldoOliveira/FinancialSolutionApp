@@ -1,103 +1,115 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-vermelho-personalizado">
-    <div class="container">
-        <a class="navbar-brand" [routerLink]="['/login']">Family Control Solution</a>
-        @if (userLogged()){
-        <h1 class="nav-link text-light" id="userName">{{ user.name }}</h1>
-        <h1 class="nav-link text-light" id="userEmail">{{ user.email }}</h1>
-        <a class="btn btn-dark" [routerLink]="['/login']" (click)="logout()">
-            Sair <span class="fas fa-sign-out ms-2"></span>
+<nav class="navbar navbar-expand-lg navbar-dark bg-vermelho-personalizado py-1">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand fw-bold" [routerLink]="['/login']">
+            <i class="fas fa-coins me-2"></i>Family Control Solution
         </a>
-        } @else {
-        <h1 class="nav-link text-light"> REALIZE O LOGIN </h1>
-        <a class="btn btn-dark" [routerLink]="['/login']">
-            Login <span class="fas fa-sign-in ms-2"></span>
-        </a>
-        }
+        
+        <div class="d-flex align-items-center gap-3">
+            @if (userLogged()){
+                <div class="text-end text-light lh-1 d-none d-md-block">
+                    <div class="fw-bold small">{{ user.name }}</div>
+                    <small class="text-white-50">{{ user.email }}</small>
+                </div>
+                <div class="vr text-white-50 d-none d-md-block"></div>
+                <button class="btn btn-outline-light btn-sm d-flex align-items-center gap-2" [routerLink]="['/login']" (click)="logout()">
+                    <span>Sair</span>
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            } @else {
+                <span class="text-light me-2 small fw-bold d-none d-sm-inline">REALIZE O LOGIN</span>
+                <a class="btn btn-light btn-sm text-danger fw-bold" [routerLink]="['/login']">
+                    Login <i class="fas fa-sign-in-alt ms-1"></i>
+                </a>
+            }
+        </div>
     </div>
 </nav>
-<nav class="mh-100 mv-100 bg-preto-personalizado text-light" style="height: 170px;">
-    <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
-        <picture class="d-flex justify-content-center align-items-center mt-3 mb-3">
-            <source srcset="images/logo.png" type="image/png">
-            <img src="images/logo.png" alt="Logo da Aplicação" width="30%">
+<nav class="mh-100 mv-100 bg-preto-personalizado text-light shadow-sm" style="height: 170px;">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <picture class="d-flex justify-content-center align-items-center h-100">
+            <img src="images/logo.png" alt="Logo da Aplicação" class="img-fluid" style="max-height: 80%; width: auto;">
         </picture>
     </div>
 </nav>
 @if (userLogged()){
 <nav class="navbar navbar-expand-lg navbar-dark bg-cinza-personalizado flex-sm-row-reverse">
     <div>
-        <button class="navbar-toggler" type="button" (click)="isCollapsed = !isCollapsed" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse d-sm-inline-flex flex-sm-row-reverse" id="navbarNav"
-            [ngbCollapse]="isCollapsed">
-            <ul class="navbar-nav ms-auto d-flex align-items-center">
-                <li class="nav-item dropdown me-5">
-                    <a class="nav-link" [routerLink]="['/dashboard']" id="dashboard" role="button"
-                        aria-expanded="false">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item dropdown me-5">
-                    <a class="nav-link dropdown-toggle" href="#" id="lancamentosDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Lançamentos
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="lancamentosDropdown">
-                        <li><a class="dropdown-item" [routerLink]="['/expense/new']">Novo Lançamento</a></li>
-                        <li><a class="dropdown-item" [routerLink]="['/expense/list']">Listar Lançamentos</a></li>
-                        <li><a class="dropdown-item" href="#">Lançamentos Recentes</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown me-5">
-                    <a class="nav-link dropdown-toggle" href="#" id="contasDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Contas
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="contasDropdown">
-                        <li><a class="dropdown-item" href="#">Ver Contas</a></li>
-                        <li><a class="dropdown-item" href="#">Nova Conta</a></li>
-                    </ul>
-                </li>
+        <div class="offcanvas offcanvas-start bg-cinza-personalizado" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title text-white" id="offcanvasNavbarLabel">Menu</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link" [routerLink]="['/dashboard']" id="dashboard" role="button" aria-expanded="false" data-bs-dismiss="offcanvas">
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="lancamentosDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Lançamentos
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="lancamentosDropdown">
+                            <li><a class="dropdown-item" [routerLink]="['/expense/new']" data-bs-dismiss="offcanvas">Novo Lançamento</a></li>
+                            <li><a class="dropdown-item" [routerLink]="['/expense/list']" data-bs-dismiss="offcanvas">Listar Lançamentos</a></li>
+                            <li><a class="dropdown-item" href="#">Lançamentos Recentes</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="contasDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Contas
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="contasDropdown">
+                            <li><a class="dropdown-item" href="#">Ver Contas</a></li>
+                            <li><a class="dropdown-item" href="#">Nova Conta</a></li>
+                        </ul>
+                    </li>
 
-                <li class="nav-item dropdown me-5">
-                    <a class="nav-link dropdown-toggle" href="#" id="metasDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Metas
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="metasDropdown">
-                        <li><a class="dropdown-item" href="#">Minhas Metas</a></li>
-                        <li><a class="dropdown-item" href="#">Criar Meta</a></li>
-                    </ul>
-                </li>
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="metasDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Metas
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="metasDropdown">
+                            <li><a class="dropdown-item" href="#">Minhas Metas</a></li>
+                            <li><a class="dropdown-item" href="#">Criar Meta</a></li>
+                        </ul>
+                    </li>
 
-                <li class="nav-item dropdown me-5">
-                    <a class="nav-link dropdown-toggle" href="#" id="relatoriosDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Relatórios
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="relatoriosDropdown">
-                        <li><a class="dropdown-item" href="#">Por Categoria</a></li>
-                        <li><a class="dropdown-item" href="#">Fluxo de Caixa</a></li>
-                        <li><a class="dropdown-item" href="#">Anual</a></li>
-                    </ul>
-                </li>
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="relatoriosDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Relatórios
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="relatoriosDropdown">
+                            <li><a class="dropdown-item" href="#">Por Categoria</a></li>
+                            <li><a class="dropdown-item" href="#">Fluxo de Caixa</a></li>
+                            <li><a class="dropdown-item" href="#">Anual</a></li>
+                        </ul>
+                    </li>
 
-                <li class="nav-item dropdown me-5">
-                    <a class="nav-link dropdown-toggle" href="#" id="configDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Configurações
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="configDropdown">
-                        <li><a class="dropdown-item" [routerLink]="['/profile/user']">Perfil</a></li>
-                        <li><a class="dropdown-item" href="#">Cartoes de Credito</a></li>
-                        <li><a class="dropdown-item" href="#">Formas de Pagamento</a></li>
-                        <li><a class="dropdown-item" href="#">Responsáveis</a></li>
-                        <li><a class="dropdown-item" href="#">Tipos de Despesas</a></li>
-                    </ul>
-                </li>
-            </ul>
+                    <li class="nav-item dropdown me-5">
+                        <a class="nav-link dropdown-toggle" href="#" id="configDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Configurações
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="configDropdown">
+                            <li><a class="dropdown-item" [routerLink]="['/profile/user']" data-bs-dismiss="offcanvas">Perfil</a></li>
+                            <li><a class="dropdown-item" href="#">Cartoes de Credito</a></li>
+                            <li><a class="dropdown-item" href="#">Formas de Pagamento</a></li>
+                            <li><a class="dropdown-item" href="#">Responsáveis</a></li>
+                            <li><a class="dropdown-item" href="#">Tipos de Despesas</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>

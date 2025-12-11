@@ -3,9 +3,9 @@
     {
       "accessToken": "1",
       "userToken": "1",
-      "name": "Geraldo Oliveira",
+      "name": "Geraldo Oliveira Neto",
       "email": "gevo.neto@hotmail.com",
-      "password": "Hheya9gr",
+      "password": "123123123",
       "createdAt": "2025-10-07T16:20:52.534Z",
       "id": 1,
       "claims": [
@@ -18,15 +18,17 @@
     {
       "accessToken": "1",
       "userToken": "1",
-      "name": "asdasdasdasd",
+      "name": "Geraldo Neto",
       "email": "gevo.neto@hotmail.comm",
-      "password": "123123",
+      "password": "",
       "image": "",
       "imageUpload": "",
-      "claims": [{
+      "claims": [
+        {
           "type": "Expense",
           "value": "Create,Edit,Delete"
-        }],
+        }
+      ],
       "createdAt": "2025-12-09T01:57:46.538Z",
       "id": 2
     }

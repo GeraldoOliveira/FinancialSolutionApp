@@ -33,9 +33,9 @@ export class ProfileService extends BaseService {
         return response;
     }
 
-    updateProfile(id: string, userTransaction: User): Observable<User> {
+    updateProfile(userTransaction: User): Observable<User> {
         let response = this.http
-            .put<any>(this.UrlServiceV1 + 'profile/' + id, userTransaction, this.GetAuthHeaderJson())
+            .put<any>(this.UrlServiceV1 + 'profile/', userTransaction, this.GetAuthHeaderJson())
             .pipe(
                 map(this.ExtractData),
                 catchError(this.ServiceError)

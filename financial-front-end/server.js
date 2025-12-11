@@ -195,10 +195,14 @@ server.post('/api/v1/login', (req, res, next) => {
                 accessToken: existingUser.accessToken,
                 userToken: existingUser.userToken,
                 user: {
+                    id: existingUser.id,
                     name: existingUser.name,
-                    email: existingUser.email
+                    email: existingUser.email,
+                    image: existingUser.image,
+                imageUpload: existingUser.imageUpload
                 },
-                claims: existingUser.claims
+                claims: existingUser.claims,
+                
             }
         });
     }
@@ -207,6 +211,51 @@ server.post('/api/v1/login', (req, res, next) => {
     });
     // next();
 
+});
+
+server.put('/api/v1/profile/', (req, res) => {
+    const { name, email, password, image, imageUpload, id } = req.body;
+    
+    // Find user by ID or Email (assuming email is unique and ID is present)
+    // Using ID is safer if available in the body
+    let userToUpdate = null;
+    
+    // Ensure we have an identifier
+    if (!id && !email) {
+         return res.status(400).jsonp({ error: 'ID ou Email necessários para atualização.' });
+    }
+
+    if (id) {
+         userToUpdate = db.find({ id: parseInt(id) }).value();
+    } else {
+         userToUpdate = db.find({ email: email }).value();
+    }
+
+    if (userToUpdate) {
+        // Update fields
+        const updatedUser = db.find({ id: userToUpdate.id })
+            .assign({ name, email, password, image, imageUpload }) // Add other fields as needed
+            .write();
+
+        return res.status(200).jsonp({
+            message: 'Perfil atualizado com sucesso',
+             data: {
+                accessToken: updatedUser.accessToken,
+                userToken: updatedUser.userToken,
+                user: {
+                    id: updatedUser.id,
+                    name: updatedUser.name,
+                    email: updatedUser.email,
+                    password: updatedUser.password,
+                    image: updatedUser.image,
+                    imageUpload: updatedUser.imageUpload
+                },
+                claims: updatedUser.claims
+            }
+        });
+    } else {
+        return res.status(404).jsonp({ error: 'Usuário não encontrado.' });
+    }
 });
 
 server.use(router); // Usa o roteador padrão do JSON Server

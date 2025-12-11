@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { TabNavigation, TabItem } from '../../../../shared/components/tab-navigation/tab-navigation';
 import { RouterOutlet } from "@angular/router";
+import { LocalStorageUtils } from '../../../../shared/utils/local-storage';
 
 @Component({
   selector: 'app-profile-layout',
@@ -9,9 +10,13 @@ import { RouterOutlet } from "@angular/router";
   styleUrl: './profile-layout.css'
 })
 export class ProfileLayout {
+
+  public LocalStorage = new LocalStorageUtils();
+  user: any = this.LocalStorage.getUser();
+
   settingsTabs: TabItem[] = [
     { label: 'Perfil', route: '/profile/user' },
-    { label: 'Editar Perfil', route: '/profile/edit/1' },
+    { label: 'Editar Perfil', route: '/profile/edit/' + this.user.id },
     { label: 'Configurações', route: '/profile/settings' },
     // { label: 'Segurança', route: '/profile/security' },
   ];
