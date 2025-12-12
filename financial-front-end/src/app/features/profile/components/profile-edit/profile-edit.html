@@ -18,7 +18,7 @@
                     
                     <div class="d-flex flex-column align-items-center gap-3 mb-4">
                         <div class="position-relative">
-                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHdxqu57ulcq2CYKd1AA_ZwvV9Nwp_E86JugxvxzUYYoYYAZFA2zVckzSGVPkXbwlPyZebJJUqACgGHUBgdhVVSwvODo6u1mRZfcOVSPqvqdq4W4jaEGwNZNVL7Vrj1Y-BFislSkQDczdVTY4bmqWSBh8JurgZ-wYETKGPI5sUSGsN0OckbfwOaonVSM27L_W7oFRMWLjBCQs5e_jO51AP19bucfhv2mn4s_ZCSR2E0S0nObN6v0F1ivAP6wWQgcYjtCCpcVPlekE" alt="User avatar placeholder" class="rounded-circle border border-white" style="width: 96px; height: 96px; object-fit: cover;">
+                            <img [src]="croppedImage()" alt="User avatar placeholder" class="rounded-circle border border-white" style="width: 96px; height: 96px; object-fit: cover;">
                             <!-- <label   for="photo-upload" class="position-absolute top-0 start-0 w-100 h-100 rounded-circle bg-black bg-opacity-50 d-flex align-items-center justify-content-center cursor-pointer opacity-0 transition-opacity hover-opacity-100">
                                 <i class="fa-solid fa-camera text-white fs-4"></i>
                             </label> -->
@@ -30,7 +30,7 @@
                                 <i class="fa-solid fa-cloud-arrow-up"></i>
                                 Trocar foto
                             </label>
-                            <input type="file" (change)="fileChangeEvent($event)"; $event.target.value = null; class="d-none" id="photo-upload" name="photo-upload"/>
+                            <input type="file" accept="image/*" (change)="fileChangeEvent($event)"; $event.target.value = null; class="d-none" id="photo-upload" name="photo-upload"/>
                         </div>
                         @if(imageName !=''){
                         <div class="d-flex align-items-center">

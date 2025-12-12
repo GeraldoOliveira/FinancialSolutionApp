@@ -13,6 +13,7 @@ import { CustomValidators } from 'ng2-validation';
 import { User } from '../../../../shared/models/user';
 import { DisplayMessage, GenericValidator, ValidationMessages } from '../../../../shared/utils/generic-form-validation';
 import { ProfileService } from '../../services/profile.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-profile-edit',
@@ -44,7 +45,6 @@ export class ProfileEdit {
   showCropper = false;
   containWithinAspectRatio = false;
   transform: ImageTransform = {};
-  imageUrl: string;
   imageName: string = '';
 
   constructor(private fb: FormBuilder,
@@ -53,6 +53,7 @@ export class ProfileEdit {
     private route: ActivatedRoute,
     private router: Router,
     private profileTransactionService: ProfileService,
+    private sanitizer: DomSanitizer
   ) {
     this.validationMessages = {
       name: {
@@ -100,9 +101,10 @@ export class ProfileEdit {
     this.profileForm.patchValue({
       name: this.user.name,
       email: this.user.email,
-      image: this.user.image,
-      imageUpload: this.user.imageUpload
+      imageUpload: this.user.imageUpload,
+      image: this.user.image
     });
+
   }
 
   ngAfterViewInit(): void {
@@ -135,11 +137,13 @@ export class ProfileEdit {
     });
 
   }
-  //ADICIONAR ROTA DO JSON SERVER PRA ATUALIZAR USUARIO E INSERIR IMAGEM NA CHAMADA
+
   updateUser() {
     if (this.profileForm.dirty && this.profileForm.valid) {
 
       this.userTransaction = Object.assign({}, this.userTransaction, this.profileForm.value);
+      this.userTransaction.imageUpload = this.croppedImage();
+      this.userTransaction.image = this.imageName;
 
       this.profileTransactionService.updateProfile(this.userTransaction)
         .pipe(
