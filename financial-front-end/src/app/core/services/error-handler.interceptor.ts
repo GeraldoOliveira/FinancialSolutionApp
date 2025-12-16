@@ -16,7 +16,7 @@ export const errorHandlerInterceptor: HttpInterceptorFn = (req, next) => {
         catchError((error: HttpErrorResponse) => {
             if (error.status === 401) {
                 localStorageUtils.clearLocalUser();
-                router.navigate(['/login']);
+                router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
             }
             if (error.status === 403) {
                 router.navigate(['/access-denied']);

@@ -1,4 +1,4 @@
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { ChangeDetectorRef, Component, DestroyRef, ElementRef, ViewChildren, signal, WritableSignal } from '@angular/core';
@@ -37,12 +37,16 @@ export class Login {
 
   changesNotSaved: boolean;
 
+  returnUrl: string;
+
   constructor(private fb: FormBuilder,
     private loginService: LoginService,
     private router: Router,
     private destroyRef: DestroyRef,
     private toastr: ToastrService,
+    private route: ActivatedRoute,
     private changeDetectorRef: ChangeDetectorRef) {
+
     this.validationMessages = {
       email: {
         required: 'Informe o e-mail',
@@ -55,6 +59,8 @@ export class Login {
     };
 
     this.genericValidator = new GenericValidator(this.validationMessages);
+
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
 
     this.destroyRef.onDestroy(() => {
       console.log('Componente Login está sendo destruído.');
@@ -106,10 +112,10 @@ export class Login {
     let toastr = this.toastr.success('Login realizado com sucesso!', 'Bem vindo!!!', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
     if (toastr) {
       toastr.onHidden.subscribe(() => {
-        this.router.navigate(['/dashboard']);
+        this.returnUrl ? this.router.navigate([this.returnUrl]) : this.router.navigate(['/dashboard']);
       }),
         toastr.onTap.subscribe(() => {
-          this.router.navigate(['/dashboard']);
+          this.returnUrl ? this.router.navigate([this.returnUrl]) : this.router.navigate(['/dashboard']);
         })
     }
   }
