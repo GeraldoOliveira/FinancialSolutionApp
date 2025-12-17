@@ -56,8 +56,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/profile/components/profile-layout/profile-layout').then(c => c.ProfileLayout),
     children: [
       {
-        path: 'user',
-        loadComponent: () => import('./features/profile/components/profile-user/profile-user').then(m => m.ProfileUser)
+        path: 'user/:id',
+        loadComponent: () => import('./features/profile/components/profile-user/profile-user').then(m => m.ProfileUser),
+        resolve: {
+          user: ProfileResolve
+        }
       },
       {
         path: 'edit/:id',

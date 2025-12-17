@@ -3,7 +3,7 @@
     {
       "accessToken": "1",
       "userToken": "1",
-      "name": "Geraldo Oliveira Neto",
+      "name": "Geraldo Vitorio de Oliveira Neto",
       "email": "gevo.neto@hotmail.com",
       "password": "123123",
       "createdAt": "2025-10-07T16:20:52.534Z",
@@ -14,8 +14,8 @@
           "value": "Create,Edit,Delete"
         }
       ],
-      "image": "RobloxScreenShot20250429_192725062.png",
-      "imageUpload": "blob:http://localhost:4200/7945d6e0-4f32-4156-a019-9a2ca6510566"
+      "image": "123",
+      "imageUpload": "123"
     },
     {
       "accessToken": "1",

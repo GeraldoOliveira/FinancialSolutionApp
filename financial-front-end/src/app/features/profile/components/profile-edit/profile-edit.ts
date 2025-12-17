@@ -101,9 +101,12 @@ export class ProfileEdit {
     this.profileForm.patchValue({
       name: this.user.name,
       email: this.user.email,
-      imageUpload: this.user.imageUpload,
-      image: this.user.image
+      password: this.user.password,
+      confirmPassword: this.user.password
     });
+
+    this.imageName = this.user.image;
+    this.croppedImage.set(this.user.imageUpload);
 
   }
 
@@ -142,8 +145,8 @@ export class ProfileEdit {
     if (this.profileForm.dirty && this.profileForm.valid) {
 
       this.userTransaction = Object.assign({}, this.userTransaction, this.profileForm.value);
-      this.userTransaction.imageUpload = this.croppedImage();
-      this.userTransaction.image = this.imageName;
+      this.userTransaction.imageUpload = this.croppedImage().length <= 0 ? this.user.imageUpload : this.croppedImage();
+      this.userTransaction.image = this.imageName.length <= 0 ? this.user.image : this.imageName;
 
       this.profileTransactionService.updateProfile(this.userTransaction)
         .pipe(

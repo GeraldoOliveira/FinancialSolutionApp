@@ -7,13 +7,11 @@ import { fromEvent, merge, Observable, of, Subscription, switchMap } from 'rxjs'
 
 import { ToastrService } from 'ngx-toastr';
 
-import { DisplayMessage, GenericValidator, ValidationMessages } from '../../../../shared/utils/generic-form-validation';
 import { ExpenseService } from '../../services/expense.service';
-import { Expense } from '../../../../shared/models/expense-transaction';
-import { ExpenseOrigin } from '../../../../shared/models/expense-origin';
-import { ExpenseResponsible } from '../../../../shared/models/expense-responsible';
-import { NgxBrazilMASKS, MaskedInputDirective } from 'ngx-brazil';
+import { MaskedInputDirective } from 'ngx-brazil';
 import { StringUtils } from '../../../../shared/utils/string-utils';
+import { ExpenseFormBaseComponent } from '../../services/expense-form.base.component';
+import { Expense } from '../../../../shared/models/expense-transaction';
 
 @Component({
   selector: 'app-expense-transaction',
@@ -22,11 +20,9 @@ import { StringUtils } from '../../../../shared/utils/string-utils';
   styleUrl: './expense-transaction.css',
   providers: []
 })
-export class ExpenseTransaction {
+export class ExpenseTransaction extends ExpenseFormBaseComponent {
 
   @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: QueryList<ElementRef>;
-
-  MASKS = NgxBrazilMASKS;
 
   private itemSubscriptions: Map<number, Subscription> = new Map();
 
@@ -36,17 +32,7 @@ export class ExpenseTransaction {
     new FormArray<any>([])
   );
 
-
   controlBlurs: Observable<any>[];
-
-  expenseTransaction: Expense;
-  expenseOrigin: ExpenseOrigin;
-  expenseResposible: ExpenseResponsible;
-  expenseForm!: FormGroup;
-
-  validationMessages!: ValidationMessages;
-  genericValidator!: GenericValidator;
-  displayMessage: DisplayMessage = { name: '', description: '', totalValue: '', methodList: '', creditCardList: '', installments: '', responsible: '', proratedValue: '', categoryList: '', date: '' };
 
   changesNotSaved: boolean;
 
@@ -54,42 +40,7 @@ export class ExpenseTransaction {
     private expenseTransactionService: ExpenseService,
     private destroyRef: DestroyRef,
     private toastr: ToastrService) {
-    this.validationMessages = {
-      name: {
-        required: 'Informe o nome do gasto',
-      },
-      description: {
-        required: 'Informe a descrição do gasto',
-      },
-      totalValue: {
-        required: 'Informe o valor total',
-        number: 'Valor deve ser numérico'
-      },
-      methodList: {
-        required: 'Informe o método de pagamento',
-      },
-      creditCardList: {
-        required: 'Informe o cartão de crédito',
-      },
-      installments: {
-        required: 'Informe o parcelamento',
-      },
-      responsible: {
-        required: 'Informe o responsável',
-      },
-      proratedValue: {
-        required: 'Informe o valor de rateio',
-        number: 'Valor deve ser numérico'
-      },
-      categoryList: {
-        required: 'Informe a categoria',
-      },
-      date: {
-        required: 'Informe a data do gasto',
-      },
-    };
-
-    this.genericValidator = new GenericValidator(this.validationMessages);
+    super();
 
     this.destroyRef.onDestroy(() => {
       console.log('Componente _expenseTransaction está sendo destruído.');
@@ -202,7 +153,7 @@ export class ExpenseTransaction {
     const proratedGroup = this.expenseResposiblesArraySignal();
     let cleanValue: number = parseFloat(StringUtils.justNumbers(totalValue));
     cleanValue = parseFloat(cleanValue.toFixed(0)) / parseFloat(proratedGroup.length.toString());
-    if(cleanValue.toString().includes(".")){
+    if (cleanValue.toString().includes(".")) {
       cleanValue = cleanValue * 10
     }
 

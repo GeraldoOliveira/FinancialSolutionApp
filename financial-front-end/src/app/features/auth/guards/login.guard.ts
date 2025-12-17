@@ -1,14 +1,8 @@
 import { CanActivateFn, CanDeactivateFn, GuardResult, Router } from '@angular/router';
-import { LocalStorageUtils } from '../../../shared/utils/local-storage';
-import { inject } from '@angular/core';
+import { validateToken } from '../../../core/services/base.guard';
 
 export const loginActivateGuard: CanActivateFn = () => {
 
-    const router = inject(Router);
-    const localStorageUtils = new LocalStorageUtils();
+    return validateToken();
 
-    if (localStorageUtils.getUserToken()) {
-        return router.createUrlTree(['/dashboard']);
-    }
-    return true;
 }

@@ -13,8 +13,8 @@
                         <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1nSv-MJ7FN2z996Wvd3SNd_NWhEG3E7IctFM_Av4J8EzrDmKPF9J1QkAZaTO2-bAgqDedMmovwASxMWDQZPRyNzwj_fWCbHzeyaKYSMwzQfCkp0esEKHyQYwqyJuCBX1bcY7PmhlhWFJC0DF6lJ5ORpLqgYnxlYKibGgZw4d9UWqVSR6NyrdFVaGfJopa0SWHZhub16iDB4oepT4_fGRLxMOkw124x4gzjTpyA0pWWgIyKghDzFuwAVNd7H0E753tGDhvK9_fqfo" alt="User avatar of Geraldo Oliveira Neto" class="rounded-circle border border-danger border-4" style="width: 128px; height: 128px; object-fit: cover;">
                     </div>
                     <div>
-                        <p class="text-white fs-5 fw-bold mb-0">Geraldo Oliveira Neto</p>
-                        <p class="text-secondary small m-0">gevo.neto@hotmail.com</p>
+                        <p class="text-white fs-5 fw-bold mb-0">{{ this.user.name }}</p>
+                        <p class="text-secondary small m-0">{{ this.user.email }}</p>
                     </div>
                 </div>
                 
@@ -22,13 +22,13 @@
                     
                     <div class="d-flex flex-column gap-1 gap-sm-0 flex-sm-row align-items-sm-center justify-content-between py-2">
                         <p class="text-secondary small m-0">Nome Completo</p>
-                        <p class="text-white fw-medium m-0">Geraldo Oliveira Neto</p>
+                        <p class="text-white fw-medium m-0">{{ this.user.name }}</p>
                     </div>
                     <hr class="border-light border-opacity-10 my-0"/>
                     
                     <div class="d-flex flex-column gap-1 gap-sm-0 flex-sm-row align-items-sm-center justify-content-between py-2">
                         <p class="text-secondary small m-0">Email</p>
-                        <p class="text-white fw-medium m-0">gevo.neto@hotmail.com</p>
+                        <p class="text-white fw-medium m-0">{{ this.user.email }}</p>
                     </div>
                     <hr class="border-light border-opacity-10 my-0"/>
                     
@@ -39,7 +39,7 @@
                 </div>
                 
                 <div class="mt-4 d-flex justify-content-end">
-                    <button class="btn btn-danger fw-bold py-2 px-4 d-flex align-items-center justify-content-center gap-2">
+                    <button (click)="editProfile()" class="btn btn-danger fw-bold py-2 px-4 d-flex align-items-center justify-content-center gap-2">
                         <i class="fa-solid fa-pen-to-square"></i>
                         Editar Perfil
                     </button>

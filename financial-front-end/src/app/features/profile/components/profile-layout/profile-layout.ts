@@ -15,7 +15,7 @@ export class ProfileLayout {
   user: any = this.LocalStorage.getUser();
 
   settingsTabs: TabItem[] = [
-    { label: 'Perfil', route: '/profile/user' },
+    { label: 'Perfil', route: '/profile/user/' + this.user.id },
     { label: 'Editar Perfil', route: '/profile/edit/' + this.user.id },
     { label: 'Configurações', route: '/profile/settings' },
     // { label: 'Segurança', route: '/profile/security' },
