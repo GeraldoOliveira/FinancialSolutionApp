@@ -1,19 +1,15 @@
 import { Component, ElementRef, ViewChildren, signal, WritableSignal, QueryList, PipeTransform, Pipe } from '@angular/core';
 import { FormArray, FormBuilder, FormControlName, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 
-import { ToastrService } from 'ngx-toastr';
-import { NgxBrazilMASKS } from 'ngx-brazil';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import { GenericValidator, ValidationMessages } from '../../../../shared/utils/generic-form-validation';
 import { Expense } from '../../../../shared/models/expense-transaction';
-import { ExpenseOrigin } from '../../../../shared/models/expense-origin';
 import { ExpenseResponsible } from '../../../../shared/models/expense-responsible';
 import { ExpenseDelete } from '../expense-delete/expense-delete';
 import { ClaimsUtils } from '../../../../shared/utils/claims-utils';
+import { ExpenseFormBaseComponent } from '../../services/expense-form.base.component';
 
 @Pipe({
   name: 'creditCard',
@@ -38,43 +34,24 @@ export class CreditCardPipe implements PipeTransform {
   selector: 'app-expense-edit',
   imports: [CommonModule, ReactiveFormsModule, RouterLink, CreditCardPipe],
   templateUrl: './expense-details.html',
-  styleUrl: './expense-details.css'
+  styleUrl: './expense-details.css',
+  providers: [DatePipe]
 })
 
-export class ExpenseDetails {
+export class ExpenseDetails extends ExpenseFormBaseComponent {
 
   @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: QueryList<ElementRef>;
 
-  MASKS = NgxBrazilMASKS;
-
-  errors: WritableSignal<any[]> = signal([]);
-  isWritableDescription: WritableSignal<boolean> = signal(false);
-  expenseResposiblesArraySignal: WritableSignal<FormArray> = signal(
-    new FormArray<any>([])
-  );
+  expense: any;
 
   claimsUtils = new ClaimsUtils();
-
   canDelete: boolean = this.claimsUtils.checkExpenseClain('Delete');
   canEdit: boolean = this.claimsUtils.checkExpenseClain('Edit');
 
-  controlBlurs: Observable<any>[];
-
-  expenseTransaction: Expense;
-  expenseOrigin: ExpenseOrigin;
-  expenseResponsibles: ExpenseResponsible;
-  expenseForm!: FormGroup;
-
-  validationMessages!: ValidationMessages;
-  genericValidator!: GenericValidator;
-
-  expense: any;
-
-  constructor(private fb: FormBuilder,
-    private toastr: ToastrService,
-    private route: ActivatedRoute,
+  constructor(private route: ActivatedRoute,
     private modalService: NgbModal,
   ) {
+    super()
     this.expense = this.route.snapshot.data['expense'];
   }
 
@@ -111,10 +88,6 @@ export class ExpenseDetails {
 
   }
 
-  expenseResposiblesArrayItem(): FormArray {
-    return this.expenseForm.get('expenseResponsibles') as FormArray;
-  }
-
   private setExpenseResponsiblesForEdit(responsibles: ExpenseResponsible[]): void {
     const arrayControl = this.expenseForm.get('expenseResponsibles') as FormArray;
 
@@ -131,13 +104,6 @@ export class ExpenseDetails {
       });
       arrayControl.push(responsibleGroup);
 
-    });
-  }
-
-  private createExpenseResponsibleGroup(): FormGroup {
-    return this.fb.group({
-      responsibleId: ['', [Validators.required]],
-      proratedValue: [0, [Validators.required]]
     });
   }
 

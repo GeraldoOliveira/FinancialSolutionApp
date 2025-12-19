@@ -99,6 +99,34 @@
       "date": "2025-10-16T21:48",
       "apiId": "v1",
       "id": 4
+    },
+    {
+      "expenseOrigin": {
+        "name": "Real",
+        "description": "Carne"
+      },
+      "totalValue": "122",
+      "methodList": "1",
+      "creditCardList": "2",
+      "installments": "1",
+      "expenseResponsibles": [
+        {
+          "responsibleId": 1,
+          "proratedValue": 12
+        },
+        {
+          "responsibleId": 2,
+          "proratedValue": 12
+        },
+        {
+          "responsibleId": 3,
+          "proratedValue": 98
+        }
+      ],
+      "categoryList": "Alimentacao",
+      "date": "2025-12-18T22:04",
+      "apiId": "v1",
+      "id": 5
     }
   ]
 }

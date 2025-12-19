@@ -1,30 +1,33 @@
 export class CurrencyUtils {
 
-    public static StringToDecimal(input): any {
-
-        if (input == null || input == undefined) {
+    public static StringToDecimal(input: string | null | undefined): number {
+        if (input == null || input == undefined || input.trim() === '') {
             return 0;
         }
 
-        input = input.replace(/\./g, '');
-        input = input.replace(/,/g, '.');
-        return parseFloat(input);
+        let cleanValue = input.replace(/[R$\s]/g, '');
+        cleanValue = cleanValue.replace(/\./g, '');
 
+        cleanValue = cleanValue.replace(',', '.');
+
+        const numericValue = parseFloat(cleanValue);
+
+        return isNaN(numericValue) ? 0 : numericValue;
     }
 
-    public static DecimalToString(input): any {
-
-        var ret = (input) ? input.toString().replace('.', ',') : null;
-        if (ret) {
-            var decArr = ret.split(',');
-            if (decArr.length > 1) {
-                var dec = decArr[1].length;
-                if (dec == 1) {
-                    ret += '0';
-                }
-            }
-            return ret;
+    public static DecimalToString(input: number | null | undefined): string {
+        if (input == null || input == undefined || isNaN(input)) {
+            return '0,00';
         }
+
+        return input.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    public static RoundToTwoDecimals(value: number): number {
+        return Math.round(value * 100) / 100;
     }
 
 }
