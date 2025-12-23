@@ -10,12 +10,12 @@ import { CurrencyUtils } from '../../../shared/utils/currency-utils';
 import { ToastrService } from "ngx-toastr";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { DatePipe } from "@angular/common";
+import { FormBaseComponent } from "../../../base-components/form-base.component";
 
-export abstract class ExpenseFormBaseComponent {
+export abstract class ExpenseFormBaseComponent extends FormBaseComponent {
 
     protected toastr = inject(ToastrService);
     protected fb = inject(FormBuilder);
-    protected destroyRef = inject(DestroyRef);
     protected datePipe = inject(DatePipe);
 
     expenseTransaction: Expense;
@@ -23,21 +23,16 @@ export abstract class ExpenseFormBaseComponent {
     expenseResposible: ExpenseResponsible;
     expenseForm!: FormGroup;
 
-    validationMessages!: ValidationMessages;
-    genericValidator!: GenericValidator;
-    displayMessage: DisplayMessage = { name: '', description: '', totalValue: '', methodList: '', creditCardList: '', installments: '', responsible: '', proratedValue: '', categoryList: '', date: '' };
-
     MASKS = NgxBrazilMASKS;
 
-    protected changesNotSaved: boolean;
     protected itemSubscriptions: Map<number, Subscription> = new Map();
     protected expenseResposiblesArraySignal: WritableSignal<FormArray> = signal(
         new FormArray<any>([])
     );
     protected isWritableDescription: WritableSignal<boolean> = signal(false);
-    protected controlBlurs: Observable<any>[];
 
     constructor() {
+        super();
         this.validationMessages = {
             name: {
                 required: 'Informe o nome do gasto',
@@ -73,7 +68,7 @@ export abstract class ExpenseFormBaseComponent {
             },
         };
 
-        this.genericValidator = new GenericValidator(this.validationMessages);
+        super.configureMessageValidationBase(this.validationMessages);
     }
 
     protected expenseResposiblesArrayItem(): FormArray {
@@ -222,23 +217,7 @@ export abstract class ExpenseFormBaseComponent {
     }
 
     protected setupControlBlurObservable(formInputElements: QueryList<ElementRef>) {
-        const elementsChange$ = merge(
-            of(formInputElements),
-            formInputElements.changes
-        ).pipe(
-            takeUntilDestroyed(this.destroyRef),
-            switchMap((list: QueryList<ElementRef>) => {
-                this.controlBlurs = list.toArray()
-                    .map((formControl: ElementRef) => fromEvent(formControl.nativeElement, 'blur'));
-                return merge(...this.controlBlurs);
-            })
-        );
-
-        elementsChange$.subscribe(() => {
-            this.displayMessage = this.genericValidator.processMessages(this.expenseForm);
-            this.changesNotSaved = true;
-        });
-
+        super.configureValidationFormBase(formInputElements, this.expenseForm);
     }
 
     protected getCurrentDateTime(): string {
