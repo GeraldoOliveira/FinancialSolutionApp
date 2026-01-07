@@ -1,19 +1,21 @@
-import { LocalStorageUtils } from "./local-storage";
+import { LocalStorageUtils } from './local-storage';
 
 export class ClaimsUtils {
+  public checkExpenseClain(requiredValue: string): boolean {
+    const localStorage = new LocalStorageUtils();
+    const requiredClaims = { type: 'Expense', value: requiredValue };
 
-    public checkExpenseClain(requiredValue: string): boolean {
+    let userClaims = localStorage.getUserClaims();
 
-        const localStorage = new LocalStorageUtils();
-        const requiredClaims = { type: 'Expense', value: requiredValue };
-
-        let userClaims = localStorage.getUserClaims();
-
-        let claimsValues = userClaims[0].value.split(',');
-        if (!claimsValues.includes(requiredClaims.value)) {
-            return false;
-        }
-
-        return true;
+    if (!userClaims || userClaims.length === 0) {
+      return false;
     }
+
+    let claimsValues = userClaims[0].value.split(',');
+    if (!claimsValues.includes(requiredClaims.value)) {
+      return false;
+    }
+
+    return true;
+  }
 }
