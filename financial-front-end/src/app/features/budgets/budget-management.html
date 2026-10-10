@@ -1,0 +1,400 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+  
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-lg shadow-sm">
+        <i class="fas fa-bullseye"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Metas & Orçamentos</h2>
+        <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Planejamento financeiro mensal e limites de gastos por categoria</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <button 
+        type="button" 
+        (click)="filterByPeriod.set(!filterByPeriod())"
+        class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold border transition-all"
+        [ngClass]="filterByPeriod() 
+          ? 'bg-indigo-500/15 border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/25' 
+          : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700/60'">
+        <i class="fas fa-calendar-alt"></i>
+        <span>{{ filterByPeriod() ? ('Mês: ' + formattedMonthName()) : 'Todos os Meses' }}</span>
+      </button>
+
+      <button 
+        type="button" 
+        (click)="openNewBudgetModal()"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
+        <i class="fas fa-plus-circle"></i>
+        <span>Nova Meta</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Teto Orçamentário -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm relative overflow-hidden group hover:border-slate-600 transition-all">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Teto Total Estipulado</span>
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xs">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <h3 class="text-2xl font-black text-white tracking-tight">
+          {{ totalMonthlyLimit() | currency:'BRL':'symbol':'1.2-2' }}
+        </h3>
+        <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+          <i class="fas fa-layer-group text-slate-500"></i>
+          <span>{{ filteredBudgets().length }} categorias monitoradas</span>
+        </p>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+
+    <!-- Total Já Gasto -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm relative overflow-hidden group hover:border-slate-600 transition-all">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Total Consumido</span>
+        <div class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+          <i class="fas fa-receipt"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <h3 class="text-2xl font-black text-amber-400 tracking-tight">
+          {{ totalCurrentSpent() | currency:'BRL':'symbol':'1.2-2' }}
+        </h3>
+        <p class="text-[11px] text-slate-400 mt-1">Consumo real apurado no período</p>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-500/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+
+    <!-- Saldo Disponível Restante -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm relative overflow-hidden group hover:border-slate-600 transition-all">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold uppercase tracking-wider" [ngClass]="totalRemaining() >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+          {{ totalRemaining() >= 0 ? 'Margem Disponível' : 'Orçamento Estourado' }}
+        </span>
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
+          [ngClass]="totalRemaining() >= 0 ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' : 'bg-rose-500/15 border border-rose-500/30 text-rose-400'">
+          <i class="fas" [class.fa-piggy-bank]="totalRemaining() >= 0" [class.fa-exclamation-triangle]="totalRemaining() < 0"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <h3 class="text-2xl font-black tracking-tight" [ngClass]="totalRemaining() >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+          {{ totalRemaining() | currency:'BRL':'symbol':'1.2-2' }}
+        </h3>
+        <p class="text-[11px] text-slate-400 mt-1">
+          {{ totalRemaining() >= 0 ? 'Restante para gastar com segurança' : 'Você ultrapassou o teto previsto' }}
+        </p>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+
+    <!-- Comprometimento Global -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm relative overflow-hidden group hover:border-slate-600 transition-all">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Uso Geral</span>
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xs font-bold">
+          {{ overallPercentage() }}%
+        </div>
+      </div>
+      <div class="mt-3">
+        <div class="flex justify-between items-baseline">
+          <h3 class="text-2xl font-black text-white tracking-tight">{{ overallPercentage() }}%</h3>
+          <span class="text-[11px] font-semibold"
+            [ngClass]="overallPercentage() > 100 ? 'text-rose-400' : (overallPercentage() >= 80 ? 'text-amber-400' : 'text-emerald-400')">
+            {{ overallPercentage() > 100 ? 'Estourado' : (overallPercentage() >= 80 ? 'Atenção' : 'Dentro do Teto') }}
+          </span>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-700/60 rounded-full h-2 mt-2 overflow-hidden">
+          <div 
+            class="h-2 rounded-full transition-all duration-500"
+            [ngClass]="overallPercentage() > 100 ? 'bg-rose-500' : (overallPercentage() >= 80 ? 'bg-amber-500' : 'bg-emerald-500')"
+            [style.width.%]="overallPercentage() > 100 ? 100 : overallPercentage()">
+          </div>
+        </div>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+  </div>
+
+  <!-- Alerta Rápido de Categorias Críticas -->
+  @if (exceededCount() > 0 || warningCount() > 0) {
+    <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-xs sm:text-sm">
+      <div class="flex items-center gap-3 text-amber-300">
+        <div class="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
+          <i class="fas fa-bell text-amber-400"></i>
+        </div>
+        <div>
+          <span class="font-bold">Atenção ao orçamento da casa:</span>
+          <span class="text-amber-200/90 ml-1">
+            @if (exceededCount() > 0) {
+              <strong class="text-rose-400 font-extrabold">{{ exceededCount() }} categoria(s)</strong> ultrapassaram o limite estipulado.
+            }
+            @if (warningCount() > 0) {
+              <span>{{ warningCount() }} categoria(s) já atingiram mais de 80% do teto.</span>
+            }
+          </span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Grid de Metas por Categoria -->
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-xl font-bold text-white flex items-center gap-2">
+        <i class="fas fa-th-large text-indigo-400"></i>
+        <span>Categorias Orçadas</span>
+      </h3>
+      <span class="text-xs text-slate-400">{{ filteredBudgets().length }} metas ativas</span>
+    </div>
+
+    @if (filteredBudgets().length === 0) {
+      <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-12 text-center space-y-3 shadow-xl backdrop-blur-sm">
+        <div class="w-16 h-16 rounded-2xl bg-slate-700/40 border border-slate-600/40 flex items-center justify-center mx-auto text-slate-400 text-2xl">
+          <i class="fas fa-bullseye"></i>
+        </div>
+        <h4 class="text-lg font-bold text-white">Nenhum orçamento para este período</h4>
+        <p class="text-slate-400 text-xs sm:text-sm max-w-md mx-auto">
+          Defina limites mensais para as principais categorias deste mês ou clique em "Todos os Meses".
+        </p>
+        <button 
+          type="button" 
+          (click)="openNewBudgetModal()"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow transition-all">
+          <i class="fas fa-plus"></i>
+          <span>Criar Meta para este Mês</span>
+        </button>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        @for (budget of filteredBudgets(); track budget.id) {
+          @let spent = getSpentForBudget(budget);
+          @let pct = getBudgetPercentage(budget);
+          @let remaining = getBudgetRemaining(budget);
+          @let style = getCategoryStyle(budget.category);
+          @let isExceeded = spent > budget.monthlyLimit;
+          @let isWarning = spent >= budget.monthlyLimit * ((budget.alertThresholdPercent || 80) / 100) && !isExceeded;
+
+          <div class="bg-slate-800/85 border rounded-2xl p-5 shadow-xl backdrop-blur-sm flex flex-col justify-between transition-all hover:border-slate-600"
+            [ngClass]="isExceeded ? 'border-rose-500/40' : (isWarning ? 'border-amber-500/40' : 'border-slate-700/60')">
+            
+            <!-- Card Header -->
+            <div>
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-xl flex items-center justify-center text-lg shadow-sm"
+                    [style.background-color]="style.bgLight"
+                    [style.color]="style.color">
+                    <i [class]="style.icon"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-base font-bold text-white tracking-tight">{{ budget.category }}</h4>
+                    <span class="text-[11px] text-slate-400 flex items-center gap-1">
+                      <i class="far fa-calendar text-slate-500"></i>
+                      <span>Ciclo {{ budget.monthYear || 'Mensal' }}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Status Badge -->
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border"
+                  [ngClass]="isExceeded 
+                    ? 'bg-rose-500/15 text-rose-400 border-rose-500/30' 
+                    : (isWarning ? 'bg-amber-500/15 text-amber-400 border-amber-500/30' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30')">
+                  {{ isExceeded ? 'Estourado' : (isWarning ? 'Atenção' : 'Normal') }}
+                </span>
+              </div>
+
+              <!-- Spending Values -->
+              <div class="mt-5 space-y-1">
+                <div class="flex justify-between items-baseline">
+                  <span class="text-xs text-slate-400">Gasto Atual</span>
+                  <span class="text-xs text-slate-400">Limite Estipulado</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-xl font-black" [ngClass]="isExceeded ? 'text-rose-400' : 'text-white'">
+                    {{ spent | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
+                  <span class="text-sm font-semibold text-slate-300">
+                    {{ budget.monthlyLimit | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="mt-3 space-y-1.5">
+                <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-700/50">
+                  <div 
+                    class="h-2.5 rounded-full transition-all duration-500"
+                    [ngClass]="isExceeded ? 'bg-rose-500' : (isWarning ? 'bg-amber-500' : 'bg-emerald-500')"
+                    [style.width.%]="pct > 100 ? 100 : pct">
+                  </div>
+                </div>
+                <div class="flex justify-between text-[11px]">
+                  <span class="font-bold" [ngClass]="isExceeded ? 'text-rose-400' : (isWarning ? 'text-amber-400' : 'text-slate-300')">
+                    {{ pct }}% utilizado
+                  </span>
+                  <span [ngClass]="remaining >= 0 ? 'text-emerald-400' : 'text-rose-400 font-bold'">
+                    {{ remaining >= 0 ? 'Resta ' + (remaining | currency:'BRL':'symbol':'1.2-2') : 'Excedeu em ' + (-remaining | currency:'BRL':'symbol':'1.2-2') }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="mt-5 pt-3 border-t border-slate-700/60 flex items-center justify-between">
+              <!-- Quick Adjust Buttons -->
+              <div class="flex items-center gap-1">
+                <button 
+                  type="button" 
+                  (click)="adjustLimit(budget, -100)"
+                  title="Diminuir limite em R$ 100"
+                  class="px-2.5 py-1 rounded-xl bg-slate-700/40 hover:bg-slate-700 text-slate-300 text-[11px] font-medium transition-colors">
+                  - R$ 100
+                </button>
+                <button 
+                  type="button" 
+                  (click)="adjustLimit(budget, 100)"
+                  title="Aumentar limite em R$ 100"
+                  class="px-2.5 py-1 rounded-xl bg-slate-700/40 hover:bg-slate-700 text-slate-300 text-[11px] font-medium transition-colors">
+                  + R$ 100
+                </button>
+              </div>
+
+              <!-- Edit & Delete -->
+              <div class="flex items-center gap-1">
+                <button 
+                  type="button" 
+                  (click)="openEditBudgetModal(budget)"
+                  class="w-8 h-8 rounded-xl bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition-colors"
+                  title="Editar meta">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button 
+                  type="button" 
+                  (click)="deleteBudget(budget)"
+                  class="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs transition-colors"
+                  title="Excluir meta">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Modal Nova / Editar Meta -->
+  @if (isModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div 
+        (click)="$event.stopPropagation()"
+        class="bg-slate-900 border border-slate-700/80 rounded-2xl p-6 w-full max-w-lg shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-sm">
+              <i class="fas" [class.fa-plus]="!isEditing()" [class.fa-pen]="isEditing()"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">
+              {{ isEditing() ? 'Editar Meta de Orçamento' : 'Definir Nova Meta' }}
+            </h3>
+          </div>
+          <button 
+            type="button" 
+            (click)="closeModal()" 
+            class="w-8 h-8 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition-colors">
+            <i class="fas fa-times text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="space-y-4">
+          <!-- Categoria -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Categoria *</label>
+            <select 
+              [ngModel]="formCategory()" 
+              (ngModelChange)="formCategory.set($event)"
+              class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 transition-all">
+              @for (cat of standardCategories; track cat) {
+                <option [value]="cat">{{ cat }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Limite Mensal -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Teto Máximo Mensal (R$) *</label>
+            <div class="relative">
+              <span class="currency-prefix-badge">R$</span>
+              <input 
+                type="text" 
+                [value]="formMonthlyLimitFormatted()" 
+                (input)="onLimitInput($event)"
+                placeholder="0,00"
+                style="padding-left: 2.85rem !important;"
+                class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 font-semibold focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all currency-input" />
+            </div>
+          </div>
+
+          <!-- Mês/Ano e Limiar de Alerta -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Mês de Referência</label>
+              <input 
+                type="month" 
+                [ngModel]="formMonthYear()" 
+                (ngModelChange)="formMonthYear.set($event)"
+                class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 transition-all" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Alerta com (%)</label>
+              <div class="relative">
+                <input 
+                  type="number" 
+                  min="50" 
+                  max="99"
+                  [ngModel]="formAlertThreshold()" 
+                  (ngModelChange)="formAlertThreshold.set($event)"
+                  class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-indigo-500 transition-all" />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+          <button 
+            type="button" 
+            (click)="closeModal()"
+            class="px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            (click)="saveBudget()"
+            class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center gap-2">
+            <i class="fas fa-check"></i>
+            <span>{{ isEditing() ? 'Atualizar Meta' : 'Salvar Meta' }}</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

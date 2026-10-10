@@ -3,9 +3,9 @@ import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
-import { CustomValidators } from 'ng2-validation';
+import { CustomValidators } from '../../../shared/utils/custom-validators';
 import { fromEvent, merge, Observable } from 'rxjs';
 
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +17,7 @@ import { RegisterService } from '../services/register.service';
 
 @Component({
   selector: 'app-register',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.css',
   providers: [RegisterService]
@@ -96,7 +96,7 @@ export class Register {
   }
 
   registerUser() {
-    if (this.registerForm.dirty && this.registerForm.valid) {
+    if (this.registerForm.valid) {
       this.user = Object.assign({}, this.user, this.registerForm.value);
       this.registerService.registerUser(this.user)
         .pipe(
@@ -104,15 +104,17 @@ export class Register {
         )
         .subscribe({
           next: (success) => {
-            this.processSuccess(success)
+            this.processSuccess(success);
           },
           error: (fail) => {
-            this.processFail(fail)
+            this.processFail(fail);
           },
           complete: () => {
             this.changesNotSaved = false;
           }
-        })
+        });
+    } else {
+      this.displayMessage = this.genericValidator.processMessages(this.registerForm);
     }
   }
 
@@ -120,21 +122,24 @@ export class Register {
     this.registerForm.reset();
     this.errors.set([]);
     this.registerService.LocalStorage.saveLocalUser(response);
-    let toastr = this.toastr.success('Registro realizado com sucesso!', 'Bem vindo!!!', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
+    let toastr = this.toastr.success('Registro realizado com sucesso!', 'Bem-vindo!', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
     if (toastr) {
       toastr.onHidden.subscribe(() => {
         this.router.navigate(['/login']);
-      }),
-        toastr.onTap.subscribe(() => {
-          this.router.navigate(['/login']);
-        })
+      });
+      toastr.onTap.subscribe(() => {
+        this.router.navigate(['/login']);
+      });
+    } else {
+      this.router.navigate(['/login']);
     }
   }
 
   processFail(fail: any) {
     this.errors.set([]);
-    this.errors.set([fail.error.error]);
-    this.toastr.error('Ocorreu um erro!', 'Registro de Usuário', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
+    const errorMsg = fail?.error?.error || fail?.error?.message || 'Falha ao registrar usuário.';
+    this.errors.set(Array.isArray(errorMsg) ? errorMsg : [errorMsg]);
+    this.toastr.error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg, 'Registro de Usuário', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
   }
 
 }

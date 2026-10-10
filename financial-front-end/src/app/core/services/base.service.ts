@@ -34,14 +34,18 @@ export abstract class BaseService {
         let customError: string[] = [];
 
         if (response instanceof HttpErrorResponse) {
-            if (response.statusText === "Unknown Error") {
-                customError.push("Ocorreu um erro desconhecido. Verifique a sua conexão com a internet.");
-                response.error.error = customError;
+            if (response.status === 0 || response.statusText === "Unknown Error") {
+                customError.push("Ocorreu um erro ao conectar ao servidor. Verifique se o backend está em execução.");
+                if (!response.error || typeof response.error !== 'object') {
+                    (response as any).error = { error: customError };
+                } else {
+                    response.error.error = customError;
+                }
             }
         }
 
         console.error(response);
-        return throwError(response);
+        return throwError(() => response);
     }
 
 }

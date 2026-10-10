@@ -1,0 +1,320 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+  <div class="flex justify-between items-center">
+    <div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Cartões & Faturas</h2>
+      <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Gestão de limites, fechamento de ciclo e rateio por cartão</p>
+    </div>
+    @if (workspaceService.isAdmin()) {
+      <button 
+        type="button" 
+        (click)="openNewCardModal()"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-medium shadow-lg shadow-indigo-600/30 transition-all">
+        <i class="fas fa-plus-circle"></i>
+        <span>Novo Cartão</span>
+      </button>
+    } @else {
+      <div class="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center gap-2">
+        <i class="fas fa-lock text-xs"></i>
+        <span>Modo Leitura</span>
+      </div>
+    }
+  </div>
+
+  <!-- Lista de Cartões Visuais -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (card of cards(); track card.id) {
+      <div class="credit-card-preview" [style.background]="card.color === '#000000' ? 'linear-gradient(135deg, #18181b, #27272a)' : 'linear-gradient(135deg, ' + card.color + ', #4c1d95)'">
+        <div class="flex justify-between items-start gap-2">
+          <div>
+            <span class="font-bold tracking-wider text-lg block">{{ card.name }}</span>
+            <span class="text-xs opacity-75 uppercase font-semibold">{{ card.bank }}</span>
+          </div>
+          @if (workspaceService.isAdmin()) {
+            <div class="flex items-center gap-1 bg-black/30 backdrop-blur-md px-1.5 py-1 rounded-xl border border-white/10 shadow-sm shrink-0">
+              <button 
+                type="button" 
+                (click)="openEditCardModal(card)"
+                title="Editar Cartão"
+                class="w-7 h-7 rounded-xl flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 transition-all text-xs">
+                <i class="fas fa-pen"></i>
+              </button>
+              <button 
+                type="button" 
+                (click)="confirmDeleteCard(card)"
+                title="Excluir Cartão"
+                class="w-7 h-7 rounded-xl flex items-center justify-center text-rose-300 hover:text-rose-100 hover:bg-rose-500/30 transition-all text-xs">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="flex items-center gap-3 my-4">
+          <div class="chip"></div>
+          <i class="fas fa-wifi opacity-75"></i>
+        </div>
+
+        <div>
+          <div class="text-xs opacity-75 mb-1 tracking-widest">•••• •••• •••• {{ card.lastDigits }}</div>
+          <div class="flex justify-between items-end mt-2">
+            <div>
+              <span class="text-[10px] uppercase font-bold tracking-wider opacity-75 block">Limite Disponível</span>
+              <span class="font-extrabold text-lg text-white">{{ card.availableLimit | currency:'BRL':'symbol':'1.2-2' }}</span>
+              <span class="text-[10px] opacity-70 block">Total: {{ card.totalLimit | currency:'BRL':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="text-right space-y-0.5">
+              <span class="text-[10px] opacity-80 block">Melhor dia compra: <strong>dia {{ getBestPurchaseDay(card) }}</strong></span>
+              <span class="text-xs font-bold block">Vence dia {{ card.dueDay }}</span>
+              <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 backdrop-blur-md">
+                Até {{ getPaymentDays(card) }} dias p/ pagar
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Faturas Abertas e Fechadas -->
+  <div class="space-y-4 pt-4">
+    <div class="flex justify-between items-center">
+      <h3 class="text-xl font-bold text-white">Faturas do Ciclo</h3>
+      <span class="text-xs text-slate-400">
+        Exibindo período: <strong class="text-indigo-400">{{ periodService.formattedMonthYear() }}</strong>
+      </span>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      @for (invoice of filteredInvoices(); track invoice.id) {
+        <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm space-y-4">
+          <div class="flex justify-between items-start">
+            <div>
+              <span 
+                class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                [ngClass]="invoice.status === 'ABERTA' ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'">
+                Fatura {{ invoice.status }}
+              </span>
+              <h5 class="text-base font-bold text-white mt-2">Mês de Referência: {{ invoice.monthYear }}</h5>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-400 block">Total da Fatura</span>
+              <h4 class="text-xl font-bold text-white">{{ invoice.totalAmount | currency:'BRL':'symbol':'1.2-2' }}</h4>
+            </div>
+          </div>
+
+          <hr class="border-slate-700/60 my-2">
+
+          <div>
+            <h6 class="text-slate-300 text-xs font-semibold mb-2">Divisão de Gastos nesta Fatura:</h6>
+            <div class="space-y-1.5">
+              @for (resp of invoice.responsibleTotals; track resp.responsibleId) {
+                <div class="flex justify-between items-center p-2 rounded-lg bg-slate-900/70 border border-slate-700/40 text-xs">
+                  <span class="text-slate-300 flex items-center gap-1.5">
+                    <i class="fas fa-user text-indigo-400"></i>
+                    {{ responsibleService.getResponsibleName(resp.responsibleId) }}
+                  </span>
+                  <span class="font-semibold text-white">
+                    {{ resp.amount | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-2 text-xs text-slate-400 border-t border-slate-700/60">
+            <span>Fecha em: <strong class="text-slate-300">{{ invoice.closingDate | date:'dd/MM/yyyy' }}</strong></span>
+            <span>Vence em: <strong class="text-slate-300">{{ invoice.dueDate | date:'dd/MM/yyyy' }}</strong></span>
+          </div>
+        </div>
+      } @empty {
+        <div class="col-span-full bg-slate-800/40 border border-slate-700/60 rounded-2xl p-8 text-center text-slate-400">
+          <i class="fas fa-file-invoice-dollar text-2xl mb-2 text-slate-500"></i>
+          <p class="text-sm">Nenhuma fatura encontrada para o período <strong>{{ periodService.formattedMonthYear() }}</strong>.</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Modal Novo / Editar Cartão -->
+  @if (isNewCardModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-150">
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center text-lg">
+              <i [class]="isEditing() ? 'fas fa-pen' : 'fas fa-credit-card'"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">{{ isEditing() ? 'Editar Cartão de Crédito' : 'Novo Cartão de Crédito' }}</h4>
+              <p class="text-xs text-slate-400">{{ isEditing() ? 'Atualize as informações, limites e prazos do cartão' : 'Cadastre um novo cartão para o controle da família' }}</p>
+            </div>
+          </div>
+          <button type="button" (click)="closeNewCardModal()" class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+            <i class="fas fa-times text-lg"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3.5 text-xs sm:text-sm">
+          <div>
+            <label class="block text-slate-300 font-medium mb-1">Nome do Cartão:</label>
+            <input 
+              type="text" 
+              [ngModel]="newCardName()" 
+              (ngModelChange)="newCardName.set($event)"
+              placeholder="Ex: Nubank Ultravioleta, XP Infinite..."
+              class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs sm:text-sm">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Banco / Emissor:</label>
+              <input 
+                type="text" 
+                [ngModel]="newCardBank()" 
+                (ngModelChange)="newCardBank.set($event)"
+                placeholder="Ex: Nubank, Itaú..."
+                class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs sm:text-sm">
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Últimos 4 Dígitos:</label>
+              <input 
+                type="text" 
+                maxlength="4"
+                [ngModel]="newCardLastDigits()" 
+                (ngModelChange)="newCardLastDigits.set($event)"
+                placeholder="Ex: 4195"
+                class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs sm:text-sm">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Limite Total (R$):</label>
+              <div class="relative">
+                <span class="currency-prefix-badge">R$</span>
+                <input 
+                  type="text" 
+                  [value]="newCardTotalLimitFormatted()" 
+                  (input)="onLimitInput($event)"
+                  placeholder="0,00"
+                  style="padding-left: 2.85rem !important;"
+                  class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs sm:text-sm">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Cor do Cartão:</label>
+              <div class="flex items-center gap-2">
+                <input 
+                  type="color" 
+                  [ngModel]="newCardColor()" 
+                  (ngModelChange)="newCardColor.set($event)"
+                  class="w-10 h-9 p-0.5 rounded-lg bg-slate-900 border border-slate-700 cursor-pointer">
+                <span class="text-xs text-slate-400 font-mono">{{ newCardColor() }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Dia do Vencimento:</label>
+              <div class="relative">
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="31"
+                  [ngModel]="newCardDueDay()" 
+                  (ngModelChange)="newCardDueDay.set($event)"
+                  placeholder="Ex: 5"
+                  class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs sm:text-sm">
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 pointer-events-none">dia do mês</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Dias para Pagar:</label>
+              <div class="relative">
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="60"
+                  [ngModel]="newCardPaymentDays()" 
+                  (ngModelChange)="newCardPaymentDays.set($event)"
+                  placeholder="Ex: 38"
+                  class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs sm:text-sm">
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 pointer-events-none">dias de prazo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Destaque Dinâmico do Melhor Dia de Compra -->
+          <div class="p-3.5 bg-gradient-to-r from-indigo-950/60 to-purple-950/60 border border-indigo-500/30 rounded-xl space-y-1.5 shadow-inner">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                <i class="fas fa-magic text-indigo-400"></i>
+                Melhor Dia de Compra (Dinâmico):
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-indigo-500/25 text-indigo-300 border border-indigo-500/40">
+                Todo dia {{ dynamicBestPurchaseDay() }}
+              </span>
+            </div>
+            <p class="text-[11px] leading-relaxed text-slate-400">
+              Com vencimento no <strong class="text-white">dia {{ newCardDueDay() }}</strong> e prazo de <strong class="text-white">{{ newCardPaymentDays() }} dias</strong>, compras a partir do <strong class="text-emerald-400">dia {{ dynamicBestPurchaseDay() }}</strong> entram na fatura subsequente, garantindo o prazo máximo para pagamento.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-700/60">
+          <button 
+            type="button" 
+            (click)="closeNewCardModal()" 
+            class="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-700/50 text-xs sm:text-sm font-medium transition-colors">
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            (click)="saveCard()" 
+            class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-medium shadow-md shadow-indigo-600/30 transition-all flex items-center gap-2">
+            <i class="fas fa-check"></i>
+            <span>{{ isEditing() ? 'Atualizar Cartão' : 'Salvar Cartão' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal Confirmação de Exclusão -->
+  @if (isDeleteModalOpen() && cardToDelete()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-400 mx-auto flex items-center justify-center text-xl shadow-inner">
+          <i class="fas fa-trash-alt"></i>
+        </div>
+        <div>
+          <h4 class="text-lg font-bold text-white">Excluir Cartão?</h4>
+          <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+            Tem certeza de que deseja remover o cartão <strong class="text-white">{{ cardToDelete()?.name }}</strong> (final {{ cardToDelete()?.lastDigits }})?
+          </p>
+          <span class="inline-block mt-2 text-[11px] text-slate-400">Esta ação não poderá ser desfeita.</span>
+        </div>
+        <div class="flex items-center justify-center gap-2.5 pt-2 border-t border-slate-700/60">
+          <button 
+            type="button" 
+            (click)="cancelDelete()"
+            class="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-700/50 text-xs sm:text-sm font-medium transition-colors">
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            (click)="executeDeleteCard()"
+            class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-medium shadow-md shadow-rose-600/30 transition-all flex items-center gap-1.5">
+            <i class="fas fa-trash"></i>
+            <span>Sim, Excluir</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

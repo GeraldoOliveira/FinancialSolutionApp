@@ -1,0 +1,317 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 text-lg shadow-sm">
+        <i class="fas fa-file-invoice-dollar"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Importação de Extrato Bancário</h2>
+        <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Importação em lote de arquivos OFX e CSV com classificação inteligente por IA</p>
+      </div>
+    </div>
+
+    <!-- Supported Banks Badges -->
+    <div class="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-400">
+      <span class="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 font-semibold text-slate-300">Nubank</span>
+      <span class="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 font-semibold text-slate-300">Itaú</span>
+      <span class="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 font-semibold text-slate-300">Inter</span>
+      <span class="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 font-semibold text-slate-300">Bradesco</span>
+      <span class="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 font-semibold text-slate-300">C6 Bank</span>
+    </div>
+  </div>
+
+  <!-- TELA DE SUCESSO APÓS IMPORTAÇÃO -->
+  @if (importCompleted()) {
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-8 sm:p-12 text-center space-y-5 shadow-2xl backdrop-blur-sm animate-in zoom-in-95 duration-150">
+      <div class="w-20 h-20 rounded-3xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400 text-4xl shadow-lg">
+        <i class="fas fa-check-circle"></i>
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-2xl font-black text-white">Importação Concluída com Sucesso!</h3>
+        <p class="text-slate-300 text-sm max-w-md mx-auto">
+          <strong>{{ importedCount() }} transações</strong> foram reconciliadas, categorizadas e gravadas nas finanças da família.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-4">
+        <a [routerLink]="['/dashboard']" 
+          class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2">
+          <i class="fas fa-chart-pie"></i>
+          <span>Ver no Dashboard</span>
+        </a>
+
+        <a [routerLink]="['/expense/list']" 
+          class="px-5 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2">
+          <i class="fas fa-list"></i>
+          <span>Ver Despesas</span>
+        </a>
+
+        <button 
+          type="button" 
+          (click)="resetImport()"
+          class="px-5 py-2.5 rounded-xl border border-slate-600 text-slate-300 hover:text-white hover:bg-slate-700/50 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2">
+          <i class="fas fa-plus"></i>
+          <span>Importar Outro Arquivo</span>
+        </button>
+      </div>
+    </div>
+  } @else {
+
+    <!-- ÁREA DE UPLOAD E ARRASTAR ARQUIVO -->
+    @if (transactions().length === 0 && !isAnalyzing()) {
+      <div 
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        class="bg-slate-800/85 border-2 border-dashed rounded-3xl p-8 sm:p-14 text-center space-y-4 shadow-xl backdrop-blur-sm transition-all"
+        [ngClass]="isDragging() ? 'border-purple-500 bg-purple-500/10 scale-[1.01]' : 'border-slate-700/80 hover:border-slate-600'">
+        
+        <div class="w-16 h-16 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center mx-auto text-purple-400 text-2xl shadow-sm">
+          <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+
+        <div class="space-y-1">
+          <h4 class="text-lg sm:text-xl font-bold text-white">
+            Arraste seu extrato bancário aqui
+          </h4>
+          <p class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+            Compatível com arquivos <strong>.OFX</strong> (padrão de todos os bancos) ou planilhas <strong>.CSV</strong> de extrato.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <label class="cursor-pointer inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-purple-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
+            <i class="fas fa-file-upload text-base"></i>
+            <span>Escolher Arquivo do Computador</span>
+            <input 
+              type="file" 
+              accept=".ofx,.csv,.txt"
+              (change)="onFileSelected($event)"
+              class="hidden" />
+          </label>
+
+          <span class="text-slate-500 text-xs">ou</span>
+
+          <button 
+            type="button" 
+            (click)="loadSampleStatement()"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-700/60 hover:bg-slate-700 border border-slate-600/60 text-slate-200 text-xs sm:text-sm font-semibold transition-colors">
+            <i class="fas fa-flask text-amber-400"></i>
+            <span>Testar com Extrato Exemplo (1-Clique)</span>
+          </button>
+        </div>
+
+        <div class="pt-4 border-t border-slate-700/50 flex flex-wrap items-center justify-center gap-6 text-[11px] text-slate-400">
+          <span class="flex items-center gap-1.5">
+            <i class="fas fa-shield-alt text-emerald-400"></i>
+            <span>Processamento local seguro</span>
+          </span>
+          <span class="flex items-center gap-1.5">
+            <i class="fas fa-magic text-purple-400"></i>
+            <span>Categorização automática por IA</span>
+          </span>
+          <span class="flex items-center gap-1.5">
+            <i class="fas fa-users text-indigo-400"></i>
+            <span>Rateio familiar calculado</span>
+          </span>
+        </div>
+
+      </div>
+    }
+
+    <!-- LOADER DE ANÁLISE POR IA -->
+    @if (isAnalyzing()) {
+      <div class="bg-slate-800/85 border border-slate-700/60 rounded-3xl p-12 text-center space-y-4 shadow-xl backdrop-blur-sm animate-in fade-in duration-200">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-500/20 text-purple-400 text-2xl animate-spin">
+          <i class="fas fa-circle-notch"></i>
+        </div>
+        <h4 class="text-xl font-bold text-white">Inteligência Artificial Analisando Extrato...</h4>
+        <p class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+          Identificando estabelecimentos, detectando receitas vs despesas e sugerindo categorias e cotas de rateio familiar.
+        </p>
+      </div>
+    }
+
+    <!-- TABELA DE CONCILIAÇÃO & REVISÃO EM LOTE -->
+    @if (transactions().length > 0 && !isAnalyzing()) {
+      <div class="space-y-4">
+
+        <!-- Toolbar de Resumo -->
+        <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-4 shadow-xl backdrop-blur-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-white uppercase tracking-wider">Arquivo:</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-400 border border-purple-500/30">
+                {{ fileName() }}
+              </span>
+            </div>
+            <div class="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-3">
+              <span><strong>{{ transactions().length }}</strong> transações encontradas</span>
+              <span>•</span>
+              <span class="text-rose-400">Despesas: {{ totalSelectedExpenses() | currency:'BRL':'symbol':'1.2-2' }}</span>
+              <span>•</span>
+              <span class="text-emerald-400">Receitas: {{ totalSelectedIncomes() | currency:'BRL':'symbol':'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Filter & Action Controls -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Filter Tabs -->
+            <div class="inline-flex p-1 bg-slate-900 border border-slate-700/80 rounded-xl text-xs font-medium">
+              <button 
+                type="button" 
+                (click)="filterType.set('ALL')"
+                class="px-3 py-1.5 rounded-xl transition-all"
+                [ngClass]="filterType() === 'ALL' ? 'bg-indigo-600 text-white font-semibold shadow' : 'text-slate-400 hover:text-white'">
+                Todas ({{ transactions().length }})
+              </button>
+              <button 
+                type="button" 
+                (click)="filterType.set('EXPENSE')"
+                class="px-3 py-1.5 rounded-xl transition-all"
+                [ngClass]="filterType() === 'EXPENSE' ? 'bg-rose-600 text-white font-semibold shadow' : 'text-slate-400 hover:text-white'">
+                Despesas
+              </button>
+              <button 
+                type="button" 
+                (click)="filterType.set('INCOME')"
+                class="px-3 py-1.5 rounded-xl transition-all"
+                [ngClass]="filterType() === 'INCOME' ? 'bg-emerald-600 text-white font-semibold shadow' : 'text-slate-400 hover:text-white'">
+                Receitas
+              </button>
+            </div>
+
+            <!-- Import Primary Button -->
+            <button 
+              type="button" 
+              (click)="confirmBatchImport()"
+              [disabled]="selectedTransactions().length === 0 || isImporting()"
+              class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2">
+              <i class="fas" [class.fa-file-import]="!isImporting()" [class.fa-spinner]="isImporting()" [class.fa-spin]="isImporting()"></i>
+              <span>Importar {{ selectedTransactions().length }} Selecionadas</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela Responsiva de Transações -->
+        <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl shadow-xl backdrop-blur-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+              <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 font-semibold tracking-wider border-b border-slate-700/60">
+                <tr>
+                  <th class="py-3 px-4 w-10 text-center">
+                    <input 
+                      type="checkbox" 
+                      [checked]="isAllSelected()"
+                      (change)="toggleAll($any($event.target).checked)"
+                      class="rounded text-indigo-600 focus:ring-indigo-500 bg-slate-800 border-slate-700" />
+                  </th>
+                  <th class="py-3 px-3">Tipo</th>
+                  <th class="py-3 px-3">Data</th>
+                  <th class="py-3 px-4">Estabelecimento / Descrição</th>
+                  <th class="py-3 px-4">Categoria (Sugerida por IA)</th>
+                  <th class="py-3 px-3">Método</th>
+                  <th class="py-3 px-4 text-right">Valor</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-700/50">
+                @for (tx of filteredTransactions(); track tx.id) {
+                  <tr class="hover:bg-slate-700/30 transition-colors" [ngClass]="{'opacity-60': !tx.selected}">
+                    
+                    <!-- Checkbox -->
+                    <td class="py-3 px-4 text-center">
+                      <input 
+                        type="checkbox" 
+                        [(ngModel)]="tx.selected"
+                        class="rounded text-indigo-600 focus:ring-indigo-500 bg-slate-800 border-slate-700" />
+                    </td>
+
+                    <!-- Tipo -->
+                    <td class="py-3 px-3">
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                        [ngClass]="tx.type === 'INCOME' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'">
+                        {{ tx.type === 'INCOME' ? 'Receita' : 'Despesa' }}
+                      </span>
+                    </td>
+
+                    <!-- Data -->
+                    <td class="py-3 px-3 text-xs text-slate-400 whitespace-nowrap">
+                      {{ tx.date | date:'dd/MM/yyyy' }}
+                    </td>
+
+                    <!-- Estabelecimento / Descrição editável -->
+                    <td class="py-3 px-4">
+                      <input 
+                        type="text" 
+                        [(ngModel)]="tx.establishment"
+                        class="w-full px-2.5 py-1 bg-slate-900/60 border border-slate-700/70 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500 transition-all font-medium" />
+                      <span class="text-[11px] text-slate-400 block mt-0.5 truncate max-w-xs">
+                        Original: {{ tx.originalDescription }}
+                      </span>
+                    </td>
+
+                    <!-- Categoria Dropdown -->
+                    <td class="py-3 px-4">
+                      @if (tx.type === 'EXPENSE') {
+                        <select 
+                          [(ngModel)]="tx.category"
+                          class="px-2.5 py-1 bg-slate-900/60 border border-slate-700/70 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500 transition-all">
+                          @for (cat of availableCategories; track cat) {
+                            <option [value]="cat">{{ cat }}</option>
+                          }
+                        </select>
+                      } @else {
+                        <span class="text-xs text-emerald-400 font-medium">Entrada / Renda</span>
+                      }
+                    </td>
+
+                    <!-- Método -->
+                    <td class="py-3 px-3 whitespace-nowrap">
+                      <span class="text-xs text-slate-300">
+                        {{ tx.paymentMethod === '1' ? 'Cartão' : 'Pix' }}
+                      </span>
+                    </td>
+
+                    <!-- Valor -->
+                    <td class="py-3 px-4 text-right font-black whitespace-nowrap"
+                      [ngClass]="tx.type === 'INCOME' ? 'text-emerald-400' : 'text-rose-400'">
+                      {{ tx.type === 'INCOME' ? '+ ' : '- ' }}{{ tx.amount | currency:'BRL':'symbol':'1.2-2' }}
+                    </td>
+
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Rodapé com botão de descarte -->
+          <div class="p-4 bg-slate-900/60 border-t border-slate-700/60 flex items-center justify-between">
+            <button 
+              type="button" 
+              (click)="resetImport()"
+              class="px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-rose-400 transition-colors">
+              <i class="fas fa-trash-alt mr-1"></i>
+              <span>Descartar e Escolher Outro Arquivo</span>
+            </button>
+
+            <button 
+              type="button" 
+              (click)="confirmBatchImport()"
+              [disabled]="selectedTransactions().length === 0 || isImporting()"
+              class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2">
+              <i class="fas fa-check"></i>
+              <span>Confirmar e Importar {{ selectedTransactions().length }} Itens</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    }
+
+  }
+
+</div>

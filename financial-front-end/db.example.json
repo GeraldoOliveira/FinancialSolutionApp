@@ -1,0 +1,1310 @@
+{
+  "users": [
+    {
+      "accessToken": "1",
+      "userToken": "1",
+      "name": "Usuario Administrador",
+      "email": "admin@exemplo.com",
+      "password": "password123",
+      "createdAt": "2025-10-07T16:20:52.534Z",
+      "id": 1,
+      "claims": [
+        {
+          "type": "Expense",
+          "value": "Create,Edit,Delete"
+        }
+      ],
+      "image": "default-avatar.png",
+      "imageUpload": "",
+      "phone": "11999990001"
+    },
+    {
+      "accessToken": "1",
+      "userToken": "1",
+      "name": "Usuario 2",
+      "email": "usuario2@exemplo.com",
+      "password": "password123",
+      "image": "default-avatar.png",
+      "imageUpload": "",
+      "claims": [
+        {
+          "type": "Expense",
+          "value": "Create,Edit,Delete"
+        }
+      ],
+      "createdAt": "2025-12-09T01:57:46.538Z",
+      "id": 2,
+      "phone": "11999990001"
+    },
+    {
+      "id": 3,
+      "name": "Usuario 3",
+      "email": "usuario3@exemplo.com",
+      "phone": "11999990001",
+      "imageUpload": "",
+      "image": "default-avatar.png",
+      "createdAt": "2026-10-16T00:31:27.979Z",
+      "accessToken": "oauth_token_1792110687979",
+      "userToken": "user_token_1792110687979",
+      "password": "password123"
+    },
+    {
+      "id": 4,
+      "name": "Usuario 4",
+      "email": "usuario4@exemplo.com",
+      "phone": "11999990001",
+      "imageUpload": "",
+      "image": "default-avatar.png",
+      "createdAt": "2026-10-16T00:51:38.450Z",
+      "accessToken": "oauth_token_1792111898450",
+      "userToken": "user_token_1792111898450",
+      "password": "password123"
+    }
+  ],
+  "expense": [
+    {
+      "expenseOrigin": {
+        "name": "Supermercado",
+        "description": "Frango"
+      },
+      "totalValue": "500",
+      "methodList": "1",
+      "creditCardList": "1",
+      "installments": "1",
+      "expenseResponsibles": [
+        {
+          "responsibleId": 1,
+          "proratedValue": 100
+        },
+        {
+          "responsibleId": 3,
+          "proratedValue": 100
+        },
+        {
+          "responsibleId": 2,
+          "proratedValue": 10
+        },
+        {
+          "responsibleId": 3,
+          "proratedValue": 190
+        },
+        {
+          "responsibleId": 1,
+          "proratedValue": 100
+        }
+      ],
+      "categoryList": "Carro",
+      "date": "2025-10-16T21:48",
+      "apiId": "v1",
+      "id": 3,
+      "paymentMethod": "1",
+      "creditCardId": 1
+    },
+    {
+      "expenseOrigin": {
+        "name": "Supermercado",
+        "description": "Frango"
+      },
+      "totalValue": "1222",
+      "methodList": "1",
+      "creditCardList": "1",
+      "installments": "1",
+      "expenseResponsibles": [
+        {
+          "responsibleId": 1,
+          "proratedValue": 350
+        },
+        {
+          "responsibleId": 3,
+          "proratedValue": 350
+        },
+        {
+          "responsibleId": 2,
+          "proratedValue": 350
+        },
+        {
+          "responsibleId": 3,
+          "proratedValue": 172
+        }
+      ],
+      "categoryList": "Alimentacao",
+      "date": "2025-10-16T21:48",
+      "apiId": "v1",
+      "id": 4
+    },
+    {
+      "expenseOrigin": {
+        "name": "Real",
+        "description": "Carne"
+      },
+      "totalValue": "122",
+      "methodList": "1",
+      "creditCardList": "2",
+      "installments": "1",
+      "expenseResponsibles": [
+        {
+          "responsibleId": 1,
+          "proratedValue": 12
+        },
+        {
+          "responsibleId": 2,
+          "proratedValue": 12
+        },
+        {
+          "responsibleId": 3,
+          "proratedValue": 98
+        }
+      ],
+      "categoryList": "Viagem",
+      "date": "2025-12-18T22:04",
+      "apiId": "v1",
+      "id": 5
+    },
+    {
+      "expenseOrigin": {
+        "name": "Casa Mineira - Paraisópolis",
+        "description": "Compra no cartão de crédito em Casa Mineira (2x de R$ 77,50 - Total R$ 155,00)"
+      },
+      "totalValue": "38.75",
+      "methodList": "1",
+      "creditCardList": "4",
+      "installments": 4,
+      "expenseResponsibles": [
+        {
+          "responsibleId": 1,
+          "proratedValue": 20
+        },
+        {
+          "responsibleId": 2,
+          "proratedValue": 18.75
+        }
+      ],
+      "categoryList": "Alimentacao",
+      "date": "2026-10-09T16:54",
+      "receiptName": "Comprovante colado (Ctrl+V)",
+      "apiId": "v1",
+      "id": 6
+    },
+    {
+      "expenseOrigin": {
+        "name": "Casa Mineira - Paraisópolis",
+        "description": "Compra no cartão de crédito em Casa Mineira (2x de R$ 77,50 - Total R$ 155,00)"
+      },
+      "totalValue": "38.75",
+      "methodList": "1",
+      "creditCardList": "4",
+      "installments": "2",
+      "expenseResponsibles": [
+        {
+          "responsibleId": 2,
+          "proratedValue": 38.75
+        }
+      ],
+      "categoryList": "Alimentacao",
+      "date": "2026-10-09T16:54",
+      "receiptName": "Comprovante colado (Ctrl+V)",
+      "apiId": "v1",
+      "id": 7
+    },
+    {
+      "expenseOrigin": {
+        "name": "Pagamento recebido",
+        "description": "Pagamento recebido"
+      },
+      "totalValue": "1.136",
+      "paymentMethod": "2",
+      "creditCardId": 0,
+      "installments": 1,
+      "userId": 2,
+      "categoryId": 1,
+      "categoryList": "Outros",
+      "date": "2026-08-06T00:00:00.000Z",
+      "expenseResponsibles": [
+        {
+          "responsibleId": 1,
+          "proratedValue": 0.38
+        },
+        {
+          "responsibleId": 2,
+          "proratedValue": 0.38
+        },
+        {
+          "responsibleId": 3,
+          "proratedValue": 0.38
+        }
+      ],
+      "id": 1791937517378
+    },
+    {
+      "expenseOrigin": {
+        "name": "Pagamento recebido",
+        "description": "Pagamento recebido"
+      },
+      "totalValue": "1.136",
+      "paymentMethod": "2",
+      "creditCardId": 0,
+      "installments": 1,
+      "userId": 2,
+      "categoryId": 1,
+      "categoryList": "Outros",
+      "date": "2026-08-06T00:00:00.000Z",
+      "expenseResponsibles": [
+        {
+          "responsibleId": 1,
+          "proratedValue": 0.38
+        },
+        {
+          "responsibleId": 2,
+          "proratedValue": 0.38
+        },
+        {
+          "responsibleId": 3,
+          "proratedValue": 0.38
+        }
+      ],
+      "id": 1791937581746
+    },
+    {
+      "expenseOrigin": {
+        "name": "asda",
+        "description": "asdas"
+      },
+      "totalValue": "100",
+      "methodList": "1",
+      "creditCardList": 1,
+      "installments": 3,
+      "expenseResponsibles": [
+        {
+          "responsibleId": 1,
+          "proratedValue": 50
+        },
+        {
+          "responsibleId": 2,
+          "proratedValue": 50
+        }
+      ],
+      "categoryList": "Alimentacao",
+      "date": "2026-10-14T21:06",
+      "paymentMethod": "1",
+      "creditCardId": 1,
+      "apiId": "v1",
+      "id": 1791937581747
+    }
+  ],
+  "creditCards": [
+    {
+      "id": 1,
+      "name": "Nubank Ultravioleta",
+      "bank": "Nubank",
+      "lastDigits": "4821",
+      "color": "#8B5CF6",
+      "totalLimit": 15000,
+      "availableLimit": 9450,
+      "closingDay": 10,
+      "dueDay": 17
+    },
+    {
+      "id": 2,
+      "name": "XP Visa Infinite",
+      "bank": "XP Investimentos",
+      "lastDigits": "9012",
+      "color": "#000000",
+      "totalLimit": 25000,
+      "availableLimit": 21800,
+      "closingDay": 22,
+      "dueDay": 29
+    },
+    {
+      "id": 3,
+      "name": "Bradesco Cartões",
+      "bank": "Bradesco",
+      "lastDigits": "4641",
+      "color": "#CC092F",
+      "totalLimit": 12000,
+      "availableLimit": 8450,
+      "closingDay": 25,
+      "dueDay": 2
+    },
+    {
+      "name": "asda",
+      "bank": "Nubank",
+      "lastDigits": "4141",
+      "color": "#820AD1",
+      "totalLimit": 10,
+      "availableLimit": 10,
+      "closingDay": 6,
+      "dueDay": 5,
+      "paymentDays": 30,
+      "apiId": "v1",
+      "id": 4
+    }
+  ],
+  "invoices": [
+    {
+      "id": 1,
+      "cardId": 1,
+      "monthYear": "2026-10",
+      "closingDate": "2026-10-10",
+      "dueDate": "2026-10-17",
+      "totalAmount": 2840.5,
+      "status": "ABERTA",
+      "responsibleTotals": [
+        {
+          "responsibleId": 1,
+          "amount": 1420.25
+        },
+        {
+          "responsibleId": 2,
+          "amount": 1420.25
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "cardId": 2,
+      "monthYear": "2026-10",
+      "closingDate": "2026-10-22",
+      "dueDate": "2026-10-29",
+      "totalAmount": 1200,
+      "status": "ABERTA",
+      "responsibleTotals": [
+        {
+          "responsibleId": 2,
+          "amount": 800
+        },
+        {
+          "responsibleId": 3,
+          "amount": 400
+        }
+      ]
+    }
+  ],
+  "incomes": [
+    {
+      "id": 1,
+      "description": "Salário Mensal - Tech Corp",
+      "source": "Salário",
+      "amount": 9500,
+      "date": "2026-10-05",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Salário Neto"
+    },
+    {
+      "id": 2,
+      "description": "Consultoria e Freelance",
+      "source": "Freelance",
+      "amount": 4200,
+      "date": "2026-10-08",
+      "recipientId": 1,
+      "received": true,
+      "notes": "Rendimento Anelise"
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 8,
+      "date": "2026-08-27",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517403
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 5,
+      "date": "2026-08-27",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Esther Minimercado",
+      "id": 1791937517416
+    },
+    {
+      "description": "Mercadinho Real",
+      "source": "Salário / Transferência",
+      "amount": 30,
+      "date": "2026-08-26",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Mercadinho Real",
+      "id": 1791937517429
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 14,
+      "date": "2026-08-25",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517443
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 14,
+      "date": "2026-08-25",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937517455
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 26,
+      "date": "2026-08-24",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517470
+    },
+    {
+      "description": "Zp*Eder Rodney Tattoo",
+      "source": "Salário / Transferência",
+      "amount": 150,
+      "date": "2026-08-22",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Zp*Eder Rodney Tattoo",
+      "id": 1791937517485
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 14,
+      "date": "2026-08-21",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Esther Minimercado",
+      "id": 1791937517498
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 55,
+      "date": "2026-08-21",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937517510
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 7,
+      "date": "2026-08-21",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517525
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 30,
+      "date": "2026-08-20",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517538
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 26,
+      "date": "2026-08-18",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517551
+    },
+    {
+      "description": "50002652karina",
+      "source": "Salário / Transferência",
+      "amount": 20,
+      "date": "2026-08-17",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: 50002652karina",
+      "id": 1791937517564
+    },
+    {
+      "description": "Lima Flores",
+      "source": "Salário / Transferência",
+      "amount": 20,
+      "date": "2026-08-12",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Lima Flores",
+      "id": 1791937517577
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 16,
+      "date": "2026-08-12",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937517589
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 26,
+      "date": "2026-08-12",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517602
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 16,
+      "date": "2026-08-08",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517616
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 44,
+      "date": "2026-08-06",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937517629
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 116,
+      "date": "2026-08-05",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937517642
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 30,
+      "date": "2026-08-05",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517655
+    },
+    {
+      "description": "Lima Flores",
+      "source": "Salário / Transferência",
+      "amount": 20,
+      "date": "2026-08-05",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Lima Flores",
+      "id": 1791937517668
+    },
+    {
+      "description": "Pro Vida Paraisopolis",
+      "source": "Salário / Transferência",
+      "amount": 59,
+      "date": "2026-08-05",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Pro Vida Paraisopolis",
+      "id": 1791937517682
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 40,
+      "date": "2026-08-03",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517695
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 7,
+      "date": "2026-08-02",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517708
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 10,
+      "date": "2026-08-02",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517720
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 76,
+      "date": "2026-08-01",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937517733
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 31,
+      "date": "2026-08-01",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517745
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 8,
+      "date": "2026-07-31",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517757
+    },
+    {
+      "description": "Pro Vida Paraisopolis",
+      "source": "Salário / Transferência",
+      "amount": 17,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Pro Vida Paraisopolis",
+      "id": 1791937517769
+    },
+    {
+      "description": "Floricultura - Parcela 4/10",
+      "source": "Salário / Transferência",
+      "amount": 13,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Floricultura - Parcela 4/10",
+      "id": 1791937517782
+    },
+    {
+      "description": "Floricultura - Parcela 4/10",
+      "source": "Salário / Transferência",
+      "amount": 13,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Floricultura - Parcela 4/10",
+      "id": 1791937517795
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 13,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937517807
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 15,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Esther Minimercado",
+      "id": 1791937517819
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 8,
+      "date": "2026-08-27",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937581831
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 5,
+      "date": "2026-08-27",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Esther Minimercado",
+      "id": 1791937581898
+    },
+    {
+      "description": "Mercadinho Real",
+      "source": "Salário / Transferência",
+      "amount": 30,
+      "date": "2026-08-26",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Mercadinho Real",
+      "id": 1791937581921
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 14,
+      "date": "2026-08-25",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937581936
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 14,
+      "date": "2026-08-25",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937581949
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 26,
+      "date": "2026-08-24",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937581962
+    },
+    {
+      "description": "Zp*Eder Rodney Tattoo",
+      "source": "Salário / Transferência",
+      "amount": 150,
+      "date": "2026-08-22",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Zp*Eder Rodney Tattoo",
+      "id": 1791937581976
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 14,
+      "date": "2026-08-21",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Esther Minimercado",
+      "id": 1791937581989
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 55,
+      "date": "2026-08-21",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937582006
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 7,
+      "date": "2026-08-21",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582033
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 30,
+      "date": "2026-08-20",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582051
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 26,
+      "date": "2026-08-18",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582068
+    },
+    {
+      "description": "50002652karina",
+      "source": "Salário / Transferência",
+      "amount": 20,
+      "date": "2026-08-17",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: 50002652karina",
+      "id": 1791937582101
+    },
+    {
+      "description": "Lima Flores",
+      "source": "Salário / Transferência",
+      "amount": 20,
+      "date": "2026-08-12",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Lima Flores",
+      "id": 1791937582124
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 16,
+      "date": "2026-08-12",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937582164
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 26,
+      "date": "2026-08-12",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582203
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 16,
+      "date": "2026-08-08",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582235
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 44,
+      "date": "2026-08-06",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937582273
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 116,
+      "date": "2026-08-05",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937582314
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 30,
+      "date": "2026-08-05",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582346
+    },
+    {
+      "description": "Lima Flores",
+      "source": "Salário / Transferência",
+      "amount": 20,
+      "date": "2026-08-05",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Lima Flores",
+      "id": 1791937582371
+    },
+    {
+      "description": "Pro Vida Paraisopolis",
+      "source": "Salário / Transferência",
+      "amount": 59,
+      "date": "2026-08-05",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Pro Vida Paraisopolis",
+      "id": 1791937582392
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 40,
+      "date": "2026-08-03",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582407
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 7,
+      "date": "2026-08-02",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582421
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 10,
+      "date": "2026-08-02",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582438
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 76,
+      "date": "2026-08-01",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Unissul Supermercados",
+      "id": 1791937582454
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 31,
+      "date": "2026-08-01",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582469
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 8,
+      "date": "2026-07-31",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582484
+    },
+    {
+      "description": "Pro Vida Paraisopolis",
+      "source": "Salário / Transferência",
+      "amount": 17,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Pro Vida Paraisopolis",
+      "id": 1791937582500
+    },
+    {
+      "description": "Floricultura - Parcela 4/10",
+      "source": "Salário / Transferência",
+      "amount": 13,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Floricultura - Parcela 4/10",
+      "id": 1791937582521
+    },
+    {
+      "description": "Floricultura - Parcela 4/10",
+      "source": "Salário / Transferência",
+      "amount": 13,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Floricultura - Parcela 4/10",
+      "id": 1791937582552
+    },
+    {
+      "description": "Supermercad Central",
+      "source": "Salário / Transferência",
+      "amount": 13,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Supermercad Central",
+      "id": 1791937582602
+    },
+    {
+      "description": "Supermercado / Compras",
+      "source": "Salário / Transferência",
+      "amount": 15,
+      "date": "2026-07-30",
+      "recipientId": 2,
+      "received": true,
+      "notes": "Importado de extrato: Esther Minimercado",
+      "id": 1791937582650
+    },
+    {
+      "description": "Freelance",
+      "source": "Freelance",
+      "amount": 2.5,
+      "date": "2026-10-15",
+      "recipientId": 2,
+      "received": true,
+      "id": 1792022766357
+    },
+    {
+      "description": "Free",
+      "source": "Salário",
+      "amount": 100000,
+      "date": "2026-10-15",
+      "recipientId": 1,
+      "received": true,
+      "id": 1792022783335
+    },
+    {
+      "description": "Salario",
+      "source": "Salário",
+      "amount": 100,
+      "date": "2026-10-15",
+      "recipientId": 1,
+      "received": false,
+      "notes": "",
+      "id": 1792024176843
+    },
+    {
+      "description": "asdas",
+      "source": "Salário",
+      "amount": 100,
+      "date": "2026-10-15",
+      "recipientId": 1,
+      "received": true,
+      "notes": "",
+      "id": 1792024215409
+    }
+  ],
+  "budgets": [
+    {
+      "id": 1,
+      "category": "Alimentacao",
+      "monthlyLimit": 2500,
+      "currentSpent": 1820,
+      "monthYear": "2026-10",
+      "alertThresholdPercent": 80
+    },
+    {
+      "id": 2,
+      "category": "Carro",
+      "monthlyLimit": 1200,
+      "currentSpent": 650,
+      "monthYear": "2026-10",
+      "alertThresholdPercent": 80
+    },
+    {
+      "id": 3,
+      "category": "Viagem",
+      "monthlyLimit": 2000,
+      "currentSpent": 1950,
+      "monthYear": "2026-10",
+      "alertThresholdPercent": 80
+    },
+    {
+      "id": 4,
+      "category": "Lazer",
+      "monthlyLimit": 1000,
+      "currentSpent": 420,
+      "monthYear": "2026-10",
+      "alertThresholdPercent": 80
+    },
+    {
+      "category": "Compras & Vestuário",
+      "monthlyLimit": 1200,
+      "currentSpent": 0,
+      "monthYear": "2026-10",
+      "alertThresholdPercent": 50,
+      "id": 1792024427873
+    }
+  ],
+  "responsibles": [
+    {
+      "id": 1,
+      "name": "Anelise",
+      "phone": "5511999990001",
+      "color": "#EC4899"
+    },
+    {
+      "id": 2,
+      "name": "Neto",
+      "phone": "5511999990002",
+      "color": "#3B82F6"
+    },
+    {
+      "id": 3,
+      "name": "Yah",
+      "phone": "5511999990003",
+      "color": "#10B981"
+    }
+  ],
+  "workspaces": [
+    {
+      "id": "ws_neto",
+      "name": "Finanças Família (Neto)",
+      "ownerUserId": 1,
+      "adminName": "Usuario Administrador",
+      "adminPixKey": "admin@exemplo.com",
+      "adminPhone": "5511999990001",
+      "description": "Workspace principal da casa e controle de cartões",
+      "color": "#3B82F6",
+      "icon": "fa-home",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "ws_anelise",
+      "name": "Casa da Anelise",
+      "ownerUserId": 2,
+      "adminName": "Usuario Administrador",
+      "adminPixKey": "admin@exemplo.com",
+      "adminPhone": "5511999990001",
+      "description": "Workspace de despesas compartilhadas gerenciado pela Anelise",
+      "color": "#EC4899",
+      "icon": "fa-user-friends",
+      "createdAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "ws_user_3",
+      "name": "Workspace de Test User",
+      "ownerUserId": 3,
+      "adminName": "Usuario Administrador",
+      "adminPhone": "5511999990001",
+      "adminPixKey": "admin@exemplo.com",
+      "description": "Meu workspace pessoal",
+      "color": "#4F46E5",
+      "icon": "fa-home",
+      "createdAt": "2026-10-16T00:31:27.991Z"
+    },
+    {
+      "id": "ws_user_4",
+      "name": "Workspace de Anelise",
+      "ownerUserId": 4,
+      "adminName": "Usuario Administrador",
+      "adminPhone": "5511999990001",
+      "adminPixKey": "admin@exemplo.com",
+      "description": "Meu workspace pessoal",
+      "color": "#4F46E5",
+      "icon": "fa-home",
+      "createdAt": "2026-10-16T00:51:38.465Z"
+    }
+  ],
+  "workspace_members": [
+    {
+      "id": 1,
+      "workspaceId": "ws_neto",
+      "userId": 1,
+      "userName": "Usuario Administrador",
+      "email": "admin@exemplo.com",
+      "phone": "5511999990001",
+      "role": "Admin",
+      "joinedAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "workspaceId": "ws_neto",
+      "userId": 2,
+      "userName": "Membro 2",
+      "email": "membro2@exemplo.com",
+      "phone": "5511999990002",
+      "role": "Viewer",
+      "joinedAt": "2026-01-02T00:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "workspaceId": "ws_anelise",
+      "userId": 2,
+      "userName": "Membro 3",
+      "email": "membro3@exemplo.com",
+      "phone": "5511999990003",
+      "role": "Admin",
+      "joinedAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "workspaceId": "ws_anelise",
+      "userId": 1,
+      "userName": "Membro 4",
+      "email": "membro4@exemplo.com",
+      "phone": "5511999990004",
+      "role": "Viewer",
+      "joinedAt": "2026-02-16T00:00:00.000Z"
+    },
+    {
+      "id": 1792110688003,
+      "workspaceId": "ws_user_3",
+      "userId": 3,
+      "userName": "Membro 5",
+      "email": "membro5@exemplo.com",
+      "phone": "5511999990005",
+      "role": "Admin",
+      "joinedAt": "2026-10-16T00:31:28.003Z"
+    },
+    {
+      "id": 1792111898482,
+      "workspaceId": "ws_user_4",
+      "userId": 4,
+      "userName": "Membro 6",
+      "email": "membro6@exemplo.com",
+      "phone": "5511999990006",
+      "role": "Admin",
+      "joinedAt": "2026-10-16T00:51:38.482Z"
+    }
+  ],
+  "external_debts": [
+    {
+      "id": 101,
+      "workspaceId": "ws_anelise",
+      "workspaceName": "Casa da Anelise",
+      "adminName": "Administrador Externo",
+      "adminPixKey": "admin.externo@exemplo.com",
+      "debtorPhone": "5511999990001",
+      "debtorEmail": "admin@exemplo.com",
+      "description": "Mercado St. Marche - Jantar Família",
+      "category": "Alimentação",
+      "cycle": "2026-10",
+      "totalAmount": 284.5,
+      "myShare": 142.25,
+      "status": "PENDING",
+      "date": "2026-10-12"
+    },
+    {
+      "id": 102,
+      "workspaceId": "ws_anelise",
+      "workspaceName": "Casa da Anelise",
+      "adminName": "Administrador Externo",
+      "adminPixKey": "admin.externo@exemplo.com",
+      "debtorPhone": "5511999990001",
+      "debtorEmail": "admin@exemplo.com",
+      "description": "Veterinário Petz (Vacinas)",
+      "category": "Pet",
+      "cycle": "2026-10",
+      "totalAmount": 360,
+      "myShare": 180,
+      "status": "PENDING",
+      "date": "2026-10-08"
+    }
+  ]
+}

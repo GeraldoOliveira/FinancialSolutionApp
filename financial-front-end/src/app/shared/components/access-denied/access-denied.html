@@ -1,20 +1,20 @@
-<html lang="pt-br">
-<body class="bg-color-actual">
-  <div class="container text-white pt-2">
-    <div class="card bg-cinza-personalizado text-white p-5 rounded-3 register-card col-md-6 offset-md-3 shadow-lg">
-      <div class="text-center mb-4">
-        <i class="fas fa-user-lock fa-6x text-warning opacity-75"></i>
+<section class="min-h-[85vh] flex items-center justify-center py-10 px-4 bg-[#0B0F19]">
+  <div class="max-w-md w-full">
+    <div class="bg-slate-900/90 border border-slate-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl text-center space-y-4">
+      <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 text-3xl shadow-lg shadow-amber-500/10">
+        <i class="fas fa-user-lock"></i>
       </div>
-      <h2 class="text-center mb-3">Acesso Restrito</h2>
-      <div class="text-center mb-4 text-light opacity-75">
-        <p class="fs-5">Parece que você não tem as chaves para esta porta.<br>Se você precisa acessar esta área, entre em contato com seu gestor.</p>
-      </div>
-      <div class="d-grid gap-2 col-8 mx-auto">
-        <button [routerLink]="['/dashboard']" class="btn btn-outline-light btn-lg">
-          <i class="fas fa-arrow-left me-2"></i> Voltar com Segurança
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">Acesso Restrito</h2>
+      <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+        Parece que você não tem permissão para acessar esta área.<br>Entre em contato com o administrador caso precise de acesso.
+      </p>
+      <div class="pt-4 flex justify-center">
+        <button [routerLink]="['/dashboard']" 
+          class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-700 hover:border-slate-600 hover:bg-slate-800 text-slate-200 hover:text-white font-medium text-xs sm:text-sm transition-all shadow-md">
+          <i class="fas fa-arrow-left"></i>
+          <span>Voltar ao Dashboard</span>
         </button>
       </div>
     </div>
   </div>
-</body>
-</html>
+</section>

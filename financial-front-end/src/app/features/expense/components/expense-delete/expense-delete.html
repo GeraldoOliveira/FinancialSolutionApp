@@ -1,37 +1,50 @@
-
-    <div class="modal-header bg-dark text-light border-0">
-    <h5 class="modal-title fw-bold" id="modalTitle">Confirmar Exclusão</h5>
-    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="activeModal.dismiss()"></button>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+  <div class="p-6 bg-slate-900 text-white rounded-3xl border border-slate-700/60 shadow-2xl max-w-md w-full space-y-5 animate-in zoom-in-95 duration-150">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+      <h5 class="text-lg font-bold text-white tracking-tight flex items-center gap-2" id="modalTitle">
+        <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+        <span>Confirmar Exclusão</span>
+      </h5>
+      <button type="button" aria-label="Close" (click)="cancel()" 
+        class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+        <i class="fas fa-times text-sm"></i>
+      </button>
     </div>
 
-    <div class="modal-body bg-dark text-light p-4 text-center">
-        
-        <div class="mb-3">
-            <i class="fa-solid fa-triangle-exclamation" style="color: #dc3545; font-size: 60px;"></i>
-        </div>
-        <p class="mb-4 fw-bold">
-            Você tem certeza que deseja excluir esta transação? <br>
-            Esta ação não pode ser desfeita.
+    <div class="text-center space-y-4 py-2">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 text-2xl shadow-lg shadow-rose-500/10">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      <div>
+        <p class="font-bold text-sm text-slate-200">
+          Você tem certeza que deseja excluir esta transação?
         </p>
- 
-        <div class="bg-dark p-3 rounded border border-secondary border-opacity-25">
-            <p class="text-start mb-1 ms-2">
-                <span class="fw-bold">Descrição:</span> {{ this.transaction.expenseOrigin.name + ' - ' + this.transaction.expenseOrigin.description}}
-            </p>
-            <p class="text-start mb-0 ms-2">
-                <span class="fw-bold">Data:</span> {{ this.transaction.date | date:'dd/MM/yyyy HH:mm' }}
-            </p>
-            <p class="text-start mb-0 ms-2">
-                <span class="fw-bold">Valor:</span> {{ this.transaction.totalValue | currency:'BRL':'symbol':'1.2-2' }}
-            </p>
-        </div>
+        <p class="text-xs text-slate-400 mt-1">Esta ação é permanente e não poderá ser desfeita.</p>
+      </div>
 
+      <div class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/50 text-left text-xs space-y-1.5">
+        <p class="text-slate-300">
+          <span class="font-bold text-slate-400">Descrição:</span> {{ transaction.expenseOrigin?.name }} - {{ transaction.expenseOrigin?.description }}
+        </p>
+        <p class="text-slate-300">
+          <span class="font-bold text-slate-400">Data:</span> {{ transaction.date | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+        <p class="text-slate-300">
+          <span class="font-bold text-slate-400">Valor:</span> <span class="font-bold text-rose-400">{{ transaction.totalValue | currency:'BRL':'symbol':'1.2-2' }}</span>
+        </p>
+      </div>
     </div>
-    <div class="modal-footer bg-dark border-0">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center w-100">
-            <button type="button" class="btn btn-danger btn-lg text-white px-4 py-2 fw-bold" (click)="confirmDelete()">
-                <i class="fa-solid fa-trash-can"></i>
-                Confirmar Exclusão
-            </button>
-        </div>
+
+    <div class="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
+      <button type="button" (click)="cancel()" [disabled]="isDeleting"
+        class="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 text-xs sm:text-sm font-medium transition-colors disabled:opacity-50">
+        Cancelar
+      </button>
+      <button type="button" (click)="confirmDelete()" [disabled]="isDeleting"
+        class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-medium text-xs sm:text-sm shadow-md shadow-rose-600/30 transition-all cursor-pointer disabled:opacity-50">
+        <i class="fa-solid fa-trash-can"></i>
+        <span>{{ isDeleting ? 'Excluindo...' : 'Confirmar Exclusão' }}</span>
+      </button>
     </div>
+  </div>
+</div>

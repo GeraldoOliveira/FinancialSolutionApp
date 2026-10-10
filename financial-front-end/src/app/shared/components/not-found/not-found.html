@@ -1,20 +1,20 @@
-<html lang="pt-br">
-<body class="bg-color-actual">
-  <div class="container text-white pt-2">
-    <div class="card bg-cinza-personalizado text-white p-5 rounded-3 register-card col-md-6 offset-md-3 shadow-lg">
-      <div class="text-center mb-4">
-        <i class="far fa-compass fa-6x text-info opacity-75"></i>
+<section class="min-h-[85vh] flex items-center justify-center py-10 px-4 bg-[#0B0F19]">
+  <div class="max-w-md w-full">
+    <div class="bg-slate-900/90 border border-slate-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl text-center space-y-4">
+      <div class="w-20 h-20 mx-auto rounded-3xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-3xl shadow-lg shadow-indigo-500/10">
+        <i class="far fa-compass"></i>
       </div>
-      <h2 class="text-center mb-3">Ops! Caminho incorreto</h2>
-      <div class="text-center mb-4 text-light opacity-75">
-        <p class="fs-5">Não conseguimos encontrar a página que você procura.<br>Ela pode ter sido movida, deletada ou nunca existiu.</p>
-      </div>
-      <div class="d-grid gap-2 col-8 mx-auto">
-        <button [routerLink]="['/dashboard']" class="btn btn-light btn-lg text-dark fw-bold">
-          <i class="fas fa-home me-2"></i> Ir para o Dashboard
+      <h2 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">Ops! Página Não Encontrada</h2>
+      <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+        Não conseguimos encontrar a página que você procura.<br>Ela pode ter sido movida, excluída ou o link digitado está incorreto.
+      </p>
+      <div class="pt-4 flex justify-center">
+        <button [routerLink]="['/dashboard']" 
+          class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-indigo-600/30 transition-all cursor-pointer">
+          <i class="fas fa-home"></i>
+          <span>Ir para o Dashboard</span>
         </button>
       </div>
     </div>
   </div>
-</body>
-</html>
+</section>

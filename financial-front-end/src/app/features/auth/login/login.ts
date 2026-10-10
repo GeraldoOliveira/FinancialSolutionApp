@@ -6,7 +6,7 @@ import { FormBuilder, FormControl, FormControlName, FormGroup, Validators } from
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
-import { CustomValidators } from 'ng2-validation';
+import { CustomValidators } from '../../../shared/utils/custom-validators';
 import { fromEvent, merge, Observable } from 'rxjs';
 
 import { ToastrService } from 'ngx-toastr';
@@ -14,11 +14,13 @@ import { ToastrService } from 'ngx-toastr';
 import { DisplayMessage, GenericValidator, ValidationMessages } from '../../../shared/utils/generic-form-validation';
 import { User } from '../../../shared/models/user';
 import { LoginService } from '../services/login.service';
-
+import { WorkspaceService } from '../../../core/services/workspace.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, FormsModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
   providers: [LoginService]
@@ -31,6 +33,12 @@ export class Login {
   loginForm!: FormGroup;
   user!: User;
 
+  public isOAuthModalOpen = signal(false);
+  public customGoogleEmail = signal('');
+  public customGoogleName = signal('');
+  public customGooglePhone = signal('');
+  public isLoggingInOAuth = signal(false);
+
   validationMessages!: ValidationMessages;
   genericValidator!: GenericValidator;
   displayMessage: DisplayMessage = { email: '', password: '' };
@@ -41,6 +49,7 @@ export class Login {
 
   constructor(private fb: FormBuilder,
     private loginService: LoginService,
+    public workspaceService: WorkspaceService,
     private router: Router,
     private destroyRef: DestroyRef,
     private toastr: ToastrService,
@@ -86,7 +95,7 @@ export class Login {
   }
 
   loginUser() {
-    if (this.loginForm.dirty && this.loginForm.valid) {
+    if (this.loginForm.valid) {
       this.user = Object.assign({}, this.user, this.loginForm.value);
       this.loginService.loginUser(this.user)
         .pipe(
@@ -94,14 +103,16 @@ export class Login {
         )
         .subscribe({
           next: (success) => {
-            this.processSuccess(success)
+            this.processSuccess(success);
           },
           error: (fail) => {
-            this.processFail(fail)
+            this.processFail(fail);
           },
           complete: () => {
           }
-        })
+        });
+    } else {
+      this.displayMessage = this.genericValidator.processMessages(this.loginForm);
     }
   }
 
@@ -109,21 +120,69 @@ export class Login {
     this.loginForm.reset();
     this.errors.set([]);
     this.loginService.LocalStorage.saveLocalUser(response);
-    let toastr = this.toastr.success('Login realizado com sucesso!', 'Bem vindo!!!', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
+    let toastr = this.toastr.success('Login realizado com sucesso!', 'Bem-vindo!', { easeTime: 200, timeOut: 1500, progressBar: true, closeButton: true });
     if (toastr) {
       toastr.onHidden.subscribe(() => {
         this.returnUrl ? this.router.navigate([this.returnUrl]) : this.router.navigate(['/dashboard']);
-      }),
-        toastr.onTap.subscribe(() => {
-          this.returnUrl ? this.router.navigate([this.returnUrl]) : this.router.navigate(['/dashboard']);
-        })
+      });
+      toastr.onTap.subscribe(() => {
+        this.returnUrl ? this.router.navigate([this.returnUrl]) : this.router.navigate(['/dashboard']);
+      });
+    } else {
+      this.returnUrl ? this.router.navigate([this.returnUrl]) : this.router.navigate(['/dashboard']);
     }
   }
 
   processFail(fail: any) {
     this.errors.set([]);
-    this.errors.set([fail.error.error]);
-    this.toastr.error('Ocorreu um erro!', 'Login de Usuário', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
+    const errorMsg = fail?.error?.error || fail?.error?.message || 'Falha ao autenticar. Verifique seus dados.';
+    this.errors.set(Array.isArray(errorMsg) ? errorMsg : [errorMsg]);
+    this.toastr.error(Array.isArray(errorMsg) ? errorMsg[0] : errorMsg, 'Login de Usuário', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
+  }
+
+  openOAuthModal() {
+    this.isOAuthModalOpen.set(true);
+  }
+
+  closeOAuthModal() {
+    this.isOAuthModalOpen.set(false);
+  }
+
+  loginWithGoogle(email: string, name?: string, phone?: string) {
+    this.isLoggingInOAuth.set(true);
+    this.workspaceService.loginWithGoogle(email, name, phone)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.isLoggingInOAuth.set(false);
+          this.isOAuthModalOpen.set(false);
+          const userName = res?.user?.name || name || 'Usuário';
+          this.toastr.success(`Bem-vindo(a), ${userName}!`, 'Login via Google OAuth', {
+            timeOut: 1500,
+            progressBar: true
+          });
+          const target = this.returnUrl || '/dashboard';
+          this.router.navigate([target]);
+        },
+        error: (err) => {
+          this.isLoggingInOAuth.set(false);
+          const msg = err?.error?.error || 'Erro ao autenticar com Google.';
+          this.toastr.error(msg, 'Falha no OAuth');
+        }
+      });
+  }
+
+  loginWithCustomGoogle() {
+    if (!this.customGoogleEmail()) {
+      this.toastr.warning('Informe um e-mail do Google válido.');
+      return;
+    }
+    this.loginWithGoogle(
+      this.customGoogleEmail(),
+      this.customGoogleName() || this.customGoogleEmail().split('@')[0],
+      this.customGooglePhone()
+    );
   }
 
 }
+

@@ -1,4 +1,17 @@
 export class LocalStorageUtils {
+  public static userUpdatedSignal = new (class {
+    private listeners: ((user: any) => void)[] = [];
+    public subscribe(fn: (user: any) => void) {
+      this.listeners.push(fn);
+      return () => {
+        this.listeners = this.listeners.filter(l => l !== fn);
+      };
+    }
+    public emit(user: any) {
+      this.listeners.forEach(fn => fn(user));
+    }
+  })();
+
   public saveLocalUser(response: any) {
     this.saveAccessToken(response.accessToken);
     this.saveUserToken(response.userToken);
@@ -7,11 +20,18 @@ export class LocalStorageUtils {
   }
 
   public getUser() {
-    return JSON.parse(localStorage.getItem('mfs.user') || '{}');
+    try {
+      const raw = localStorage.getItem('mfs.user');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
   }
 
   public saveUser(user: any) {
-    return localStorage.setItem('mfs.user', JSON.stringify(user));
+    localStorage.setItem('mfs.user', JSON.stringify(user));
+    LocalStorageUtils.userUpdatedSignal.emit(user);
+    return;
   }
 
   public getAccessToken() {
@@ -43,5 +63,7 @@ export class LocalStorageUtils {
     localStorage.removeItem('mfs.userToken');
     localStorage.removeItem('mfs.user');
     localStorage.removeItem('mfs.userClaims');
+    LocalStorageUtils.userUpdatedSignal.emit(null);
   }
 }
+

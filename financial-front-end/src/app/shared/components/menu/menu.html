@@ -1,116 +1,473 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-vermelho-personalizado py-1">
-    <div class="container d-flex justify-content-between align-items-center">
-        <a class="navbar-brand fw-bold" [routerLink]="['/login']">
-            <i class="fas fa-coins me-2"></i>Family Control Solution
-        </a>
-        
-        <div class="d-flex align-items-center gap-3">
-            @if (userLogged()){
-                <div class="text-end text-light lh-1 d-none d-md-block">
-                    <div class="fw-bold small">{{ user.name }}</div>
-                    <small class="text-white-50">{{ user.email }}</small>
-                </div>
-                <div class="vr text-white-50 d-none d-md-block"></div>
-                <button class="btn btn-outline-light btn-sm d-flex align-items-center gap-2" [routerLink]="['/login']" (click)="logout()">
-                    <span>Sair</span>
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
+<!-- ======================================================== -->
+<!-- TOP HEADER: IDENTIDADE | MÊS VIGENTE | LOGIN & PERFIL     -->
+<!-- ======================================================== -->
+<header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800 shadow-xl transition-all">
+  
+  <!-- Linha Superior (Top Tier): 3 Zonas Estratégicas -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    
+    <!-- ========================================== -->
+    <!-- ZONA 1: BRAND, IDENTIDADE & WORKSPACE     -->
+    <!-- ========================================== -->
+    <div class="flex items-center gap-3.5 shrink-0">
+      <!-- Logo da Aplicação -->
+      <a [routerLink]="userLogged() ? ['/dashboard'] : ['/login']" 
+        class="flex items-center gap-2.5 text-decoration-none group select-none">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 p-0.5 shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+            <i class="fas fa-wallet text-indigo-400 text-sm"></i>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5 leading-none">
+            <span class="font-black text-lg tracking-tight text-white group-hover:text-indigo-300 transition-colors">
+              Financial<span class="text-indigo-500">App</span>
+            </span>
+          </div>
+          <span class="text-[9px] uppercase tracking-widest font-extrabold text-slate-400 mt-0.5">
+            Gestão Familiar
+          </span>
+        </div>
+      </a>
+
+      <!-- Divisor Vertical Sutil -->
+      @if (userLogged() && workspaceService.activeWorkspace()) {
+        <div class="hidden sm:block h-6 w-px bg-slate-800"></div>
+
+        <!-- Seletor de Workspace (Context Switcher) -->
+        <div class="relative workspace-dropdown-container">
+          <button 
+            type="button" 
+            (click)="toggleWorkspaceMenu(); $event.stopPropagation()"
+            class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-slate-200 transition-all cursor-pointer shadow-sm group">
+            
+            <!-- Workspace Icon & Background -->
+            <span class="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] shadow-sm shrink-0"
+              [style.backgroundColor]="workspaceService.activeWorkspace()?.color || '#4F46E5'"
+              [style.color]="'#fff'">
+              <i class="fas" [ngClass]="workspaceService.activeWorkspace()?.icon || 'fa-home'"></i>
+            </span>
+
+            <div class="flex flex-col text-left leading-tight max-w-[120px] sm:max-w-[160px] truncate">
+              <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Workspace</span>
+              <span class="text-xs font-bold text-white truncate group-hover:text-indigo-300 transition-colors">
+                {{ workspaceService.activeWorkspace()?.name }}
+              </span>
+            </div>
+
+            <!-- Role Badge -->
+            @if (workspaceService.isAdmin()) {
+              <span class="hidden md:inline-flex px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                Admin
+              </span>
             } @else {
-                <span class="text-light me-2 small fw-bold d-none d-sm-inline">REALIZE O LOGIN</span>
-                <a class="btn btn-light btn-sm text-danger fw-bold" [routerLink]="['/login']">
-                    Login <i class="fas fa-sign-in-alt ms-1"></i>
-                </a>
+              <span class="hidden md:inline-flex px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 items-center gap-1">
+                <i class="fas fa-eye text-[8px]"></i> Viewer
+              </span>
             }
+
+            <i class="fas fa-chevron-down text-[9px] text-slate-400 group-hover:text-white transition-colors ml-0.5"></i>
+          </button>
+
+          <!-- Dropdown com lista de Workspaces -->
+          @if (isWorkspaceMenuOpen()) {
+            <div class="absolute left-0 mt-2 w-80 rounded-2xl bg-slate-800 border border-slate-700/80 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-100 backdrop-blur-xl">
+              <div class="px-3 py-2 border-b border-slate-700/50">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Seus Workspaces & Contextos</div>
+                <div class="text-[10px] text-slate-500">Alterne entre sua conta principal e workspaces onde você participa</div>
+              </div>
+
+              <div class="mt-1 space-y-1 max-h-64 overflow-y-auto">
+                @for (ws of workspaceService.workspaces(); track ws.id) {
+                  <button 
+                    type="button" 
+                    (click)="selectWorkspace(ws.id)"
+                    [class.bg-slate-700]="ws.id === workspaceService.activeWorkspace()?.id"
+                    class="w-full flex items-center justify-between p-2.5 rounded-xl text-left hover:bg-slate-700/60 transition-colors group">
+                    <div class="flex items-center gap-2.5 truncate">
+                      <span class="w-8 h-8 rounded-xl flex items-center justify-center text-xs shrink-0 shadow"
+                        [style.backgroundColor]="ws.color || '#4F46E5'"
+                        [style.color]="'#fff'">
+                        <i class="fas" [ngClass]="ws.icon || 'fa-home'"></i>
+                      </span>
+                      <div class="truncate">
+                        <div class="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                          <span>{{ ws.name }}</span>
+                          @if (ws.isOwner) {
+                            <i class="fas fa-crown text-[9px] text-amber-400" title="Proprietário"></i>
+                          }
+                        </div>
+                        <div class="text-[10px] text-slate-400 truncate">
+                          Admin: {{ ws.adminName }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                      @if (ws.role === 'Admin') {
+                        <span class="px-1.5 py-0.5 text-[9px] font-bold rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                          Admin
+                        </span>
+                      } @else {
+                        <span class="px-1.5 py-0.5 text-[9px] font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          Viewer
+                        </span>
+                      }
+                      @if (ws.id === workspaceService.activeWorkspace()?.id) {
+                        <i class="fas fa-check text-xs text-indigo-400"></i>
+                      }
+                    </div>
+                  </button>
+                }
+              </div>
+            </div>
+          }
         </div>
+      }
     </div>
-</nav>
-<nav class="mh-100 mv-100 bg-preto-personalizado text-light shadow-sm" style="height: 170px;">
-    <div class="d-flex justify-content-center align-items-center h-100">
-        <picture class="d-flex justify-content-center align-items-center h-100">
-            <img src="images/logo.png" alt="Logo da Aplicação" class="img-fluid" style="max-height: 80%; width: auto;">
-        </picture>
-    </div>
-</nav>
-@if (userLogged()){
-<nav class="navbar navbar-expand-lg navbar-dark bg-cinza-personalizado flex-sm-row-reverse">
-    <div>
-        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
-            aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+
+    <!-- ========================================== -->
+    <!-- ZONA 2: MÊS VIGENTE (CENTRO DE CONTROLE)  -->
+    <!-- ========================================== -->
+    @if (userLogged()) {
+      <div class="flex items-center justify-center">
+        <div class="inline-flex items-center bg-slate-950/80 border border-slate-700/80 rounded-2xl p-1 shadow-lg shadow-black/30 backdrop-blur-md">
+          <!-- Botão Mês Anterior -->
+          <button 
+            type="button" 
+            (click)="periodService.previousMonth()" 
+            title="Mês anterior"
+            class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition-all cursor-pointer">
+            <i class="fas fa-chevron-left text-xs"></i>
+          </button>
+          
+          <!-- Mês/Ano com Indicador Inteligente -->
+          <button 
+            type="button"
+            (click)="periodService.resetCurrentMonth()"
+            [title]="periodService.isCurrentMonth() ? 'Visualizando Mês Vigente' : 'Clique para retornar ao Mês Vigente'"
+            class="px-2.5 sm:px-3.5 py-1 rounded-xl hover:bg-slate-800 text-slate-200 hover:text-white flex items-center gap-2 transition-all cursor-pointer">
+            <i class="far fa-calendar-alt text-indigo-400 text-xs sm:text-sm"></i>
+            
+            <div class="flex flex-col text-left">
+              <span class="text-[11px] sm:text-xs font-black tracking-tight text-white capitalize leading-tight">
+                {{ periodService.formattedMonthYear() }}
+              </span>
+              @if (!periodService.isCurrentMonth()) {
+                <span class="text-[9px] font-bold text-amber-400 flex items-center gap-1 leading-none">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+                  Histórico (clique p/ voltar)
+                </span>
+              } @else {
+                <span class="text-[9px] font-semibold text-emerald-400 leading-none">
+                  Mês Vigente
+                </span>
+              }
+            </div>
+          </button>
+
+          <!-- Botão Próximo Mês -->
+          <button 
+            type="button" 
+            (click)="periodService.nextMonth()" 
+            title="Próximo mês"
+            class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition-all cursor-pointer">
+            <i class="fas fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- ========================================== -->
+    <!-- ZONA 3: LOGIN / PERFIL & UTILITÁRIOS       -->
+    <!-- ========================================== -->
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      @if (userLogged()) {
+        <!-- PWA Install -->
+        <app-pwa-install-button></app-pwa-install-button>
+
+        <!-- Notification Center -->
+        <app-notification-center></app-notification-center>
+
+        <!-- Divisor Sutil -->
+        <div class="hidden sm:block h-6 w-px bg-slate-800"></div>
+
+        <!-- Profile Dropdown -->
+        <div class="relative profile-dropdown-container">
+          <button 
+            type="button" 
+            (click)="toggleProfileMenu(); $event.stopPropagation()"
+            class="flex items-center gap-2.5 p-1 sm:p-1.5 sm:pr-3 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 text-slate-200 transition-all cursor-pointer shadow-sm group">
+            
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white font-bold flex items-center justify-center text-xs shadow overflow-hidden ring-2 ring-indigo-500/20 group-hover:ring-indigo-500/50 transition-all">
+              @if (user?.imageUpload || user?.image) {
+                <img [src]="user?.imageUpload || user?.image" alt="Avatar" class="w-full h-full object-cover">
+              } @else {
+                {{ (user?.name || 'U').charAt(0).toUpperCase() }}
+              }
+            </div>
+
+            <div class="hidden md:flex flex-col text-left leading-none">
+              <span class="text-xs font-bold text-white max-w-[110px] truncate group-hover:text-indigo-300 transition-colors">
+                {{ user?.name }}
+              </span>
+              <span class="text-[9px] text-slate-400 mt-0.5">
+                {{ workspaceService.isAdmin() ? 'Administrador' : 'Viewer' }}
+              </span>
+            </div>
+
+            <i class="fas fa-chevron-down text-[9px] text-slate-400 group-hover:text-white transition-colors"></i>
+          </button>
+
+          <!-- Dropdown Menu do Usuário -->
+          @if (isProfileMenuOpen()) {
+            <div class="absolute right-0 mt-2 w-64 rounded-2xl bg-slate-800 border border-slate-700/70 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-100 backdrop-blur-xl">
+              <!-- Info Box -->
+              <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-700/50 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white font-bold flex items-center justify-center text-sm shadow overflow-hidden shrink-0">
+                  @if (user?.imageUpload || user?.image) {
+                    <img [src]="user?.imageUpload || user?.image" alt="Avatar" class="w-full h-full object-cover">
+                  } @else {
+                    {{ (user?.name || 'U').charAt(0).toUpperCase() }}
+                  }
+                </div>
+                <div class="overflow-hidden">
+                  <div class="font-bold text-white text-xs truncate">{{ user?.name }}</div>
+                  <div class="text-[11px] text-slate-400 truncate">{{ user?.email }}</div>
+                  <span class="inline-block px-1.5 py-0.5 mt-1 rounded text-[9px] font-bold"
+                    [class.bg-blue-500\/20]="workspaceService.isAdmin()"
+                    [class.text-blue-400]="workspaceService.isAdmin()"
+                    [class.border]="workspaceService.isAdmin()"
+                    [class.border-blue-500\/30]="workspaceService.isAdmin()"
+                    [class.bg-amber-500\/20]="workspaceService.isViewer()"
+                    [class.text-amber-300]="workspaceService.isViewer()"
+                    [class.border-amber-500\/30]="workspaceService.isViewer()">
+                    {{ workspaceService.activeWorkspace()?.name }} &bull; {{ workspaceService.currentRole() }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Menu Items -->
+              <div class="mt-2 space-y-0.5">
+                <a [routerLink]="['/profile/user/' + (user?.id || 1)]" (click)="closeMenus()"
+                  class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-slate-200 hover:text-white hover:bg-slate-700/60 transition-colors">
+                  <i class="fas fa-user-circle text-indigo-400"></i>
+                  <span>Meu Perfil</span>
+                </a>
+                <a [routerLink]="['/settlement/external-debts']" (click)="closeMenus()"
+                  class="flex items-center justify-between px-3 py-2 rounded-xl text-xs text-slate-200 hover:text-white hover:bg-slate-700/60 transition-colors">
+                  <div class="flex items-center gap-2.5">
+                    <i class="fas fa-hand-holding-usd text-emerald-400"></i>
+                    <span>Rateios a Pagar</span>
+                  </div>
+                  @if (workspaceService.pendingExternalDebtsCount() > 0) {
+                    <span class="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-amber-500 text-slate-950">
+                      {{ workspaceService.pendingExternalDebtsCount() }}
+                    </span>
+                  }
+                </a>
+              </div>
+
+              <div class="my-1.5 border-t border-slate-700/50"></div>
+
+              <button 
+                type="button" 
+                (click)="logout(); closeMenus()" [routerLink]="['/login']"
+                class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors cursor-pointer">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair da conta</span>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Botão Menu Mobile Sanduíche -->
+        <button 
+          type="button" 
+          (click)="toggleMobileNav()"
+          class="lg:hidden w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer">
+          <i class="fas" [class.fa-bars]="!isMobileNavOpen()" [class.fa-times]="isMobileNavOpen()"></i>
         </button>
-        <div class="offcanvas offcanvas-start bg-cinza-personalizado" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title text-white" id="offcanvasNavbarLabel">Menu</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-                <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                    <li class="nav-item dropdown me-5">
-                        <a class="nav-link" [routerLink]="['/dashboard']" id="dashboard" role="button" aria-expanded="false" data-bs-dismiss="offcanvas">
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown me-5">
-                        <a class="nav-link dropdown-toggle" href="#" id="lancamentosDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Lançamentos
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="lancamentosDropdown">
-                            <li><a class="dropdown-item" [routerLink]="['/expense/new']" data-bs-dismiss="offcanvas">Novo Lançamento</a></li>
-                            <li><a class="dropdown-item" [routerLink]="['/expense/list']" data-bs-dismiss="offcanvas">Listar Lançamentos</a></li>
-                            <li><a class="dropdown-item" href="#">Lançamentos Recentes</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown me-5">
-                        <a class="nav-link dropdown-toggle" href="#" id="contasDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Contas
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="contasDropdown">
-                            <li><a class="dropdown-item" href="#">Ver Contas</a></li>
-                            <li><a class="dropdown-item" href="#">Nova Conta</a></li>
-                        </ul>
-                    </li>
 
-                    <li class="nav-item dropdown me-5">
-                        <a class="nav-link dropdown-toggle" href="#" id="metasDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Metas
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="metasDropdown">
-                            <li><a class="dropdown-item" href="#">Minhas Metas</a></li>
-                            <li><a class="dropdown-item" href="#">Criar Meta</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item dropdown me-5">
-                        <a class="nav-link dropdown-toggle" href="#" id="relatoriosDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Relatórios
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="relatoriosDropdown">
-                            <li><a class="dropdown-item" href="#">Por Categoria</a></li>
-                            <li><a class="dropdown-item" href="#">Fluxo de Caixa</a></li>
-                            <li><a class="dropdown-item" href="#">Anual</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item dropdown me-5">
-                        <a class="nav-link dropdown-toggle" href="#" id="configDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Configurações
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="configDropdown">
-                            <li><a class="dropdown-item" [routerLink]="['/profile/user/' + user.id]" data-bs-dismiss="offcanvas">Perfil</a></li>
-                            <li><a class="dropdown-item" href="#">Cartoes de Credito</a></li>
-                            <li><a class="dropdown-item" href="#">Formas de Pagamento</a></li>
-                            <li><a class="dropdown-item" href="#">Responsáveis</a></li>
-                            <li><a class="dropdown-item" href="#">Tipos de Despesas</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
+      } @else {
+        <!-- Botão Entrar se não estiver logado -->
+        <a [routerLink]="['/login']" 
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-md shadow-indigo-600/30 transition-all">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Entrar no Sistema</span>
+        </a>
+      }
     </div>
-</nav>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- BARRA INFERIOR (SUB-BAR): MENUS DE NAVEGAÇÃO DEDICADOS    -->
+  <!-- ======================================================== -->
+  @if (userLogged()) {
+    <div class="hidden lg:block border-t border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex items-center gap-1.5 py-1.5 overflow-x-auto no-scrollbar text-xs font-semibold">
+          
+          <a [routerLink]="['/dashboard']" routerLinkActive="bg-indigo-500/15 text-indigo-300 border-indigo-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0">
+            <i class="fas fa-chart-pie text-xs text-indigo-400"></i>
+            <span>Dashboard</span>
+          </a>
+
+          <a [routerLink]="['/expense/list']" routerLinkActive="bg-rose-500/15 text-rose-300 border-rose-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0">
+            <i class="fas fa-receipt text-xs text-rose-400"></i>
+            <span>Despesas</span>
+          </a>
+
+          <a [routerLink]="['/incomes']" routerLinkActive="bg-emerald-500/15 text-emerald-300 border-emerald-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0">
+            <i class="fas fa-hand-holding-usd text-xs text-emerald-400"></i>
+            <span>Receitas</span>
+          </a>
+
+          <a [routerLink]="['/recurring']" routerLinkActive="bg-cyan-500/15 text-cyan-300 border-cyan-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0">
+            <i class="fas fa-sync-alt text-xs text-cyan-400"></i>
+            <span>Recorrentes</span>
+          </a>
+
+          <a [routerLink]="['/cards']" routerLinkActive="bg-purple-500/15 text-purple-300 border-purple-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0">
+            <i class="fas fa-credit-card text-xs text-purple-400"></i>
+            <span>Cartões & Faturas</span>
+          </a>
+
+          <a [routerLink]="['/settlement']" [routerLinkActiveOptions]="{exact: true}" routerLinkActive="bg-amber-500/15 text-amber-300 border-amber-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0">
+            <i class="fas fa-users text-xs text-amber-400"></i>
+            <span>Rateio Familiar</span>
+          </a>
+
+          <!-- Contas a Pagar a Terceiros com Badge -->
+          <a [routerLink]="['/settlement/external-debts']" routerLinkActive="bg-emerald-500/15 text-emerald-300 border-emerald-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0 relative">
+            <i class="fas fa-money-bill-wave text-xs text-emerald-400"></i>
+            <span>Contas a Pagar</span>
+            @if (workspaceService.pendingExternalDebtsCount() > 0) {
+              <span class="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-amber-500 text-slate-950 animate-pulse">
+                {{ workspaceService.pendingExternalDebtsCount() }}
+              </span>
+            }
+          </a>
+
+          <a [routerLink]="['/contacts']" routerLinkActive="bg-teal-500/15 text-teal-300 border-teal-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0">
+            <i class="fas fa-address-book text-xs text-teal-400"></i>
+            <span>Contatos</span>
+          </a>
+
+          <a [routerLink]="['/budgets']" routerLinkActive="bg-yellow-500/15 text-yellow-300 border-yellow-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0">
+            <i class="fas fa-bullseye text-xs text-yellow-400"></i>
+            <span>Metas</span>
+          </a>
+
+          <a [routerLink]="['/import']" routerLinkActive="bg-indigo-500/15 text-indigo-300 border-indigo-500/30 shadow-sm"
+            class="px-3 py-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 border border-transparent transition-all flex items-center gap-2 shrink-0">
+            <i class="fas fa-file-invoice-dollar text-xs text-indigo-400"></i>
+            <span>Importar Extrato</span>
+          </a>
+
+        </nav>
+      </div>
+    </div>
+  }
+
+  <!-- ======================================================== -->
+  <!-- MOBILE DRAWER                                             -->
+  <!-- ======================================================== -->
+  @if (userLogged() && isMobileNavOpen()) {
+    <div class="lg:hidden border-t border-slate-800 bg-slate-950/95 backdrop-blur-2xl px-4 py-4 space-y-2 animate-in slide-in-from-top-2 duration-150 max-h-[80vh] overflow-y-auto">
+      
+      <!-- Seção Navegação -->
+      <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 pt-1">Navegação Principal</div>
+      
+      <a [routerLink]="['/dashboard']" (click)="closeMenus()"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <i class="fas fa-chart-pie text-indigo-400"></i>
+        <span>Dashboard</span>
+      </a>
+      <a [routerLink]="['/expense/list']" (click)="closeMenus()"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <i class="fas fa-receipt text-rose-400"></i>
+        <span>Despesas</span>
+      </a>
+      <a [routerLink]="['/incomes']" (click)="closeMenus()"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <i class="fas fa-hand-holding-usd text-emerald-400"></i>
+        <span>Receitas</span>
+      </a>
+      <a [routerLink]="['/recurring']" (click)="closeMenus()"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <i class="fas fa-sync-alt text-cyan-400"></i>
+        <span>Despesas Recorrentes</span>
+      </a>
+      <a [routerLink]="['/cards']" (click)="closeMenus()"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <i class="fas fa-credit-card text-purple-400"></i>
+        <span>Cartões & Faturas</span>
+      </a>
+      <a [routerLink]="['/settlement']" (click)="closeMenus()"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <i class="fas fa-users text-amber-400"></i>
+        <span>Rateio Familiar</span>
+      </a>
+      <a [routerLink]="['/settlement/external-debts']" (click)="closeMenus()"
+        class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-money-bill-wave text-emerald-400"></i>
+          <span>Contas a Pagar (Rateios)</span>
+        </div>
+        @if (workspaceService.pendingExternalDebtsCount() > 0) {
+          <span class="px-2 py-0.5 rounded-full text-xs font-black bg-amber-500 text-slate-950">
+            {{ workspaceService.pendingExternalDebtsCount() }}
+          </span>
+        }
+      </a>
+      <a [routerLink]="['/contacts']" (click)="closeMenus()"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <i class="fas fa-address-book text-teal-400"></i>
+        <span>Contatos do Rateio</span>
+      </a>
+      <a [routerLink]="['/budgets']" (click)="closeMenus()"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <i class="fas fa-bullseye text-amber-400"></i>
+        <span>Metas & Orçamentos</span>
+      </a>
+      <a [routerLink]="['/import']" (click)="closeMenus()"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800">
+        <i class="fas fa-file-invoice-dollar text-purple-400"></i>
+        <span>Importar Extrato</span>
+      </a>
+    </div>
+  }
+
+</header>
+
+<!-- ======================================================== -->
+<!-- BANNER CONTEXTUAL: MODO LEITURA (VIEWER)                  -->
+<!-- ======================================================== -->
+@if (userLogged() && workspaceService.isViewer()) {
+  <div class="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-center text-xs text-amber-300 flex items-center justify-center gap-2 backdrop-blur-sm sticky top-[7rem] lg:top-[7rem] z-40">
+    <span class="w-5 h-5 rounded-md bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px]">
+      <i class="fas fa-eye"></i>
+    </span>
+    <span>
+      Modo Leitura: Você está acessando o Workspace <strong>{{ workspaceService.activeWorkspace()?.name }}</strong> como <strong>Convidado/Viewer</strong>.
+      Apenas o administrador (<strong>{{ workspaceService.activeWorkspace()?.adminName }}</strong>) pode alterar cadastros.
+    </span>
+    <button 
+      type="button" 
+      (click)="toggleWorkspaceMenu()"
+      class="ml-2 text-xs font-bold underline text-amber-200 hover:text-white transition-colors cursor-pointer">
+      Alternar Workspace
+    </button>
+  </div>
 }

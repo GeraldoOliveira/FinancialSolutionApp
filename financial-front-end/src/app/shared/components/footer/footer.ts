@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NgbAccordionItem } from '@ng-bootstrap/ng-bootstrap';
+
 
 @Component({
   selector: 'app-footer',

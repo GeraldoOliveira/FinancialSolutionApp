@@ -1,244 +1,430 @@
-<html lang="pt-br">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-<body class="bg-color-actual">
-  <div class="container text-white pt-2">
-    <div class="card bg-cinza-personalizado text-white p-4 rounded-3 register-card col-md-6 offset-md-3">
-      <h2 class="text-center mb-4 pt-1">Lançamento de Transação</h2>
-      <form novalidate (ngSubmit)="registerExpense()" [formGroup]="expenseForm">
-
-        @if (errors().length > 0) {
-        <div class="alert alert-danger">
-          <h3 id="returnMessage">Ocorreu um erro ao tentar cadastrar:</h3>
-          <ul>
-            @for (error of errors(); track $index) {
-            <li> {{ error }} </li>
-            }
-          </ul>
+  <!-- Painel de Sucesso pós-lançamento com botões 1-Click WhatsApp -->
+  @if (lastRegisteredExpense(); as expense) {
+    <div class="bg-slate-800/90 border border-emerald-500/50 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm space-y-4">
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-2xl">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div>
+            <h5 class="text-base sm:text-lg font-bold text-white">Gasto Registrado com Sucesso!</h5>
+            <p class="text-xs sm:text-sm text-slate-400 mt-0.5">{{ expense.expenseOrigin?.name }} - {{ expense.expenseOrigin?.description }} (R$ {{ expense.totalValue }})</p>
+          </div>
         </div>
-        }
+        <button type="button" (click)="dismissSuccessModal()" class="px-3 py-1.5 rounded-xl border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700/50 text-xs font-medium transition-colors">
+          <i class="fas fa-times me-1"></i> Fechar
+        </button>
+      </div>
 
-        <div class="form-group">
-          <label for="description" class="control-label mb-2">Nome e Descrição:</label>
-          <div class="row g-2" formGroupName="expenseOrigin">
-            <div class="col-md-5 col-lg-6 col-5">
-              @if(!isWritableDescription()){
-              <select class="form-select" id="nameList" formControlName="name"
-                                      ngClass="{'is-invalid': displayMessage.name}">
-                <option value="Supermercado">Supermercado</option>
-                <option value="Real">Real</option>
-              </select>
-              } @else {
-              <input type="text" class="form-control" id="nameList" placeholder="Digite o nome do gasto"
-                                     formControlName="name" ngClass="{'is-invalid': displayMessage.name}">
-              }
-              @if(displayMessage.name){
-              <div class="col-12">
-                <span class="text-danger">
-                  <p [innerHTML]="displayMessage.name"></p>
-                </span>
-              </div>
-              }
-            </div>
-            <div class="col-md-5 col-lg-5 col-5">
-              @if(!isWritableDescription()){
-              <select class="form-select" id="descriptionList" formControlName="description"
-                                       ngClass="{'is-invalid': displayMessage.description}">
-                <option value="Frango">Frango</option>
-                <option value="Carne">Carne</option>
-                <option value="Banana">Banana</option>
-                <option value="Banana">Bolacha</option>
+      <hr class="border-slate-700/60">
 
-              </select>
-              }@else {
-              <input type="text" class="form-control" id="descriptionList"
-                                     placeholder="Digite a descrição" formControlName="description"
-                                     ngClass="{'is-invalid': displayMessage.description}">
-              }
-              @if(displayMessage.description){
-              <div class="col-12">
-                <span class="text-danger">
-                  <p [innerHTML]="displayMessage.description"></p>
-                </span>
+      <div>
+        <h6 class="text-xs sm:text-sm font-semibold text-white flex items-center gap-1.5 mb-2.5">
+          <i class="fab fa-whatsapp text-emerald-400 text-base"></i>
+          <span>Notificar responsáveis por WhatsApp:</span>
+        </h6>
+        <div class="flex flex-wrap gap-2">
+          @for (item of expense.expenseResponsibles; track item.responsibleId) {
+            <button 
+              type="button" 
+              (click)="sendWhatsAppNotification(item.responsibleId, item.proratedValue)"
+              class="px-3 py-1.5 rounded-xl border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 text-xs font-medium inline-flex items-center gap-2 transition-colors">
+              <i class="fab fa-whatsapp text-sm"></i>
+              <span>Cobrar <strong>{{ responsibleService.getResponsibleName(item.responsibleId) }}</strong> (R$ {{ item.proratedValue }})</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Coluna Esquerda: Anexo / Captura de Recibo (Ctrl+V) -->
+    <div class="lg:col-span-4">
+      <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm h-full flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <h4 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fas fa-receipt text-indigo-400"></i>
+              <span>Comprovante</span>
+            </h4>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+              <i class="fas fa-robot me-1"></i> IA Ativa
+            </span>
+          </div>
+          <p class="text-slate-400 text-xs sm:text-sm mb-4">
+            Cole com <kbd class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-indigo-300 font-mono text-xs">Ctrl + V</kbd> ou arraste para identificação automática.
+          </p>
+          
+          <app-receipt-uploader (receiptCaptured)="onReceiptCaptured($event)" (receiptCleared)="onReceiptCleared()"></app-receipt-uploader>
+
+          @if (isAiAnalyzing()) {
+            <div class="mt-4 p-3.5 rounded-xl bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 text-xs flex items-center gap-3 animate-pulse">
+              <i class="fas fa-spinner fa-spin text-lg text-indigo-400"></i>
+              <div>
+                <strong class="block text-white font-semibold">Analisando comprovante com IA...</strong>
+                <span>Extraindo valores, datas e dados de pagamento</span>
               </div>
-              }
             </div>
-            <div class="col-md-2 col-lg-1  col-2">
-              <button class="btn btn-danger w-100" type="button" (click)="changeWritableDescription()">
-                <i                   class="fas fa-pencil"></i>
+          }
+
+          @if (aiDetectedData(); as ai) {
+            <div class="mt-4 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-emerald-400 font-bold flex items-center gap-1.5">
+                  <i class="fas fa-sparkles"></i> Dados Identificados por IA
+                </span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold">96% Confiança</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-slate-300 pt-1">
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Estabelecimento:</span>
+                  <strong class="text-white">{{ ai.establishment }}</strong>
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">{{ ai.installments && ai.installments > 1 ? 'Valor da Parcela:' : 'Valor Total:' }}</span>
+                  <strong class="text-emerald-400 font-bold">R$ {{ ai.totalValueFormatted }}</strong>
+                  @if (ai.installments && ai.installments > 1 && ai.originalTotalFormatted) {
+                    <span class="text-slate-400 text-[10px] block font-normal">Total: R$ {{ ai.originalTotalFormatted }}</span>
+                  }
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Método:</span>
+                  <span class="text-white">{{ ai.paymentMethodName }}</span>
+                  @if (ai.installments && ai.installments > 1) {
+                    <span class="text-amber-400 text-xs font-semibold block">Parcelado em {{ ai.installments }}x</span>
+                  }
+                </div>
+                <div>
+                  <span class="text-slate-400 block text-[11px]">Categoria:</span>
+                  <span class="text-white">{{ ai.category }}</span>
+                </div>
+                <div class="col-span-2 pt-1 border-t border-emerald-500/20 flex justify-between items-center text-slate-300">
+                  <span class="text-slate-400 text-[11px] flex items-center gap-1">
+                    <i class="far fa-calendar-alt text-emerald-400"></i> Data / Hora da Compra:
+                  </span>
+                  <strong class="text-white font-mono text-xs">{{ ai.date | date:'dd/MM/yyyy HH:mm' }}</strong>
+                </div>
+              </div>
+              <button type="button" (click)="applyAiDataToForm(ai)" class="w-full mt-2 py-2 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-medium text-xs transition-colors border border-emerald-500/30 flex items-center justify-center gap-2">
+                <i class="fas fa-check-double"></i> Reaplicar aos campos
               </button>
             </div>
-          </div>
+          }
         </div>
-        <div class="form-group">
-          <div class="mb-3 row g-2">
-            <label for="totalValue" class="form-label">Valor Total:</label>
-            <input type="text" class="form-control" id="totalValue" placeholder="Digite o valor total"
-                                 formControlName="totalValue" [textMask]="{mask: MASKS.currency.textMask}"  
-                                 ngClass="{'is-invalid': displayMessage.totalValue}">
+      </div>
+    </div>
+
+    <!-- Coluna Direita: Formulário de Lançamento -->
+    <div class="lg:col-span-8">
+      <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm">
+        <h3 class="text-xl font-bold text-white mb-4">Lançamento de Transação</h3>
+
+        <form novalidate (ngSubmit)="registerExpense()" [formGroup]="expenseForm" class="space-y-4">
+          @if (errors().length > 0) {
+            <div class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs space-y-1">
+              <strong class="font-semibold block">Ocorreu um erro ao tentar cadastrar:</strong>
+              <ul class="list-disc list-inside space-y-0.5">
+                @for (error of errors(); track $index) {
+                  <li>{{ error }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          <!-- Nome e Descrição com Autocomplete e Texto Livre -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" formGroupName="expenseOrigin">
+            <div>
+              <label for="nameList" class="block text-xs sm:text-sm font-medium text-slate-200 mb-1.5">Estabelecimento / Favorecido:</label>
+              <input 
+                type="text" 
+                id="nameList" 
+                list="suggestedNames"
+                placeholder="Ex: Supermercado Real, Posto Ipiranga..." 
+                formControlName="name" 
+                [class.border-rose-500]="displayMessage.name"
+                class="w-full px-3 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <datalist id="suggestedNames">
+                <option value="Supermercado Real">
+                <option value="Supermercado Pão de Açúcar">
+                <option value="Posto Ipiranga">
+                <option value="Farmácia Raia">
+                <option value="Uber Transporte">
+                <option value="Restaurante & Gastronomia">
+                <option value="Mercado Livre">
+                <option value="Padaria da Esquina">
+              </datalist>
+              @if(displayMessage.name){
+                <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.name"></div>
+              }
+            </div>
+
+            <div>
+              <label for="descriptionList" class="block text-xs sm:text-sm font-medium text-slate-200 mb-1.5">Descrição da Despesa:</label>
+              <input 
+                type="text" 
+                id="descriptionList" 
+                list="suggestedDescriptions"
+                placeholder="Ex: Compras do mês, Combustível, Almoço..." 
+                formControlName="description" 
+                [class.border-rose-500]="displayMessage.description"
+                class="w-full px-3 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <datalist id="suggestedDescriptions">
+                <option value="Compras do mês / Supermercado">
+                <option value="Abastecimento de Gasolina">
+                <option value="Medicamentos e Cuidados">
+                <option value="Almoço em Família">
+                <option value="Corrida de aplicativo">
+                <option value="Manutenção do Carro">
+                <option value="Hospedagem e Lazer">
+              </datalist>
+              @if(displayMessage.description){
+                <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.description"></div>
+              }
+            </div>
+          </div>
+
+          <!-- Valor Total -->
+          <div>
+            <label for="totalValue" class="block text-xs sm:text-sm font-medium text-slate-200 mb-1.5">Valor Total:</label>
+            <div class="relative flex items-center">
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <span class="text-indigo-400 font-bold text-sm select-none">R$</span>
+              </div>
+              <input type="text" id="totalValue" placeholder="0,00"
+                formControlName="totalValue" [textMask]="{mask: MASKS.number.textMask}"
+                (focus)="$any($event.target).select()"
+                [class.border-rose-500]="displayMessage.totalValue"
+                style="padding-left: 2.85rem !important;"
+                class="currency-input w-full pr-4 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold" />
+            </div>
             @if(displayMessage.totalValue){
-            <span class="text-danger">
-              <p [innerHTML]="displayMessage.totalValue"></p>
-            </span>
+              <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.totalValue"></div>
             }
           </div>
-        </div>
-        <div class="form-group">
-          <div class="mb-3 row g-2">
-            <label for="method" class="control-label mb-2">Método de Pagamento:</label>
-            <div class="form-check">
-              <input class="form-check-input" value="1" type="radio" name="methodList" id="methodList"
-                                     formControlName="methodList">
-              <label class="form-check-label" for="methodList">
-                Crédito
+
+          <!-- Método de Pagamento -->
+          <div>
+            <label class="block text-xs sm:text-sm font-medium text-slate-200 mb-2">Método de Pagamento:</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label 
+                [class.bg-indigo-600/15]="expenseForm.get('methodList')?.value === '1'"
+                [class.border-indigo-500]="expenseForm.get('methodList')?.value === '1'"
+                [class.text-white]="expenseForm.get('methodList')?.value === '1'"
+                [class.bg-slate-900/60]="expenseForm.get('methodList')?.value !== '1'"
+                [class.border-slate-700/60]="expenseForm.get('methodList')?.value !== '1'"
+                [class.text-slate-400]="expenseForm.get('methodList')?.value !== '1'"
+                class="flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all duration-200 hover:border-slate-600 select-none">
+                <input type="radio" value="1" name="methodList" formControlName="methodList" class="sr-only">
+                <i class="fas fa-credit-card text-indigo-400 text-sm sm:text-base mr-3"></i>
+                <span class="text-xs sm:text-sm font-medium">Cartão de Crédito</span>
               </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" value="2" type="radio" name="methodList"
-                                     formControlName="methodList" id="methodList">
-              <label class="form-check-label" for="methodList">
-                Pix
+
+              <label 
+                [class.bg-emerald-600/15]="expenseForm.get('methodList')?.value === '2'"
+                [class.border-emerald-500]="expenseForm.get('methodList')?.value === '2'"
+                [class.text-white]="expenseForm.get('methodList')?.value === '2'"
+                [class.bg-slate-900/60]="expenseForm.get('methodList')?.value !== '2'"
+                [class.border-slate-700/60]="expenseForm.get('methodList')?.value !== '2'"
+                [class.text-slate-400]="expenseForm.get('methodList')?.value !== '2'"
+                class="flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all duration-200 hover:border-slate-600 select-none">
+                <input type="radio" value="2" name="methodList" formControlName="methodList" class="sr-only">
+                <i class="fas fa-bolt text-emerald-400 text-sm sm:text-base mr-3"></i>
+                <span class="text-xs sm:text-sm font-medium">Pix / À Vista</span>
               </label>
             </div>
             @if(displayMessage.methodList){
-            <div class="col-12">
-              <span class="text-danger">
-                <p [innerHTML]="displayMessage.methodList"></p>
-              </span>
-            </div>
+              <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.methodList"></div>
             }
           </div>
-        </div>
 
-        @if(expenseForm.get('methodList')?.value === '1'){
-        <div class="form-group ">
-          <div class="mb-3">
-            <label for="credit-card" class="control-label mb-2">Cartão de Crédito:</label>
-            <div class="row g-2">
-              <div class=" col-md-8 col-lg-8 col-8">
-                <select class="form-select" id="creditCardList" formControlName="creditCardList">
-                  <option value="1">Infinite - 4195</option>
-                  <option value="2">Infinite - 1880</option>
-                  <option value="3">Nubank - 2020</option>
+          <!-- Opções de Cartão de Crédito -->
+          @if(expenseForm.get('methodList')?.value === '1'){
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-xl bg-slate-900/60 border border-slate-700/50">
+              <div class="sm:col-span-8">
+                <label for="creditCardList" class="block text-xs font-medium text-slate-300 mb-1">Cartão de Crédito:</label>
+                <select id="creditCardList" formControlName="creditCardList"
+                  class="w-full px-3 py-2 bg-slate-900 border border-slate-700/70 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option [value]="null" disabled selected>Selecione um cartão</option>
+                  @for (card of creditCardService.cardsSignal(); track card.id) {
+                    <option [value]="card.id">{{ card.name }} (•••• {{ card.lastDigits }}) - {{ card.bank }}</option>
+                  }
                 </select>
                 @if(displayMessage.creditCardList){
-                <div class="col-12">
-                  <span class="text-danger">
-                    <p [innerHTML]="displayMessage.creditCardList"></p>
-                  </span>
-                </div>
+                  <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.creditCardList"></div>
                 }
-
               </div>
-              <div class="col-md-4 col-lg-4 col-4">
-                <input type="number" class="form-control" id="installments" placeholder="Parcelas"
-                                         formControlName="installments"
-                                         [ngClass]="{'is-invalid': displayMessage.installments }" />
-                @if(displayMessage.installments){
-                <div class="col-12">
-                  <span class="text-danger">
-                    <p [innerHTML]="displayMessage.installments"></p>
+              <div class="sm:col-span-4">
+                <label for="installments" class="block text-xs font-medium text-slate-300 mb-1">Parcelas:</label>
+                <input type="number" id="installments" placeholder="Parcelas" formControlName="installments"
+                  [class.border-rose-500]="displayMessage.installments"
+                  class="w-full px-3 py-2 bg-slate-900 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                @if ((expenseForm.get('installments')?.value || 1) > 1 && fullPurchaseTotal()) {
+                  <span class="text-[11px] text-amber-300 mt-1 block font-medium">
+                    {{ expenseForm.get('installments')?.value }}x de R$ {{ expenseForm.get('totalValue')?.value }} (Total: R$ {{ fullPurchaseTotalFormatted() }})
                   </span>
-                </div>
+                }
+                @if(displayMessage.installments){
+                  <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.installments"></div>
                 }
               </div>
             </div>
-          </div>
-        </div>
-        }
-        <div class="form-group">
-          <div class="mb-3">
-            <label for="responsibleId" class="control-label mb-2">Responsável:</label>
-            <div formArrayName="expenseResponsibles">
+          }
+
+          <!-- Responsáveis e Rateio -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-xs sm:text-sm font-medium text-slate-200">Divisão do Rateio:</label>
+              <button 
+                type="button" 
+                (click)="splitEqually()"
+                class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2 transition-colors"
+                title="Divide o valor total em partes iguais entre os responsáveis inseridos">
+                <i class="fas fa-divide text-emerald-400"></i>
+                <span>Dividir Igualmente</span>
+              </button>
+            </div>
+
+            <div formArrayName="expenseResponsibles" class="space-y-2">
               @for(groupResponsible of expenseResposiblesArraySignal().controls; track $index) {
-              <div [formGroupName]="$index" class="row mb-2 gx-1">
-                <div class="col-md-9 col-lg-9 col-9">
-                  <select class="form-select" id="responsible_{{$index}}"
-                                              formControlName="responsibleId">
-                    <option value="1">Anelise</option>
-                    <option value="2">Neto</option>
-                    <option value="3">Yah</option>
-                  </select>
-
-                  @if(displayMessage['responsible_' + $index]){
-                  <div class="col-12">
-                    <span class="text-danger">
-                      <p [innerHTML]="displayMessage['responsible_' + $index]"></p>
-                    </span>
+                <div [formGroupName]="$index" class="flex items-center gap-2">
+                  <div class="flex-1 min-w-0">
+                    <select id="responsible_{{$index}}" formControlName="responsibleId"
+                      class="w-full px-3 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                      @for (resp of responsibleService.responsiblesSignal(); track resp.id) {
+                        <option [value]="resp.id">{{ resp.name }}</option>
+                      }
+                    </select>
+                    @if(displayMessage['responsible_' + $index]){
+                      <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage['responsible_' + $index]"></div>
+                    }
                   </div>
+
+                  <div class="w-36 sm:w-44 shrink-0">
+                    <div class="relative flex items-center">
+                      <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5">
+                        <span class="text-indigo-400 font-semibold text-xs select-none">R$</span>
+                      </div>
+                      <input type="text" id="proratedValue_{{$index}}" placeholder="0,00"
+                        formControlName="proratedValue" [textMask]="{mask: MASKS.number.textMask}"
+                        (focus)="$any($event.target).select()"
+                        [class.border-rose-500]="displayMessage['proratedValue_' + $index]"
+                        style="padding-left: 2.35rem !important;"
+                        class="currency-input-sm w-full pr-3 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                    </div>
+                    @if(displayMessage['proratedValue_' + $index]){
+                      <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage['proratedValue_' + $index]"></div>
+                    }
+                  </div>
+
+                  @if (expenseResposiblesArraySignal().length > 1) {
+                    <button type="button" (click)="removeExpenseResponsible($index)"
+                      class="w-9 h-9 shrink-0 flex items-center justify-center rounded-xl border border-slate-700/70 text-slate-400 hover:text-rose-400 hover:border-rose-500/40 hover:bg-rose-500/10 transition-colors"
+                      title="Remover este responsável">
+                      <i class="fas fa-trash-alt text-xs"></i>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Indicador Visual em Tempo Real da Diferença do Rateio -->
+            @if (expenseForm.get('totalValue')?.value) {
+              <div class="mt-3 p-3 rounded-xl border flex items-center justify-between text-xs"
+                [class.bg-emerald-500/10]="differenceValueTotalWithProrated() === 0"
+                [class.border-emerald-500/30]="differenceValueTotalWithProrated() === 0"
+                [class.text-emerald-300]="differenceValueTotalWithProrated() === 0"
+                [class.bg-amber-500/10]="differenceValueTotalWithProrated() > 0"
+                [class.border-amber-500/30]="differenceValueTotalWithProrated() > 0"
+                [class.text-amber-300]="differenceValueTotalWithProrated() > 0"
+                [class.bg-rose-500/10]="differenceValueTotalWithProrated() < 0"
+                [class.border-rose-500/30]="differenceValueTotalWithProrated() < 0"
+                [class.text-rose-300]="differenceValueTotalWithProrated() < 0">
+                <div class="flex items-center gap-2 font-medium">
+                  @if (differenceValueTotalWithProrated() === 0) {
+                    <i class="fas fa-check-circle text-emerald-400 text-sm"></i>
+                    <span>Rateio 100% equilibrado com o valor total</span>
+                  } @else if (differenceValueTotalWithProrated() > 0) {
+                    <i class="fas fa-info-circle text-amber-400 text-sm"></i>
+                    <span>Restam <strong>R$ {{ differenceValueTotalWithProrated() | number:'1.2-2' }}</strong> para completar o total</span>
+                  } @else {
+                    <i class="fas fa-exclamation-triangle text-rose-400 text-sm"></i>
+                    <span>A soma dos rateios excede o total em <strong>R$ {{ -differenceValueTotalWithProrated() | number:'1.2-2' }}</strong></span>
                   }
                 </div>
 
-                <div class="col-md-3 col-lg-3 col-3">
-                  <input type="text" class="form-control" id="proratedValue_{{$index}}"
-                                             placeholder="Valor dividido" formControlName="proratedValue" [textMask]="{mask: MASKS.currency.textMask}"  
-                                             [ngClass]="{'is-invalid': displayMessage['proratedValue_' + $index] }" />
-
-                  @if(displayMessage['proratedValue_' + $index]){
-                  <div class="col-12">
-                    <span class="text-danger">
-                      <p [innerHTML]="displayMessage['proratedValue_' + $index]"></p>
-                    </span>
-                  </div>
-                  }
-                </div>
-
+                @if (differenceValueTotalWithProrated() !== 0) {
+                  <button type="button" (click)="splitEqually()" 
+                    class="font-semibold underline hover:opacity-80 transition-opacity">
+                    Equalizar
+                  </button>
+                }
               </div>
+            }
+
+            <div class="flex items-center gap-2 mt-2.5">
+              <button type="button" (click)="addExpenseResponsible()" 
+                class="px-3.5 py-2 rounded-xl border border-indigo-500/40 text-indigo-400 hover:bg-indigo-500/10 text-xs font-medium flex items-center gap-2 transition-colors">
+                <i class="fas fa-plus-circle"></i>
+                <span>Adicionar Responsável</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Categoria e Data -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="categoryList" class="block text-xs sm:text-sm font-medium text-slate-200 mb-1.5">Categoria:</label>
+              <select id="categoryList" formControlName="categoryList"
+                class="w-full px-3 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="Alimentacao">Alimentação</option>
+                <option value="Supermercado">Supermercado</option>
+                <option value="Carro">Carro / Transporte</option>
+                <option value="Moradia">Moradia & Casa</option>
+                <option value="Saude">Saúde & Farmácia</option>
+                <option value="Viagem">Viagem</option>
+                <option value="Lazer">Lazer & Streaming</option>
+                <option value="Educacao">Educação</option>
+                <option value="Outros">Outros</option>
+              </select>
+              @if(displayMessage.categoryList){
+                <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.categoryList"></div>
+              }
+            </div>
+
+            <div>
+              <label for="date" class="block text-xs sm:text-sm font-medium text-slate-200 mb-1.5">Data:</label>
+              <input type="datetime-local" id="date" formControlName="date"
+                [class.border-rose-500]="displayMessage.date"
+                class="w-full px-3 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              @if(displayMessage.date){
+                <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.date"></div>
               }
             </div>
           </div>
-        </div>
-        <div class="d-flex justify-content-center align-items-center">
-          <div class="col-md-2 col-lg-2 col-2 me-2">
-            <button class="btn btn-danger w-100" type="button" (click)="this.addExpenseResponsible();">
-              <i class="bi bi-plus fas fa-plus-circle">
-              </i>
+
+          <div class="pt-4 space-y-2">
+            <button type="submit" id="submit" [disabled]="!expenseForm.valid || differenceValueTotalWithProrated() !== 0"
+              class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-600/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base">
+              <i class="fas fa-check-circle"></i>
+              <span>Registrar Lançamento</span>
             </button>
-          </div>
-          <div class="col-md-2 col-lg-2 col-2">
-            <button class="btn btn-danger w-100" type="button" (click)="this.removeExpenseResponsible();">
-              <i class="bi bi-plus fas fa-minus-circle">
-              </i>
-            </button>
-          </div>
-        </div>
-        <div class="form-group ">
-          <div class="mb-2 row g-2">
-            <label for="categoryList" class="control-label mb-2">Categoria:</label>
-            <select class="form-select" id="categoryList" formControlName="categoryList">
-              <option value="Alimentacao">Alimentacao</option>
-              <option value="Carro">Carro</option>
-              <option value="Viagem">Viagem</option>
-            </select>
-            @if(displayMessage.categoryList){
-            <div class="col-12">
-              <span class="text-danger">
-                <p [innerHTML]="displayMessage.categoryList"></p>
-              </span>
-            </div>
+            @if (!expenseForm.valid || differenceValueTotalWithProrated() !== 0) {
+              <p class="text-center text-xs text-slate-400">
+                @if (differenceValueTotalWithProrated() !== 0) {
+                  <span>* Ajuste a divisão do rateio para equalizar com o valor total antes de registrar.</span>
+                } @else if (!expenseForm.valid) {
+                  <span>* Preencha todos os campos obrigatórios para liberar o cadastro.</span>
+                }
+              </p>
             }
           </div>
-        </div>
-        <div class="form-group">
-          <div class="mb-3 row g-2">
-            <label for="date" class="form-label">Data:</label>
-            <input type="datetime-local" class="form-control" id="date" formControlName="date"
-                                 ngClass="{'is-invalid': displayMessage.date } " />
-            @if(displayMessage.date){
-            <span class="text-danger">
-              <p [innerHTML]="displayMessage.date"></p>
-            </span>
-            }
-          </div>
-        </div>
-        <div class="d-grid mt-4">
-          <button type="submit" id="submit" class="btn btn-danger"
-                              [disabled]="!expenseForm.valid">
-            Registrar
-          </button>
-        </div>
-      </form>
+        </form>
+
+      </div>
     </div>
   </div>
-</body>
 
-</html>
+</div>

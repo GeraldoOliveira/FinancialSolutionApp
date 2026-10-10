@@ -1,95 +1,202 @@
-<body class="bg-color-actual">
-    <ngx-spinner bdColor="rgba(0,0,0,0.8)" size="medium" color="#B4121B" type="square-loader" [fullScreen]="true">
-        <p style="color: rgb(228, 17, 17)"> Loading... </p>
-    </ngx-spinner>
-    <div class="container main-container text-white">
+<ngx-spinner bdColor="rgba(11,15,25,0.85)" size="medium" color="#6366F1" type="square-loader" [fullScreen]="true">
+    <p class="text-white mt-2 text-sm"> Carregando despesas... </p>
+</ngx-spinner>
 
-        <h1>Lista de Transações</h1>
-        <p>
-            <a class="btn btn-danger" [routerLink]="['/expense/new']">Nova Transação</a>
-        </p>
-        <table class="table table-hover table-custom-dark rounded-3 overflow-hidden">
-            <thead>
-                <tr class="text-center">
-                    <th>Id</th>
-                    <th>Descrição</th>
-                    <th>Valor Total</th>
-                    <th>Rateio/Responsáveis</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody class="text-center">
-                @for (transaction of transactionsSignal(); track transaction.id) {
-                <tr>
-                    <td>
-                        {{ transaction.id }}
-                    </td>
-
-                    <td>
-                        {{ transaction.expenseOrigin.name + ' - ' + transaction.expenseOrigin.description}}
-                    </td>
-
-                    <td>
-                        {{ transaction.totalValue | currency:'BRL':'symbol':'1.2-2' }}
-                    </td>
-
-                    <td>
-                        <ul class="list-unstyled">
-                            @for (responsible of transaction.expenseResponsibles; track $index){
-                            <li>
-                                <span class="text-warning">
-                                    {{ responsible.responsibleId | responsibleName }}
-                                </span>
-                                - {{ responsible.proratedValue | currency:'BRL':'symbol':'1.2-2' }}
-                            </li>
-                            }
-                            @empty {
-                            <span class="text-muted">N/A</span>
-                            }
-                        </ul>
-
-                    </td>
-                    <td class="text-center">
-                        <a class="btn btn-sm btn-outline-info" [routerLink]="['/expense/details/',transaction.id]">
-                            <span class="fa fa-search"></span> Detalhes
-                        </a>
-                        &nbsp;
-                        <button 
-                            class="btn btn-sm btn-outline-warning" 
-                            [disabled]="!canEdit" 
-                            [routerLink]="['/expense/edit',transaction.id]"> 
-                            <span class="fa fa-pencil-alt"></span> Editar
-                        </button>
-                        &nbsp;
-
-                        <button 
-                            class="btn btn-sm btn-danger" 
-                            [disabled]="!canDelete" 
-                            (click)="openDeleteModal(transaction)">
-                            <span class="fa fa-trash"></span> Excluir
-                        </button>
-                    </td>
-                    <!-- <td class="text-center">
-                        <a class="btn btn-sm btn-outline-info" [routerLink]="['/expense/details/',transaction.id]">
-                            <span class="fa fa-search"></span> Detalhes
-                        </a>&nbsp;
-                        <a class="btn btn-sm btn-outline-warning" [routerLink]="['/expense/edit',transaction.id]" >
-                            <span class="fa fa-pencil-alt"></span> Editar
-                        </a>&nbsp;
-                        <a class="btn btn-sm btn-danger" (click)="openDeleteModal(transaction)">
-                            <span class="fa fa-trash"></span> Excluir
-                        </a>
-                    </td> -->
-                </tr>
-                }
-                @empty {
-                <tr>
-                    <td colspan="5" class="text-center text-muted">
-                        {{ errorMessageSignal() ? errorMessageSignal() : 'Nenhuma transação encontrada.' }}
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Lista de Despesas</h2>
+            <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Histórico de lançamentos e divisões de rateio familiar</p>
+        </div>
+        <div class="flex items-center gap-2">
+            @if (workspaceService.isAdmin()) {
+                <a [routerLink]="['/import']" 
+                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600 border border-purple-500/40 text-purple-300 hover:text-white text-xs sm:text-sm font-semibold transition-all">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Importar Extrato</span>
+                </a>
+                <a [routerLink]="['/expense/new']" 
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Nova Despesa</span>
+                </a>
+            } @else {
+                <div class="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-semibold flex items-center gap-2">
+                    <i class="fas fa-eye text-xs"></i>
+                    <span>Modo Leitura (Apenas Admin cria despesas)</span>
+                </div>
+            }
+        </div>
     </div>
-</body>
+
+    <!-- Barra de Filtros e Busca Rápida -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-4 shadow-xl backdrop-blur-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div class="flex-1 relative">
+            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400 text-sm pointer-events-none"></i>
+            <input 
+                type="text" 
+                [ngModel]="searchTerm()" 
+                (ngModelChange)="searchTerm.set($event)"
+                placeholder="Buscar por favorecido, descrição ou #ID..." 
+                style="padding-left: 2.65rem !important;"
+                class="w-full pr-9 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+            @if (searchTerm()) {
+                <button type="button" (click)="searchTerm.set('')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            }
+        </div>
+
+        <div class="flex items-center gap-2">
+            <div class="relative">
+                <select 
+                    [ngModel]="selectedCategory()" 
+                    (ngModelChange)="selectedCategory.set($event)"
+                    class="px-3.5 py-2 pr-8 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer min-w-[175px]">
+                    <option value="">Todas as Categorias</option>
+                    <option value="Alimentacao">Alimentação</option>
+                    <option value="Carro">Carro</option>
+                    <option value="Viagem">Viagem</option>
+                    <option value="Lazer">Lazer</option>
+                    <option value="Saude">Saúde</option>
+                    <option value="Outros">Outros</option>
+                </select>
+            </div>
+
+            <div class="px-3 py-2 rounded-xl bg-slate-900/80 border border-slate-700/60 text-xs text-slate-300 font-medium whitespace-nowrap">
+                <span class="text-slate-400">Total:</span> 
+                <strong class="text-emerald-400 ms-1">{{ totalFilteredValue() | currency:'BRL':'symbol':'1.2-2' }}</strong>
+                <span class="text-slate-500 ms-1.5">({{ filteredTransactions().length }})</span>
+            </div>
+
+            <!-- Botão de Período / Todos os Meses -->
+            <button 
+                type="button" 
+                (click)="filterByPeriod.set(!filterByPeriod())"
+                [title]="filterByPeriod() ? 'Clique para ver despesas de todos os meses' : 'Clique para filtrar apenas o mês vigente'"
+                class="px-3 py-2 rounded-xl border border-slate-700/60 bg-slate-900/80 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer hover:bg-slate-800"
+                [class.border-indigo-500]="filterByPeriod()"
+                [class.text-indigo-300]="filterByPeriod()"
+                [class.text-slate-400]="!filterByPeriod()">
+                <i class="far fa-calendar-alt text-indigo-400"></i>
+                @if (filterByPeriod()) {
+                    <span>Mês: <strong class="text-white">{{ periodService.shortMonthYear() }}</strong></span>
+                } @else {
+                    <span>Todos os Meses</span>
+                }
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+                <thead class="bg-slate-900/70 text-xs uppercase text-slate-400 font-semibold tracking-wider border-b border-slate-700/60 text-center">
+                    <tr>
+                        <th class="py-3.5 px-4">Id</th>
+                        <th class="py-3.5 px-4 text-left">Descrição</th>
+                        <th class="py-3.5 px-4">Data / Hora</th>
+                        <th class="py-3.5 px-4">Valor Total</th>
+                        <th class="py-3.5 px-4 text-left">Rateio / Responsáveis</th>
+                        <th class="py-3.5 px-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/40 text-center">
+                    @for (transaction of filteredTransactions(); track transaction.id) {
+                    <tr class="hover:bg-slate-700/30 transition-colors">
+                        <td class="py-3.5 px-4 font-mono text-xs text-slate-400">
+                            #{{ transaction.id }}
+                        </td>
+
+                        <td class="py-3.5 px-4 text-left font-medium text-white">
+                            {{ transaction.expenseOrigin.name }} <span class="text-slate-400 font-normal">- {{ transaction.expenseOrigin.description }}</span>
+                            @if (transaction.receiptImage) {
+                                <span class="ms-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" title="Comprovante Anexado">
+                                    <i class="fas fa-receipt text-[9px]"></i> Anexo
+                                </span>
+                            }
+                        </td>
+
+                        <td class="py-3.5 px-4 text-xs text-slate-300 font-medium whitespace-nowrap">
+                            <i class="far fa-calendar-alt text-slate-500 me-1"></i>
+                            {{ transaction.date | date:'dd/MM/yyyy HH:mm' }}
+                        </td>
+
+                        <td class="py-3.5 px-4 font-bold text-white">
+                            {{ transaction.totalValue | currency:'BRL':'symbol':'1.2-2' }}
+                        </td>
+
+                        <td class="py-3.5 px-4 text-left">
+                            <ul class="space-y-1">
+                                @for (responsible of transaction.expenseResponsibles; track $index){
+                                <li class="text-xs">
+                                    <span class="text-amber-400 font-semibold">
+                                        {{ responsible.responsibleId | responsibleName }}
+                                    </span>
+                                    <span class="text-slate-400"> - {{ responsible.proratedValue | currency:'BRL':'symbol':'1.2-2' }}</span>
+                                </li>
+                                }
+                                @empty {
+                                <span class="text-slate-500 text-xs">N/A</span>
+                                }
+                            </ul>
+                        </td>
+
+                        <td class="py-3.5 px-4">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <a [routerLink]="['/expense/details/', transaction.id]"
+                                   class="px-2.5 py-1.5 rounded-xl border border-sky-500/30 text-sky-400 hover:bg-sky-500/10 text-xs font-medium flex items-center gap-1.5 transition-colors"
+                                   title="Ver Detalhes">
+                                    <i class="fa fa-search text-[11px]"></i>
+                                    <span class="hidden sm:inline">Detalhes</span>
+                                </a>
+
+                                <button 
+                                    class="px-2.5 py-1.5 rounded-xl border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed" 
+                                    [disabled]="!canEdit" 
+                                    [routerLink]="['/expense/edit', transaction.id]"
+                                    title="Editar"> 
+                                    <i class="fa fa-pencil-alt text-[11px]"></i>
+                                    <span class="hidden sm:inline">Editar</span>
+                                </button>
+
+                                <button 
+                                    class="px-2.5 py-1.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-medium flex items-center gap-1.5 shadow-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed" 
+                                    [disabled]="!canDelete" 
+                                    (click)="openDeleteModal(transaction)"
+                                    title="Excluir">
+                                    <i class="fa fa-trash text-[11px]"></i>
+                                    <span class="hidden sm:inline">Excluir</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                    @empty {
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-slate-400 text-sm">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <i class="fas fa-inbox text-3xl text-slate-600"></i>
+                                <span>{{ errorMessageSignal() ? errorMessageSignal() : (searchTerm() || selectedCategory() ? 'Nenhuma despesa corresponde aos filtros selecionados.' : 'Nenhuma transação encontrada.') }}</span>
+                                @if (searchTerm() || selectedCategory()) {
+                                    <button type="button" (click)="searchTerm.set(''); selectedCategory.set('')" class="text-xs text-indigo-400 hover:underline">
+                                        Limpar filtros
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@if (isDeleteModalOpen() && transactionToDelete()) {
+  <app-expense-delete 
+    [transaction]="transactionToDelete()!" 
+    (cancelled)="cancelDelete()" 
+    (confirmed)="onDeleteConfirmed()">
+  </app-expense-delete>
+}

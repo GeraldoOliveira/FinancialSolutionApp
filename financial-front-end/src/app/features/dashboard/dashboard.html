@@ -1,1 +1,529 @@
-Entrou no dashboard!
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+  <!-- Cabeçalho do Dashboard -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-lg shadow-sm">
+        <i class="fas fa-chart-pie"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Painel Financeiro</h2>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+            {{ periodService.formattedMonthYear() }}
+          </span>
+        </div>
+        <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Visão consolidada de receitas, despesas, faturas e rateio familiar</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2.5">
+      <button 
+        type="button" 
+        (click)="openIncomeModal()"
+        class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 text-xs sm:text-sm font-semibold transition-all">
+        <i class="fas fa-arrow-down"></i>
+        <span>+ Receita</span>
+      </button>
+      <a [routerLink]="['/expense/new']" 
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
+        <i class="fas fa-plus-circle"></i>
+        <span>Nova Despesa</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Cards de Indicadores (KPIs Padronizados Solicitados) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    
+    <!-- 1. Renda Mensal -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm flex flex-col justify-between group hover:border-slate-600 transition-all">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Renda Mensal</span>
+          <h3 class="text-2xl font-black text-emerald-400 mt-1">{{ totalIncomes() | currency:'BRL':'symbol':'1.2-2' }}</h3>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-lg">
+          <i class="fas fa-hand-holding-usd"></i>
+        </div>
+      </div>
+      <a [routerLink]="['/incomes']" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors mt-4 inline-flex items-center gap-1">
+        <span>Gerenciar receitas</span>
+        <i class="fas fa-chevron-right text-[10px]"></i>
+      </a>
+    </div>
+
+    <!-- 2. Total de Gastos -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm flex flex-col justify-between group hover:border-slate-600 transition-all">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total de Gastos</span>
+          <h3 class="text-2xl font-black text-rose-400 mt-1">{{ totalExpenses() | currency:'BRL':'symbol':'1.2-2' }}</h3>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center text-lg">
+          <i class="fas fa-receipt"></i>
+        </div>
+      </div>
+      <a [routerLink]="['/expense/list']" class="text-xs font-semibold text-rose-400 hover:text-rose-300 transition-colors mt-4 inline-flex items-center gap-1">
+        <span>Ver todas as despesas</span>
+        <i class="fas fa-chevron-right text-[10px]"></i>
+      </a>
+    </div>
+
+    <!-- 3. Minha Parte no Rateio -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm flex flex-col justify-between group hover:border-slate-600 transition-all">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Minha Parte no Rateio</span>
+          <h3 class="text-2xl font-black text-indigo-300 mt-1">{{ myProratedShare() | currency:'BRL':'symbol':'1.2-2' }}</h3>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center text-lg">
+          <i class="fas fa-users"></i>
+        </div>
+      </div>
+      <a [routerLink]="['/settlement']" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors mt-4 inline-flex items-center gap-1">
+        <span>Ver acerto familiar</span>
+        <i class="fas fa-chevron-right text-[10px]"></i>
+      </a>
+    </div>
+
+    <!-- 4. Saldo Líquido -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm flex flex-col justify-between group hover:border-slate-600 transition-all">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Saldo Líquido</span>
+          <h3 class="text-2xl font-black mt-1" [ngClass]="netBalance() >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+            {{ netBalance() | currency:'BRL':'symbol':'1.2-2' }}
+          </h3>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-lg">
+          <i class="fas fa-wallet"></i>
+        </div>
+      </div>
+      <span class="text-xs text-slate-400 mt-4 block">
+        Individual: <strong [ngClass]="individualNetBalance() >= 0 ? 'text-emerald-400' : 'text-rose-400'">{{ individualNetBalance() | currency:'BRL':'symbol':'1.2-2' }}</strong>
+      </span>
+    </div>
+
+  </div>
+
+  <!-- COMPARATIVO DOS ÚLTIMOS MESES (HISTÓRICO) -->
+  <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+      <div>
+        <h4 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i class="fas fa-chart-bar text-indigo-400"></i>
+          <span>Comparativo dos Últimos Meses (Histórico)</span>
+        </h4>
+        <p class="text-xs text-slate-400 mt-0.5">Evolução de receitas versus despesas consolidadas nos últimos 6 meses</p>
+      </div>
+
+      <div class="flex items-center gap-3 text-xs">
+        <span class="flex items-center gap-1.5 text-emerald-400 font-semibold">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span>Receitas</span>
+        </span>
+        <span class="flex items-center gap-1.5 text-rose-400 font-semibold">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+          <span>Despesas</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Canvas do Gráfico Histórico -->
+    <div class="h-64 w-full">
+      <canvas #historyCanvas class="w-full h-full"></canvas>
+    </div>
+
+    <!-- Resumo dos meses em cards rápidos -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mt-5 pt-4 border-t border-slate-700/60">
+      @for (point of monthlyHistory(); track point.monthYear) {
+        <div class="p-2.5 rounded-xl bg-slate-900/60 border border-slate-700/40 text-center space-y-1">
+          <span class="text-[11px] font-bold text-slate-400 uppercase">{{ point.label }}</span>
+          <div class="text-xs font-semibold text-rose-400">-{{ point.expenses | currency:'BRL':'symbol':'1.0-0' }}</div>
+          <div class="text-xs font-semibold text-emerald-400">+{{ point.incomes | currency:'BRL':'symbol':'1.0-0' }}</div>
+          <div class="text-[10px] font-bold" [ngClass]="point.net >= 0 ? 'text-indigo-400' : 'text-amber-400'">
+            {{ point.net >= 0 ? '+' : '' }}{{ point.net | currency:'BRL':'symbol':'1.0-0' }}
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- PRÓXIMAS FATURAS DE CARTÃO -->
+  <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm space-y-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h4 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i class="fas fa-credit-card text-purple-400"></i>
+          <span>Próximas Faturas de Cartão</span>
+        </h4>
+        <p class="text-xs text-slate-400 mt-0.5">Acompanhamento de vencimentos, prazos de pagamento e total da fatura</p>
+      </div>
+      <a [routerLink]="['/cards']" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors inline-flex items-center gap-1">
+        <span>Gerenciar cartões</span>
+        <i class="fas fa-chevron-right text-[10px]"></i>
+      </a>
+    </div>
+
+    @if (upcomingInvoices().length === 0) {
+      <div class="text-center py-6 text-slate-400 text-xs">
+        Nenhuma fatura pendente registrada.
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (inv of upcomingInvoices(); track inv.id) {
+          @let card = getCardForInvoice(inv.cardId);
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-700/70 space-y-3 hover:border-slate-600 transition-all">
+            <div class="flex justify-between items-start">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" [style.background]="card?.color || '#6366F1'">
+                  <i class="fas fa-credit-card"></i>
+                </div>
+                <div>
+                  <h5 class="text-sm font-bold text-white leading-none">{{ card?.name || 'Cartão de Crédito' }}</h5>
+                  <span class="text-[11px] text-slate-400">Final {{ card?.lastDigits || '••••' }}</span>
+                </div>
+              </div>
+
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                [ngClass]="inv.status === 'ABERTA' ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'">
+                {{ inv.status }}
+              </span>
+            </div>
+
+            <div class="flex justify-between items-baseline pt-1">
+              <div>
+                <span class="text-[11px] text-slate-400 block">Total da Fatura</span>
+                <span class="text-lg font-black text-white">{{ inv.totalAmount | currency:'BRL':'symbol':'1.2-2' }}</span>
+              </div>
+              <div class="text-right">
+                <span class="text-[11px] text-slate-400 block">Vencimento</span>
+                <span class="text-xs font-bold text-slate-200">{{ inv.dueDate | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 text-[11px] border-t border-slate-800 text-slate-400">
+              <span>Fecha em: <strong class="text-slate-300">{{ inv.closingDate | date:'dd/MM' }}</strong></span>
+              <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400 font-bold">
+                Vence em {{ getDaysUntilDue(inv.dueDate) }} dias
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- SEÇÃO DE GRÁFICOS INTERATIVOS & METAS -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Card: Donut Interativo (Categorias vs Membros) -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm flex flex-col justify-between">
+      <div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div>
+            <h4 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <i class="fas fa-chart-pie text-indigo-400"></i>
+              <span>Distribuição de Gastos</span>
+            </h4>
+            <p class="text-xs text-slate-400 mt-0.5">Explore despesas por categoria ou por membro familiar</p>
+          </div>
+
+          <!-- Switcher: Por Categoria / Por Membro -->
+          <div class="inline-flex p-1 bg-slate-900 border border-slate-700/80 rounded-xl text-xs font-semibold">
+            <button 
+              type="button" 
+              (click)="setDonutMode('CATEGORY')"
+              class="px-3 py-1.5 rounded-xl transition-all"
+              [ngClass]="donutViewMode() === 'CATEGORY' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'">
+              Por Categoria
+            </button>
+            <button 
+              type="button" 
+              (click)="setDonutMode('MEMBER')"
+              class="px-3 py-1.5 rounded-xl transition-all"
+              [ngClass]="donutViewMode() === 'MEMBER' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'">
+              Por Membro
+            </button>
+          </div>
+        </div>
+
+        <!-- Donut Canvas & Breakdown List -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 items-center gap-6">
+          <div class="h-56 relative flex items-center justify-center">
+            <canvas #donutCanvas class="max-h-full"></canvas>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+              <span class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Total</span>
+              <span class="text-base font-extrabold text-white">{{ totalExpenses() | currency:'BRL':'symbol':'1.0-0' }}</span>
+            </div>
+          </div>
+
+          <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+            @if (donutViewMode() === 'CATEGORY') {
+              @for (cat of categoryMetrics(); track cat.name) {
+                <div class="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-900/40 hover:bg-slate-900/80 transition-colors">
+                  <div class="flex items-center gap-2 truncate">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" [style.background-color]="cat.color"></span>
+                    <span class="text-slate-300 font-medium truncate">{{ cat.name }}</span>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <span class="font-bold text-white">{{ cat.total | currency:'BRL':'symbol':'1.0-0' }}</span>
+                    <span class="text-[10px] text-slate-400 font-mono w-8 text-right">{{ cat.percentage }}%</span>
+                  </div>
+                </div>
+              }
+            } @else {
+              @for (member of memberMetrics(); track member.id) {
+                <div class="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-900/40 hover:bg-slate-900/80 transition-colors">
+                  <div class="flex items-center gap-2 truncate">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" [style.background-color]="member.color"></span>
+                    <span class="text-slate-300 font-medium truncate">{{ member.name }}</span>
+                  </div>
+                  <div class="flex items-center gap-2 shrink-0">
+                    <span class="font-bold text-white">{{ member.total | currency:'BRL':'symbol':'1.0-0' }}</span>
+                    <span class="text-[10px] text-slate-400 font-mono w-8 text-right">{{ member.percentage }}%</span>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metas & Orçamentos (Budgets) -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h5 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i class="fas fa-bullseye text-amber-400"></i>
+          <span>Metas & Orçamentos (Teto Mensal)</span>
+        </h5>
+        <a [routerLink]="['/budgets']" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors inline-flex items-center gap-1">
+          <span>Gerenciar metas</span>
+          <i class="fas fa-chevron-right text-[10px]"></i>
+        </a>
+      </div>
+
+      <div class="space-y-4">
+        @if (budgets().length === 0) {
+          <div class="text-center py-8 text-slate-400 text-xs">
+            Nenhuma meta cadastrada para este ciclo.
+          </div>
+        } @else {
+          @for (budget of budgets(); track budget.id) {
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-xs sm:text-sm">
+                <span class="text-slate-200 font-medium">{{ budget.category }}</span>
+                <span class="text-slate-400">
+                  {{ budget.currentSpent | currency:'BRL':'symbol':'1.2-2' }} / <strong class="text-white">{{ budget.monthlyLimit | currency:'BRL':'symbol':'1.2-2' }}</strong>
+                </span>
+              </div>
+              <div class="w-full bg-slate-900/80 rounded-full h-2 overflow-hidden border border-slate-700/50">
+                <div 
+                  class="h-2 rounded-full transition-all duration-500"
+                  [style.width.%]="getBudgetProgress(budget)"
+                  [ngClass]="{
+                    'bg-emerald-500': getBudgetProgress(budget) <= 70,
+                    'bg-amber-500': getBudgetProgress(budget) > 70 && getBudgetProgress(budget) <= 90,
+                    'bg-rose-500': getBudgetProgress(budget) > 90
+                  }">
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LANÇAMENTOS RECENTES (CARD DE TELA INTEIRA SOLICITADO PELO USUÁRIO) -->
+  <div class="w-full bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-sm space-y-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h5 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+          <i class="fas fa-history text-indigo-400"></i>
+          <span>Lançamentos Recentes</span>
+        </h5>
+        <p class="text-xs text-slate-400 mt-0.5">Visão detalhada de despesas recentes, favorecido e divisão de rateio</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a [routerLink]="['/expense/list']" class="px-3.5 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold transition-colors inline-flex items-center gap-2">
+          <span>Ver lista completa</span>
+          <i class="fas fa-arrow-right text-[10px]"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-xl border border-slate-700/60">
+      <table class="w-full text-left text-sm text-slate-300">
+        <thead class="bg-slate-900/80 text-xs uppercase text-slate-400 font-semibold tracking-wider border-b border-slate-700/60">
+          <tr>
+            <th class="py-3 px-4">#ID</th>
+            <th class="py-3 px-4">Descrição / Favorecido</th>
+            <th class="py-3 px-4">Categoria</th>
+            <th class="py-3 px-4">Data</th>
+            <th class="py-3 px-4 text-right">Valor Total</th>
+            <th class="py-3 px-4">Divisão de Rateio</th>
+            <th class="py-3 px-4 text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-700/40">
+          @if (recentExpenses().length === 0) {
+            <tr>
+              <td colspan="7" class="py-8 text-center text-slate-400 text-xs">
+                Nenhuma despesa recente registrada neste período.
+              </td>
+            </tr>
+          } @else {
+            @for (exp of recentExpenses(); track exp.id) {
+              <tr class="hover:bg-slate-700/30 transition-colors">
+                <td class="py-3 px-4 font-mono text-xs text-slate-400">#{{ exp.id }}</td>
+                
+                <td class="py-3 px-4 font-medium text-white">
+                  <div class="flex items-center gap-2">
+                    <span>{{ exp.expenseOrigin?.name || 'Despesa' }}</span>
+                    @if (exp.expenseOrigin?.description) {
+                      <span class="text-xs text-slate-400 font-normal">({{ exp.expenseOrigin.description }})</span>
+                    }
+                    @if (exp.receiptImage) {
+                      <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" title="Comprovante Anexado">
+                        <i class="fas fa-receipt text-[9px]"></i> Anexo
+                      </span>
+                    }
+                  </div>
+                </td>
+
+                <td class="py-3 px-4">
+                  <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                    {{ exp.categoryList || 'Geral' }}
+                  </span>
+                </td>
+
+                <td class="py-3 px-4 text-xs text-slate-300 whitespace-nowrap">
+                  {{ exp.date | date:'dd/MM/yyyy' }}
+                </td>
+
+                <td class="py-3 px-4 text-right font-black text-rose-400 whitespace-nowrap">
+                  -{{ exp.totalValue | currency:'BRL':'symbol':'1.2-2' }}
+                </td>
+
+                <td class="py-3 px-4">
+                  <div class="flex flex-wrap gap-1.5">
+                    @for (resp of exp.expenseResponsibles; track resp.responsibleId) {
+                      <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] bg-slate-900 text-slate-300 border border-slate-700/60">
+                        <strong class="text-amber-400">{{ responsibleService.getResponsibleName(resp.responsibleId) }}:</strong>
+                        <span>{{ resp.proratedValue | currency:'BRL':'symbol':'1.2-2' }}</span>
+                      </span>
+                    }
+                  </div>
+                </td>
+
+                <td class="py-3 px-4 text-center">
+                  <a [routerLink]="['/expense/edit', exp.id]" 
+                    class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-xl transition-colors inline-block"
+                    title="Editar despesa">
+                    <i class="fas fa-pen text-xs"></i>
+                  </a>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL DE NOVA RECEITA RÁPIDA -->
+  @if (isIncomeModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div 
+        (click)="$event.stopPropagation()"
+        class="bg-slate-900 border border-slate-700/80 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4 animate-in zoom-in-95 duration-150">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-sm">
+              <i class="fas fa-plus"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Nova Receita</h3>
+          </div>
+          <button 
+            type="button" 
+            (click)="closeIncomeModal()" 
+            class="w-8 h-8 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition-colors">
+            <i class="fas fa-times text-sm"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Descrição *</label>
+            <input 
+              type="text" 
+              [ngModel]="newIncomeDescription()" 
+              (ngModelChange)="newIncomeDescription.set($event)"
+              placeholder="Ex: Salário, Freelance, Dividendos..." 
+              class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Valor (R$) *</label>
+              <div class="relative">
+                <span class="currency-prefix-badge">R$</span>
+                <input 
+                  type="text" 
+                  [value]="newIncomeAmountFormatted()"
+                  (input)="onIncomeAmountInput($event)"
+                  placeholder="0,00"
+                  style="padding-left: 2.85rem !important;"
+                  class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white font-semibold focus:outline-none focus:border-emerald-500 transition-all currency-input" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Data</label>
+              <input 
+                type="date" 
+                [ngModel]="newIncomeDate()" 
+                (ngModelChange)="newIncomeDate.set($event)"
+                class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Destinatário</label>
+            <select 
+              [ngModel]="newIncomeRecipientId()" 
+              (ngModelChange)="newIncomeRecipientId.set($event)"
+              class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition-all">
+              @for (resp of responsibleService.responsiblesSignal(); track resp.id) {
+                <option [value]="resp.id">{{ resp.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+          <button 
+            type="button" 
+            (click)="closeIncomeModal()" 
+            class="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-xs font-semibold transition-colors">
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            (click)="saveIncome()" 
+            class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md shadow-emerald-600/30 transition-all">
+            Salvar Receita
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

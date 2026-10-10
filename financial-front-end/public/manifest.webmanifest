@@ -1,0 +1,38 @@
+{
+  "name": "Financial Solution - Gestão Financeira Familiar",
+  "short_name": "FinancialApp",
+  "theme_color": "#0F172A",
+  "background_color": "#0B0F19",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "orientation": "portrait-primary",
+  "description": "Controle financeiro pessoal e familiar, rateio de despesas, faturas de cartão e integração WhatsApp.",
+  "icons": [
+    {
+      "src": "/assets/images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "share_target": {
+    "action": "/expense/new",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "receipt",
+          "accept": ["image/*", "application/pdf"]
+        }
+      ]
+    }
+  }
+}

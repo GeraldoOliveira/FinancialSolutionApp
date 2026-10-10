@@ -11,12 +11,14 @@ import { ToastrService } from "ngx-toastr";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { DatePipe } from "@angular/common";
 import { FormBaseComponent } from "../../../base-components/form-base.component";
+import { ResponsibleService } from "../../../core/services/responsible.service";
 
 export abstract class ExpenseFormBaseComponent extends FormBaseComponent {
 
     protected toastr = inject(ToastrService);
     protected fb = inject(FormBuilder);
     protected datePipe = inject(DatePipe);
+    public responsibleService = inject(ResponsibleService);
 
     expenseTransaction: Expense;
     expenseOrigin: ExpenseOrigin;
@@ -26,7 +28,7 @@ export abstract class ExpenseFormBaseComponent extends FormBaseComponent {
     MASKS = NgxBrazilMASKS;
 
     protected itemSubscriptions: Map<number, Subscription> = new Map();
-    protected expenseResposiblesArraySignal: WritableSignal<FormArray> = signal(
+    public expenseResposiblesArraySignal: WritableSignal<FormArray> = signal(
         new FormArray<any>([])
     );
     protected isWritableDescription: WritableSignal<boolean> = signal(false);
@@ -84,15 +86,8 @@ export abstract class ExpenseFormBaseComponent extends FormBaseComponent {
         const formGroup = this.expenseResposiblesArraySignal().at(index) as FormGroup;
 
         const sub = formGroup.valueChanges.subscribe(value => {
-
-            const newProratedRaw: string = value.proratedValue?.toString() || '0';
-            const newProratedNumericValue = CurrencyUtils.StringToDecimal(newProratedRaw);
-            const maxProratedValue = this.differenceValueTotalWithProrated(index);
-
-            if (newProratedNumericValue > maxProratedValue) {
-                const proratedControl = formGroup.get('proratedValue');
-                proratedControl.setValue(CurrencyUtils.DecimalToString(maxProratedValue), { emitEvent: false });
-            }
+            // Apenas monitora alterações para atualizar a validação de diferença total sem bloquear a digitação
+            this.changesNotSaved = true;
         });
 
         this.itemSubscriptions.set(index, sub);
@@ -105,11 +100,13 @@ export abstract class ExpenseFormBaseComponent extends FormBaseComponent {
         });
     }
 
-    protected removeExpenseResponsible(): void {
+    public removeExpenseResponsible(index?: number): void {
         const arrayControl = this.expenseResposiblesArraySignal();
         if (arrayControl.length > 1) {
-            arrayControl.removeAt(arrayControl.length - 1);
+            const targetIndex = index !== undefined ? index : arrayControl.length - 1;
+            arrayControl.removeAt(targetIndex);
             this.setupAllSubscriptions();
+            this.autoSplitProratedEqually();
         } else {
             this.toastr.error('É necessário ao menos um responsável.', 'Remoção de responsável', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
         }
@@ -148,56 +145,70 @@ export abstract class ExpenseFormBaseComponent extends FormBaseComponent {
     }
 
     protected handleCreditCardListChange(methodList: string): void {
+        const creditCardControl = this.getFormChild("creditCardList");
+        const installmentsControl = this.getFormChild("installments");
+
         if (methodList === '1') {
-            this.getFormChild("creditCardList")?.setValidators(Validators.required);
-            this.getFormChild("installmentsControl")?.setValidators(Validators.required);
-            this.getFormChild("creditCardList")?.setValue('');
+            creditCardControl?.setValidators(Validators.required);
+            installmentsControl?.setValidators(Validators.required);
+            if (creditCardControl?.value === 'None') {
+                creditCardControl?.setValue('');
+            }
+            if (!installmentsControl?.value) {
+                installmentsControl?.setValue('1');
+            }
         } else {
-            this.getFormChild("creditCardList")?.clearValidators();
-            this.getFormChild("installmentsControl")?.clearValidators();
-            this.getFormChild("creditCardList")?.setValue('None');
+            creditCardControl?.clearValidators();
+            installmentsControl?.clearValidators();
+            creditCardControl?.setValue('None');
+            installmentsControl?.setValue('1');
         }
-        this.getFormChild("creditCardList")?.updateValueAndValidity();
-        this.getFormChild("installmentsControl")?.updateValueAndValidity();
+        creditCardControl?.updateValueAndValidity();
+        installmentsControl?.updateValueAndValidity();
+    }
+
+    public autoSplitProratedEqually(totalValueInput?: string): void {
+        const proratedGroup = this.expenseResposiblesArraySignal();
+        const totalValue = totalValueInput !== undefined ? totalValueInput : this.expenseForm.get('totalValue')?.value;
+        const totalNumericValue: number = CurrencyUtils.StringToDecimal(totalValue);
+
+        if (proratedGroup.length === 0 || totalNumericValue <= 0) return;
+
+        const count = proratedGroup.length;
+        const splitAmount = Math.floor((totalNumericValue / count) * 100) / 100;
+        const remainder = CurrencyUtils.RoundToTwoDecimals(totalNumericValue - (splitAmount * count));
+
+        for (let i = 0; i < count; i++) {
+            const proratedChild = proratedGroup.at(i) as FormGroup;
+            const proratedControl = proratedChild.get('proratedValue');
+            const currentAmount = i === 0 ? CurrencyUtils.RoundToTwoDecimals(splitAmount + remainder) : splitAmount;
+            proratedControl?.setValue(CurrencyUtils.DecimalToString(currentAmount), { emitEvent: false });
+        }
     }
 
     protected handleProratedValueChange(totalValue: string): void {
-        const proratedGroup = this.expenseResposiblesArraySignal();
-        let totalNumericValue: number = CurrencyUtils.StringToDecimal(totalValue);
-        let valuePerPerson = totalNumericValue / proratedGroup.length;
-        valuePerPerson = CurrencyUtils.RoundToTwoDecimals(valuePerPerson);
-
-        if (proratedGroup.length > 0) {
-            for (let i = 0; i < proratedGroup.length; i++) {
-                const proratedChild = proratedGroup.at(i) as FormGroup;
-
-                const proratedControl = proratedChild.get('proratedValue');
-                if (totalValue && valuePerPerson > 0) {
-                    proratedControl.setValue(CurrencyUtils.DecimalToString(valuePerPerson), { emitEvent: false });
-                } else {
-                    proratedControl.setValue('0,00', { emitEvent: false });
-                }
-            }
-        }
+        this.autoSplitProratedEqually(totalValue);
     }
 
-    protected createExpenseResponsibleGroup(): FormGroup {
+    protected createExpenseResponsibleGroup(defaultId: number | string = ''): FormGroup {
         return this.fb.group({
-            responsibleId: ['', [Validators.required]],
-            proratedValue: [0, [Validators.required]]
+            responsibleId: [defaultId, [Validators.required]],
+            proratedValue: ['', [Validators.required]]
         });
     }
 
-    protected addExpenseResponsible(): void {
-        if (this.differenceValueTotalWithProrated() > 0) {
-            const arrayControl = this.expenseResposiblesArraySignal();
-            arrayControl.push(this.createExpenseResponsibleGroup());
-            this.setupAllSubscriptions();
-            this.completeValueAddExpenseResponsible();
-        } else {
-            this.toastr.error('Não há valores disponíveis para novos rateios!', 'Adição de responsável', { easeTime: 200, timeOut: 4000, progressBar: true, closeButton: true });
-        }
+    public addExpenseResponsible(): void {
+        const arrayControl = this.expenseResposiblesArraySignal();
+        const selectedIds = arrayControl.controls
+            .map(c => Number(c.get('responsibleId')?.value))
+            .filter(id => !isNaN(id) && id > 0);
+        const allResponsibles = this.responsibleService?.responsiblesSignal() || [];
+        const nextAvailable = allResponsibles.find(r => !selectedIds.includes(r.id));
+        const defaultId = nextAvailable ? nextAvailable.id : (allResponsibles[0]?.id || '');
 
+        arrayControl.push(this.createExpenseResponsibleGroup(defaultId));
+        this.setupAllSubscriptions();
+        this.autoSplitProratedEqually();
     }
 
     protected completeValueAddExpenseResponsible(): void {

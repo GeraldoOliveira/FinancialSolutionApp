@@ -1,14 +1,11 @@
-<div class="mb-4 border-bottom border-light border-opacity-10">
-  <nav class="nav nav-tabs gap-3" aria-label="Tabs">
+<div class="mb-4 border-b border-slate-700/60 pb-3">
+  <nav class="flex items-center gap-2" aria-label="Tabs">
     @for (tab of tabs; track tab.route) 
     {
       <a [routerLink]="tab.route"
-        [routerLinkActive]="['active']"
+        [routerLinkActive]="['bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/30']"
         (click)="selectTab(tab.route)"
-        class="nav-link px-1 py-3 text-secondary"
-        [class.text-danger]="isTabActive(tab.route)"
-        [class.fw-medium]="isTabActive(tab.route)"
-        [class.text-secondary]="!isTabActive(tab.route)">
+        class="px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800">
         {{ tab.label }}
       </a>
     }

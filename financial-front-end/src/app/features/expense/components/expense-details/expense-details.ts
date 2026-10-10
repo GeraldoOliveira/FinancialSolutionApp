@@ -1,9 +1,9 @@
 import { Component, ElementRef, ViewChildren, signal, WritableSignal, QueryList, PipeTransform, Pipe } from '@angular/core';
 import { FormArray, FormBuilder, FormControlName, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 
 import { Expense } from '../../../../shared/models/expense-transaction';
 import { ExpenseResponsible } from '../../../../shared/models/expense-responsible';
@@ -31,8 +31,8 @@ export class CreditCardPipe implements PipeTransform {
 }
 
 @Component({
-  selector: 'app-expense-edit',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, CreditCardPipe],
+  selector: 'app-expense-details',
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, CreditCardPipe, ExpenseDelete],
   templateUrl: './expense-details.html',
   styleUrl: './expense-details.css',
   providers: [DatePipe]
@@ -49,7 +49,8 @@ export class ExpenseDetails extends ExpenseFormBaseComponent {
   canEdit: boolean = this.claimsUtils.checkExpenseClain('Edit');
 
   constructor(private route: ActivatedRoute,
-    private modalService: NgbModal,
+    private router: Router,
+    
   ) {
     super()
     this.expense = this.route.snapshot.data['expense'];
@@ -107,26 +108,26 @@ export class ExpenseDetails extends ExpenseFormBaseComponent {
     });
   }
 
-  openDeleteModal(transaction: Expense): void {
+  isDeleteModalOpen = signal<boolean>(false);
+  transactionToDelete = signal<Expense | null>(null);
 
+  openDeleteModal(transaction: Expense): void {
     if (!this.canDelete) {
       this.toastr.error('Você não tem permissão para excluir despesas.', 'Acesso Negado');
       return;
     }
+    this.transactionToDelete.set(transaction);
+    this.isDeleteModalOpen.set(true);
+  }
 
-    const modalRef = this.modalService.open(ExpenseDelete);
+  cancelDelete(): void {
+    this.transactionToDelete.set(null);
+    this.isDeleteModalOpen.set(false);
+  }
 
-    modalRef.componentInstance.transaction = transaction;
-
-    modalRef.result.then((result) => {
-      if (result === true) {
-        // Lógica de exclusão aqui
-        console.log(`Exclusão do item ${transaction.id} confirmada.`);
-      }
-    }, (reason) => {
-      console.log(`Exclusão do item ${transaction.id} cancelada.`, reason);
-    }
-    );
+  onDeleteConfirmed(): void {
+    this.cancelDelete();
+    this.router.navigate(['/expense/list']);
   }
 
 }

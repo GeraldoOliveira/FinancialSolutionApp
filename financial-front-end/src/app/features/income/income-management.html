@@ -1,0 +1,431 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+  
+  <!-- Page Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg shadow-sm">
+          <i class="fas fa-hand-holding-usd"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Gestão de Receitas</h2>
+          <p class="text-slate-400 text-xs sm:text-sm mt-0.5">Controle de entradas financeiras, salários, rendimentos e recebíveis familiares</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <button 
+        type="button" 
+        (click)="openNewIncomeModal()"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]">
+        <i class="fas fa-plus-circle"></i>
+        <span>Nova Receita</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Total Geral -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm relative overflow-hidden group hover:border-slate-600 transition-all">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Previsto</span>
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xs">
+          <i class="fas fa-wallet"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <h3 class="text-2xl font-black text-white tracking-tight">
+          {{ totalIncome() | currency:'BRL':'symbol':'1.2-2' }}
+        </h3>
+        <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+          <i class="fas fa-list-ul text-slate-500"></i>
+          <span>{{ incomes().length }} lançamentos registrados</span>
+        </p>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+
+    <!-- Já Recebido -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm relative overflow-hidden group hover:border-slate-600 transition-all">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Recebido em Conta</span>
+        <div class="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs">
+          <i class="fas fa-check-circle"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <h3 class="text-2xl font-black text-emerald-400 tracking-tight">
+          {{ receivedIncome() | currency:'BRL':'symbol':'1.2-2' }}
+        </h3>
+        <p class="text-[11px] text-slate-400 mt-1">Efetivado e disponível para o mês</p>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+
+    <!-- Pendente / A Receber -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm relative overflow-hidden group hover:border-slate-600 transition-all">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider">A Receber</span>
+        <div class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs">
+          <i class="fas fa-clock"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <h3 class="text-2xl font-black text-amber-400 tracking-tight">
+          {{ pendingIncome() | currency:'BRL':'symbol':'1.2-2' }}
+        </h3>
+        <p class="text-[11px] text-slate-400 mt-1">Aguardando compensação/pagamento</p>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-500/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+
+    <!-- Taxa de Efetivação -->
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm relative overflow-hidden group hover:border-slate-600 transition-all">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Efetivação</span>
+        <div class="w-8 h-8 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xs font-bold">
+          {{ receivedPercentage() }}%
+        </div>
+      </div>
+      <div class="mt-3">
+        <div class="flex justify-between items-baseline">
+          <h3 class="text-2xl font-black text-white tracking-tight">{{ receivedPercentage() }}%</h3>
+          <span class="text-[11px] text-slate-400">do total</span>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-700/60 rounded-full h-2 mt-2 overflow-hidden">
+          <div 
+            class="bg-gradient-to-r from-emerald-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
+            [style.width.%]="receivedPercentage()">
+          </div>
+        </div>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-purple-500/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+  </div>
+
+  <!-- Filters & Search Toolbar -->
+  <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-4 shadow-xl backdrop-blur-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Search Bar -->
+    <div class="relative flex-1">
+      <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400 text-sm pointer-events-none"></i>
+      <input 
+        type="text" 
+        [ngModel]="searchTerm()" 
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Buscar receita por descrição, fonte ou observação..." 
+        style="padding-left: 2.65rem !important;"
+        class="w-full pr-4 py-2 bg-slate-900/80 border border-slate-700/80 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all" />
+    </div>
+
+    <!-- Filter Group (Status + Recipient) -->
+    <div class="flex flex-wrap items-center gap-2.5">
+      <!-- Status Tabs -->
+      <div class="inline-flex p-1 bg-slate-900/80 border border-slate-700/80 rounded-xl text-xs font-medium">
+        <button 
+          type="button" 
+          (click)="selectedStatus.set('ALL')"
+          class="px-3 py-1.5 rounded-xl transition-all"
+          [ngClass]="selectedStatus() === 'ALL' ? 'bg-indigo-600 text-white font-semibold shadow' : 'text-slate-400 hover:text-white'">
+          Todos
+        </button>
+        <button 
+          type="button" 
+          (click)="selectedStatus.set('RECEIVED')"
+          class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5"
+          [ngClass]="selectedStatus() === 'RECEIVED' ? 'bg-emerald-600 text-white font-semibold shadow' : 'text-slate-400 hover:text-white'">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Recebidos</span>
+        </button>
+        <button 
+          type="button" 
+          (click)="selectedStatus.set('PENDING')"
+          class="px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5"
+          [ngClass]="selectedStatus() === 'PENDING' ? 'bg-amber-600 text-white font-semibold shadow' : 'text-slate-400 hover:text-white'">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+          <span>Pendentes</span>
+        </button>
+      </div>
+
+      <!-- Recipient Select Filter -->
+      <select 
+        [ngModel]="selectedRecipientId()" 
+        (ngModelChange)="selectedRecipientId.set($event)"
+        class="px-3 py-2 bg-slate-900/80 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition-all">
+        <option value="ALL">Todos os Membros</option>
+        @for (resp of responsibleService.responsiblesSignal(); track resp.id) {
+          <option [value]="resp.id">{{ resp.name }}</option>
+        }
+      </select>
+
+      <!-- Botão de Período / Todos os Meses -->
+      <button 
+        type="button" 
+        (click)="filterByPeriod.set(!filterByPeriod())"
+        [title]="filterByPeriod() ? 'Clique para ver receitas de todos os meses' : 'Clique para filtrar apenas o mês vigente'"
+        class="px-3 py-2 rounded-xl border border-slate-700/80 bg-slate-900/80 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer hover:bg-slate-800"
+        [class.border-indigo-500]="filterByPeriod()"
+        [class.text-indigo-300]="filterByPeriod()"
+        [class.text-slate-400]="!filterByPeriod()">
+        <i class="far fa-calendar-alt text-indigo-400"></i>
+        @if (filterByPeriod()) {
+          <span>Mês: <strong class="text-white">{{ periodService.shortMonthYear() }}</strong></span>
+        } @else {
+          <span>Todos os Meses</span>
+        }
+      </button>
+    </div>
+  </div>
+
+  <!-- Incomes List / Table -->
+  <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl shadow-xl backdrop-blur-sm overflow-hidden">
+    @if (filteredIncomes().length === 0) {
+      <div class="p-12 text-center space-y-3">
+        <div class="w-16 h-16 rounded-2xl bg-slate-700/40 border border-slate-600/40 flex items-center justify-center mx-auto text-slate-400 text-2xl">
+          <i class="fas fa-inbox"></i>
+        </div>
+        <h4 class="text-lg font-bold text-white">Nenhuma receita encontrada</h4>
+        <p class="text-slate-400 text-xs sm:text-sm max-w-md mx-auto">
+          Não há receitas correspondentes aos filtros selecionados. Tente ajustar os termos de busca ou registre uma nova receita.
+        </p>
+        <button 
+          type="button" 
+          (click)="openNewIncomeModal()"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition-all">
+          <i class="fas fa-plus"></i>
+          <span>Cadastrar Receita</span>
+        </button>
+      </div>
+    } @else {
+      <div class="divide-y divide-slate-700/60">
+        @for (income of filteredIncomes(); track income.id) {
+          <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-700/30 transition-colors">
+            
+            <!-- Left Info (Icon, Title, Source, Date, Recipient) -->
+            <div class="flex items-start sm:items-center gap-3.5">
+              <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg shrink-0">
+                <i [class]="getSourceIcon(income.source)"></i>
+              </div>
+
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-sm sm:text-base font-bold text-white">{{ income.description }}</span>
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-700/80 text-slate-300 border border-slate-600/60">
+                    {{ income.source }}
+                  </span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                  <span class="flex items-center gap-1">
+                    <i class="far fa-calendar-alt text-slate-500"></i>
+                    <span>{{ income.date | date:'dd/MM/yyyy' }}</span>
+                  </span>
+
+                  <!-- Member Badge -->
+                  @if (responsibleService.getResponsibleById(income.recipientId); as resp) {
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-900 border border-slate-700/80">
+                      <span class="w-2 h-2 rounded-full" [style.background-color]="resp.color"></span>
+                      <span class="text-slate-200">{{ resp.name }}</span>
+                    </span>
+                  }
+
+                  @if (income.notes) {
+                    <span class="text-slate-400 truncate max-w-xs hidden md:inline-block">
+                      • {{ income.notes }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Info (Value, Status Toggle, Actions) -->
+            <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-700/50">
+              <!-- Value -->
+              <div class="text-left sm:text-right">
+                <div class="text-base sm:text-lg font-black text-emerald-400">
+                  + {{ income.amount | currency:'BRL':'symbol':'1.2-2' }}
+                </div>
+              </div>
+
+              <!-- Status Toggle Button -->
+              <button 
+                type="button" 
+                (click)="toggleReceived(income)"
+                [title]="income.received ? 'Clique para marcar como pendente' : 'Clique para marcar como recebido'"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border"
+                [ngClass]="income.received 
+                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25' 
+                  : 'bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/25'">
+                <i class="fas" [class.fa-check-circle]="income.received" [class.fa-clock]="!income.received"></i>
+                <span>{{ income.received ? 'Recebido' : 'Pendente' }}</span>
+              </button>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-1">
+                <button 
+                  type="button" 
+                  (click)="openEditIncomeModal(income)"
+                  class="w-8 h-8 rounded-xl bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs transition-colors"
+                  title="Editar receita">
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button 
+                  type="button" 
+                  (click)="deleteIncome(income)"
+                  class="w-8 h-8 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs transition-colors"
+                  title="Excluir receita">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Modal Nova / Edição de Receita -->
+  @if (isModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div 
+        (click)="$event.stopPropagation()"
+        class="bg-slate-900 border border-slate-700/80 rounded-2xl p-6 w-full max-w-lg shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
+        
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-sm">
+              <i class="fas" [class.fa-plus]="!isEditing()" [class.fa-pen]="isEditing()"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">
+              {{ isEditing() ? 'Editar Receita' : 'Registrar Nova Receita' }}
+            </h3>
+          </div>
+          <button 
+            type="button" 
+            (click)="closeModal()" 
+            class="w-8 h-8 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition-colors">
+            <i class="fas fa-times text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Form Body -->
+        <div class="space-y-4">
+          <!-- Descrição -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Descrição da Receita *</label>
+            <input 
+              type="text" 
+              [ngModel]="formDescription()" 
+              (ngModelChange)="formDescription.set($event)"
+              placeholder="Ex: Salário Mensal, Freelance Projeto Web..."
+              class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
+          </div>
+
+          <!-- Valor e Data -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Valor (R$) *</label>
+              <div class="relative">
+                <span class="currency-prefix-badge">R$</span>
+                <input 
+                  type="text" 
+                  [value]="formAmountFormatted()" 
+                  (input)="onAmountInput($event)"
+                  placeholder="0,00"
+                  style="padding-left: 2.85rem !important;"
+                  class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 font-semibold focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all currency-input" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Data de Recebimento</label>
+              <input 
+                type="date" 
+                [ngModel]="formDate()" 
+                (ngModelChange)="formDate.set($event)"
+                class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" />
+            </div>
+          </div>
+
+          <!-- Fonte e Membro Responsável -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Fonte da Receita</label>
+              <select 
+                [ngModel]="formSource()" 
+                (ngModelChange)="formSource.set($event)"
+                class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition-all">
+                @for (src of sources; track src) {
+                  <option [value]="src">{{ src }}</option>
+                }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">Destinatário / Titular</label>
+              <select 
+                [ngModel]="formRecipientId()" 
+                (ngModelChange)="formRecipientId.set($event)"
+                class="w-full px-3.5 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-emerald-500 transition-all">
+                @for (resp of responsibleService.responsiblesSignal(); track resp.id) {
+                  <option [value]="resp.id">{{ resp.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Status de Recebimento (Checkbox Switch) -->
+          <div class="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-xl flex items-center justify-between">
+            <div>
+              <span class="text-xs font-bold text-white block">Status da Receita</span>
+              <span class="text-[11px] text-slate-400">Marque se o valor já caiu na conta bancária</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                [ngModel]="formReceived()" 
+                (ngModelChange)="formReceived.set($event)"
+                class="sr-only peer" />
+              <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+            </label>
+          </div>
+
+          <!-- Observações -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Observações (Opcional)</label>
+            <textarea 
+              rows="2" 
+              [ngModel]="formNotes()" 
+              (ngModelChange)="formNotes.set($event)"
+              placeholder="Anotações adicionais sobre esta entrada..."
+              class="w-full px-3.5 py-2 bg-slate-800/90 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-all"></textarea>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
+          <button 
+            type="button" 
+            (click)="closeModal()"
+            class="px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            (click)="saveIncome()"
+            class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] inline-flex items-center gap-2">
+            <i class="fas fa-check"></i>
+            <span>{{ isEditing() ? 'Atualizar Receita' : 'Salvar Receita' }}</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

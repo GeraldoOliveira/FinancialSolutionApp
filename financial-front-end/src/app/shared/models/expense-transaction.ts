@@ -6,11 +6,16 @@ export interface Expense {
     expenseOrigin: ExpenseOrigin;
     totalValue: string;
     paymentMethod: string;
+    methodList?: string;
     creditCardId: number;
+    creditCardList?: string;
     expenseResponsibles: ExpenseResponsible[];
-    categoryId: number;
+    categoryId?: number;
+    categoryList?: string;
     installments: number;
     userId: number;
     invoiceDateId: number;
     date: Date;
+    receiptImage?: string;
+    receiptName?: string;
 }

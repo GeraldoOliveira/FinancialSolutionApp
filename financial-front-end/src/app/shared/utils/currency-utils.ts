@@ -1,26 +1,48 @@
 export class CurrencyUtils {
 
-    public static StringToDecimal(input: string | null | undefined): number {
-        if (input == null || input == undefined || input.trim() === '') {
+    public static StringToDecimal(input: string | number | null | undefined): number {
+        if (input == null || input == undefined) {
             return 0;
         }
 
-        let cleanValue = input.replace(/[R$\s]/g, '');
-        cleanValue = cleanValue.replace(/\./g, '');
+        if (typeof input === 'number') {
+            return isNaN(input) ? 0 : input;
+        }
 
-        cleanValue = cleanValue.replace(',', '.');
+        const trimmed = input.toString().trim();
+        if (trimmed === '') {
+            return 0;
+        }
+
+        let cleanValue = trimmed.replace(/[R$\s]/g, '');
+
+        if (cleanValue.includes(',') && cleanValue.includes('.')) {
+            // Ex: "1.234,56" -> remove pontos de milhar, substitui vírgula por ponto
+            cleanValue = cleanValue.replace(/\./g, '').replace(',', '.');
+        } else if (cleanValue.includes(',')) {
+            // Ex: "123,45" -> substitui vírgula decimal por ponto
+            cleanValue = cleanValue.replace(',', '.');
+        } else if ((cleanValue.match(/\./g) || []).length > 1) {
+            // Ex: "1.000.000" -> múltiplos pontos são separadores de milhar
+            cleanValue = cleanValue.replace(/\./g, '');
+        }
 
         const numericValue = parseFloat(cleanValue);
 
         return isNaN(numericValue) ? 0 : numericValue;
     }
 
-    public static DecimalToString(input: number | null | undefined): string {
-        if (input == null || input == undefined || isNaN(input)) {
+    public static DecimalToString(input: number | string | null | undefined): string {
+        if (input == null || input == undefined) {
             return '0,00';
         }
 
-        return input.toLocaleString('pt-BR', {
+        const numeric = typeof input === 'number' ? input : this.StringToDecimal(input);
+        if (isNaN(numeric)) {
+            return '0,00';
+        }
+
+        return numeric.toLocaleString('pt-BR', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });

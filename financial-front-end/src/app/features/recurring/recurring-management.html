@@ -1,0 +1,670 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+  <!-- Header da Tela -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl shadow-lg shadow-cyan-500/10">
+        <i class="fas fa-sync-alt"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Despesas Recorrentes & Assinaturas</h2>
+        <p class="text-slate-400 text-xs sm:text-sm mt-0.5">
+          Gerenciamento de gastos fixos com lançamento automático na virada de ciclo e divisão pré-configurada
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button 
+        type="button" 
+        (click)="openNewModal()"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-cyan-600/30 transition-all">
+        <i class="fas fa-plus-circle"></i>
+        <span>Nova Recorrência</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cards de Indicadores / KPIs -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-4 shadow-xl backdrop-blur-sm">
+      <div class="flex justify-between items-center text-slate-400 text-xs mb-1">
+        <span>Total Fixo Mensal</span>
+        <i class="fas fa-money-bill-wave text-cyan-400"></i>
+      </div>
+      <div class="text-2xl font-black text-white">
+        {{ totalMonthlyFixed() | currency:'BRL':'symbol':'1.2-2' }}
+      </div>
+      <span class="text-[10px] text-slate-400 mt-1 block">Somatório de todos os gastos fixos ativos</span>
+    </div>
+
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-4 shadow-xl backdrop-blur-sm">
+      <div class="flex justify-between items-center text-slate-400 text-xs mb-1">
+        <span>Minha Parte Fixa</span>
+        <i class="fas fa-user-check text-indigo-400"></i>
+      </div>
+      <div class="text-2xl font-black text-indigo-400">
+        {{ myShareTotal() | currency:'BRL':'symbol':'1.2-2' }}
+      </div>
+      <span class="text-[10px] text-slate-400 mt-1 block">Minha cota individual calculada</span>
+    </div>
+
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-4 shadow-xl backdrop-blur-sm">
+      <div class="flex justify-between items-center text-slate-400 text-xs mb-1">
+        <span>Cota dos Contatos</span>
+        <i class="fas fa-users text-teal-400"></i>
+      </div>
+      <div class="text-2xl font-black text-teal-400">
+        {{ contactsShareTotal() | currency:'BRL':'symbol':'1.2-2' }}
+      </div>
+      <span class="text-[10px] text-slate-400 mt-1 block">Reembolsos a receber de terceiros</span>
+    </div>
+
+    <div class="bg-slate-800/85 border border-slate-700/60 rounded-2xl p-4 shadow-xl backdrop-blur-sm">
+      <div class="flex justify-between items-center text-slate-400 text-xs mb-1">
+        <span>Assinaturas Ativas</span>
+        <i class="fas fa-check-circle text-emerald-400"></i>
+      </div>
+      <div class="text-2xl font-black text-emerald-400">
+        {{ recurringService.recurringSignal().length }}
+      </div>
+      <span class="text-[10px] text-slate-400 mt-1 block">Gastos com automação mensal</span>
+    </div>
+  </div>
+
+  <!-- Barra de Automação de Ciclo & Lançamento em Lote -->
+  <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 border border-cyan-500/30 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex items-start gap-3">
+      <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg shrink-0 mt-0.5">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div>
+        <h4 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>Automação do Ciclo: {{ periodService.formattedMonthYear() }}</span>
+          @if (pendingForCycle().length > 0) {
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
+              {{ pendingForCycle().length }} pendente(s)
+            </span>
+          } @else {
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">
+              Ciclo 100% Processado
+            </span>
+          }
+        </h4>
+        <p class="text-xs text-slate-300 leading-relaxed mt-0.5 max-w-2xl">
+          O sistema processa automaticamente todas as despesas recorrentes a cada virada de mês, registrando os lançamentos e as divisões sem retrabalho manual.
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <button 
+        type="button" 
+        (click)="processRecurringCycle()"
+        [disabled]="isProcessing() || pendingForCycle().length === 0"
+        class="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center gap-2"
+        [ngClass]="pendingForCycle().length > 0 
+          ? 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-600/30 cursor-pointer' 
+          : 'bg-slate-800 text-slate-500 border border-slate-700/60 cursor-not-allowed'">
+        <i class="fas" [ngClass]="isProcessing() ? 'fa-spinner fa-spin' : 'fa-play'"></i>
+        <span>{{ pendingForCycle().length > 0 ? 'Lançar Recorrentes Deste Ciclo' : 'Ciclo Já Processado' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Grade de Despesas Recorrentes -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    @for (item of recurringService.recurringSignal(); track item.id) {
+      @let isProcessedThisMonth = item.lastProcessedMonth === periodService.selectedMonthYear();
+
+      <div class="recurring-card bg-slate-800/85 border border-slate-700/60 rounded-2xl p-5 shadow-xl backdrop-blur-sm flex flex-col justify-between space-y-4"
+        [class.opacity-60]="!item.active">
+        
+        <!-- Topo: Categoria, Título, Status e Ações -->
+        <div class="flex justify-between items-start gap-2">
+          <div class="space-y-1">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-slate-900/80 text-cyan-400 border border-cyan-500/30 inline-block">
+              {{ item.category }}
+            </span>
+            <h4 class="text-base font-bold text-white leading-snug">{{ item.title }}</h4>
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <span class="flex items-center gap-1 font-semibold text-slate-300">
+                <i class="far fa-calendar-alt text-cyan-400"></i>
+                Todo dia {{ item.dueDay }}
+              </span>
+              <span>•</span>
+              <span class="truncate max-w-[130px]">
+                {{ item.paymentMethod === '1' ? getCardName(item.creditCardId) : 'Pix / Boleto' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1 bg-black/25 backdrop-blur-md px-1.5 py-1 rounded-xl border border-white/10 shrink-0">
+            <button 
+              type="button" 
+              (click)="openEditModal(item)"
+              title="Editar Recorrência"
+              class="w-7 h-7 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition-all text-xs">
+              <i class="fas fa-pen"></i>
+            </button>
+            <button 
+              type="button" 
+              (click)="confirmDelete(item)"
+              title="Excluir Recorrência"
+              class="w-7 h-7 rounded-xl flex items-center justify-center text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 transition-all text-xs">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Valor Fixo Mensal -->
+        <div class="flex justify-between items-baseline py-1">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Valor Fixo Mensal</span>
+            <span class="text-2xl font-black text-white">
+              {{ item.amount | currency:'BRL':'symbol':'1.2-2' }}
+            </span>
+          </div>
+
+          <!-- Switch Ativo/Pausado -->
+          <button 
+            type="button" 
+            (click)="toggleActive(item)"
+            title="Alternar Ativo/Pausado"
+            class="px-2.5 py-1 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5"
+            [ngClass]="item.active ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-slate-700/50 text-slate-400 border-slate-600'">
+            <i class="fas" [ngClass]="item.active ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+            <span>{{ item.active ? 'Ativa' : 'Pausada' }}</span>
+          </button>
+        </div>
+
+        <!-- Rateio Configurado entre os Contatos ou Rodízio Alternado -->
+        @if (item.splitType === 'ROTATING') {
+          <div class="bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-900 rounded-xl p-3 border border-indigo-500/30 text-xs space-y-2.5">
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="font-bold text-indigo-300 flex items-center gap-1.5">
+                <i class="fas fa-sync-alt text-indigo-400"></i>
+                Cobrança Alternada (Rodízio)
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">
+                {{ item.rotationOrder?.length || 0 }} no ciclo
+              </span>
+            </div>
+
+            <!-- Fila Ordenada da Rotação -->
+            <div class="space-y-1">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider block">Fila do Rodízio:</span>
+              <div class="flex flex-wrap items-center gap-1 text-[11px]">
+                @for (respId of item.rotationOrder || []; track $index) {
+                  @let resp = responsibleService.getResponsibleById(respId);
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200">
+                    <span class="w-2 h-2 rounded-full" [style.background-color]="resp?.color || '#3B82F6'"></span>
+                    <span class="font-medium">{{ resp?.name || 'Contato' }}</span>
+                  </span>
+                  @if (!$last) {
+                    <i class="fas fa-arrow-right text-[9px] text-slate-500"></i>
+                  } @else {
+                    <span class="text-slate-500 text-[10px] ml-0.5" title="Retorna o ciclo">↺</span>
+                  }
+                }
+              </div>
+            </div>
+
+            <!-- Pagador da Vez no Ciclo Selecionado -->
+            @let currentRotating = getRotatingResponsible(item);
+            <div class="p-2 rounded-lg bg-slate-800/90 border border-indigo-500/40 flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+                  [style.background-color]="currentRotating?.color || '#3B82F6'">
+                  {{ (currentRotating?.name || '?').charAt(0) }}
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-white text-xs">{{ currentRotating?.name }}</span>
+                    @if (currentRotating?.id === 2) {
+                      <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                        Minha Vez
+                      </span>
+                    } @else {
+                      <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        Reembolso
+                      </span>
+                    }
+                  </div>
+                  <span class="text-[10px] text-slate-400 block">Pagador em {{ periodService.shortMonthYear() }} (100%)</span>
+                </div>
+              </div>
+              <span class="text-xs font-black text-indigo-300">
+                {{ item.amount | currency:'BRL':'symbol':'1.2-2' }}
+              </span>
+            </div>
+
+            <!-- Próximo Mês -->
+            @let nextRotating = getNextRotatingResponsible(item);
+            @if (nextRotating) {
+              <div class="flex justify-between items-center text-[10px] text-slate-400 pt-0.5">
+                <span>Próximo ciclo:</span>
+                <span class="text-slate-300 font-semibold flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full" [style.background-color]="nextRotating.color"></span>
+                  {{ nextRotating.name }}
+                </span>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Rateio Fixo Configurado entre os Contatos -->
+          <div class="bg-slate-900/60 rounded-xl p-3 border border-slate-700/40 text-xs space-y-2">
+            <div class="flex justify-between items-center text-slate-400 text-[11px]">
+              <span class="font-semibold text-slate-300">Rateio Fixo Mensal:</span>
+              <span>{{ (item.responsiblesSplit || []).length }} pessoa(s)</span>
+            </div>
+
+            <div class="space-y-1">
+              @for (split of item.responsiblesSplit; track split.responsibleId) {
+                @let member = responsibleService.getResponsibleById(split.responsibleId);
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-slate-300 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full" [style.background-color]="member?.color || '#6366F1'"></span>
+                    {{ responsibleService.getResponsibleName(split.responsibleId) }}
+                  </span>
+                  <span class="font-bold text-white">
+                    {{ split.proratedValue | currency:'BRL':'symbol':'1.2-2' }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Rodapé do Card: Status do Mês -->
+        <div class="pt-2 border-t border-slate-700/60 flex justify-between items-center text-[11px]">
+          <span class="text-slate-400">Ciclo {{ periodService.shortMonthYear() }}:</span>
+          @if (isProcessedThisMonth) {
+            <span class="text-emerald-400 font-bold flex items-center gap-1">
+              <i class="fas fa-check-circle"></i>
+              <span>Lançado nas Despesas</span>
+            </span>
+          } @else {
+            <span class="text-amber-400 font-bold flex items-center gap-1">
+              <i class="fas fa-clock"></i>
+              <span>Aguardando Lançamento</span>
+            </span>
+          }
+        </div>
+
+      </div>
+    }
+  </div>
+
+  <!-- Modal Adicionar / Editar Recorrência -->
+  @if (isModalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+        
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center text-lg">
+              <i [class]="isEditing() ? 'fas fa-pen' : 'fas fa-sync-alt'"></i>
+            </div>
+            <div>
+              <h4 class="text-lg font-bold text-white">{{ isEditing() ? 'Editar Despesa Recorrente' : 'Nova Despesa Recorrente' }}</h4>
+              <p class="text-xs text-slate-400">Configuração de gastos fixos com lançamento automático</p>
+            </div>
+          </div>
+          <button type="button" (click)="closeModal()" class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+            <i class="fas fa-times text-lg"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3.5 text-xs sm:text-sm">
+          <div>
+            <label class="block text-slate-300 font-medium mb-1">Título da Assinatura / Gasto Fixo:</label>
+            <input 
+              type="text" 
+              [ngModel]="formTitle()" 
+              (ngModelChange)="formTitle.set($event)"
+              placeholder="Ex: Netflix 4K, Aluguel, Internet Fibra..."
+              class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-xs sm:text-sm">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Categoria:</label>
+              <select 
+                [ngModel]="formCategory()" 
+                (ngModelChange)="formCategory.set($event)"
+                class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 text-xs sm:text-sm">
+                @for (cat of categories; track cat) {
+                  <option [value]="cat">{{ cat }}</option>
+                }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Valor Mensal (R$):</label>
+              <div class="relative">
+                <span class="currency-prefix-badge">R$</span>
+                <input 
+                  type="text" 
+                  [value]="formAmountFormatted()" 
+                  (input)="onAmountInput($event)"
+                  placeholder="0,00"
+                  style="padding-left: 2.85rem !important;"
+                  class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-xs sm:text-sm">
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Dia do Vencimento / Cobrança:</label>
+              <div class="relative">
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="31"
+                  [ngModel]="formDueDay()" 
+                  (ngModelChange)="formDueDay.set($event)"
+                  placeholder="Ex: 10"
+                  class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold focus:outline-none focus:ring-2 focus:ring-cyan-500 text-xs sm:text-sm">
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 pointer-events-none">todo mês</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Forma de Pagamento:</label>
+              <select 
+                [ngModel]="formPaymentMethod()" 
+                (ngModelChange)="formPaymentMethod.set($event)"
+                class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 text-xs sm:text-sm">
+                <option value="1">Cartão de Crédito</option>
+                <option value="2">Pix / Débito em Conta</option>
+                <option value="3">Boleto Bancário</option>
+              </select>
+            </div>
+          </div>
+
+          @if (formPaymentMethod() === '1') {
+            <div>
+              <label class="block text-slate-300 font-medium mb-1">Cartão Vinculado:</label>
+              <select 
+                [ngModel]="formCreditCardId()" 
+                (ngModelChange)="formCreditCardId.set($event)"
+                class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 text-xs sm:text-sm">
+                @for (c of cardService.cardsSignal(); track c.id) {
+                  <option [value]="c.id">{{ c.name }} (•••• {{ c.lastDigits }})</option>
+                }
+              </select>
+            </div>
+          }
+
+          <!-- Modelo de Divisão: Rateio Fixo vs Cobrança Alternada (Rodízio) -->
+          <div class="space-y-2">
+            <label class="block text-slate-300 font-medium mb-1">Modelo de Divisão:</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button 
+                type="button"
+                (click)="formSplitType.set('FIXED')"
+                class="p-3 rounded-xl border text-left transition-all cursor-pointer"
+                [ngClass]="formSplitType() === 'FIXED' 
+                  ? 'bg-cyan-500/15 border-cyan-500 text-white ring-2 ring-cyan-500/20 shadow-lg' 
+                  : 'bg-slate-900/60 border-slate-700/60 text-slate-400 hover:border-slate-600'">
+                <div class="flex items-center gap-2 mb-1">
+                  <i class="fas fa-users" [class.text-cyan-400]="formSplitType() === 'FIXED'"></i>
+                  <span class="font-bold text-xs sm:text-sm">Rateio Fixo Mensal</span>
+                </div>
+                <p class="text-[11px] text-slate-400 leading-tight">Divide a conta entre os contatos todo mês.</p>
+              </button>
+
+              <button 
+                type="button"
+                (click)="formSplitType.set('ROTATING')"
+                class="p-3 rounded-xl border text-left transition-all cursor-pointer"
+                [ngClass]="formSplitType() === 'ROTATING' 
+                  ? 'bg-indigo-500/15 border-indigo-500 text-white ring-2 ring-indigo-500/20 shadow-lg' 
+                  : 'bg-slate-900/60 border-slate-700/60 text-slate-400 hover:border-slate-600'">
+                <div class="flex items-center gap-2 mb-1">
+                  <i class="fas fa-sync-alt" [class.text-indigo-400]="formSplitType() === 'ROTATING'"></i>
+                  <span class="font-bold text-xs sm:text-sm">Cobrança Alternada</span>
+                </div>
+                <p class="text-[11px] text-slate-400 leading-tight">Rodízio: a cada mês uma pessoa assume 100%.</p>
+              </button>
+            </div>
+          </div>
+
+          <!-- MODO 1: Rateio Fixo Pré-configurado -->
+          @if (formSplitType() === 'FIXED') {
+            <div class="p-3.5 bg-slate-900/90 rounded-xl border border-slate-700/60 space-y-2.5">
+              <div class="flex justify-between items-center">
+                <div>
+                  <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <i class="fas fa-users text-teal-400"></i>
+                    Divisão de Rateio Automática:
+                  </span>
+                  <span class="text-[10px] text-slate-400 block mt-0.5">Defina quanto cada contato paga nesta assinatura todo mês</span>
+                </div>
+                <button 
+                  type="button" 
+                  (click)="splitEqually()"
+                  class="px-3 py-1.5 rounded-xl bg-teal-500/15 text-teal-300 border border-teal-500/30 hover:bg-teal-500/25 text-xs font-semibold transition-all inline-flex items-center gap-2">
+                  <i class="fas fa-calculator"></i>
+                  <span>Dividir Igualmente</span>
+                </button>
+              </div>
+
+              <div class="space-y-2 pt-1">
+                @for (split of formSplits(); track split.responsibleId) {
+                  @let member = responsibleService.getResponsibleById(split.responsibleId);
+                  <div class="flex items-center justify-between gap-3 p-2 rounded-lg bg-slate-800/80 border border-slate-700/40">
+                    <span class="text-xs text-slate-200 flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full" [style.background-color]="member?.color || '#6366F1'"></span>
+                      {{ responsibleService.getResponsibleName(split.responsibleId) }}
+                    </span>
+                    <div class="relative w-32">
+                      <span class="currency-prefix-badge">R$</span>
+                      <input 
+                        type="text" 
+                        [value]="split.proratedValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })"
+                        (input)="onSplitChange(split.responsibleId, $event)"
+                        style="padding-left: 2.85rem !important;"
+                        class="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-white font-mono text-xs text-right focus:outline-none focus:ring-1 focus:ring-teal-500">
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- MODO 2: Cobrança Alternada / Rodízio Mensal -->
+          @if (formSplitType() === 'ROTATING') {
+            <div class="p-3.5 bg-gradient-to-br from-indigo-950/40 via-slate-900 to-slate-900 rounded-xl border border-indigo-500/40 space-y-3.5">
+              
+              <div class="flex justify-between items-start gap-2">
+                <div>
+                  <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <i class="fas fa-sync-alt text-indigo-400"></i>
+                    Configuração do Rodízio Mensal:
+                  </span>
+                  <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
+                    A cada virada de mês, o valor integral de 
+                    <strong class="text-indigo-300 font-bold">{{ (formAmount() || 0) | currency:'BRL':'symbol':'1.2-2' }}</strong> 
+                    será atribuído a uma única pessoa da sequência abaixo. Ao completar a fila, o ciclo reinicia do primeiro automaticamente.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Fila Ordenada do Rodízio -->
+              <div class="space-y-1.5">
+                <span class="text-[11px] font-bold text-slate-300 block">Ordem da Fila (Sequência de Cobrança):</span>
+                
+                @if (formRotationOrder().length === 0) {
+                  <div class="p-3 rounded-lg bg-slate-800/80 border border-amber-500/40 text-amber-300 text-xs text-center">
+                    Adicione pelo menos uma pessoa para compor a sequência do rodízio.
+                  </div>
+                }
+
+                <div class="space-y-1.5">
+                  @for (respId of formRotationOrder(); track $index) {
+                    @let member = responsibleService.getResponsibleById(respId);
+                    <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/90 border border-slate-700/60 shadow-sm">
+                      <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center justify-center text-[10px] font-bold">
+                          {{ $index + 1 }}º
+                        </span>
+                        <span class="w-2.5 h-2.5 rounded-full" [style.background-color]="member?.color || '#3B82F6'"></span>
+                        <span class="text-xs font-semibold text-white">{{ member?.name || 'Contato' }}</span>
+                        @if (member?.id === 2) {
+                          <span class="text-[10px] text-slate-400 font-normal">(Você)</span>
+                        }
+                      </div>
+
+                      <div class="flex items-center gap-1">
+                        <button 
+                          type="button" 
+                          (click)="moveRotationUp($index)"
+                          [disabled]="$first"
+                          title="Subir ordem"
+                          class="w-6 h-6 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-700 disabled:opacity-25 disabled:hover:bg-transparent text-[11px] transition-all">
+                          <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button 
+                          type="button" 
+                          (click)="moveRotationDown($index)"
+                          [disabled]="$last"
+                          title="Descer ordem"
+                          class="w-6 h-6 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-700 disabled:opacity-25 disabled:hover:bg-transparent text-[11px] transition-all">
+                          <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button 
+                          type="button" 
+                          (click)="removeFromRotation($index)"
+                          [disabled]="formRotationOrder().length <= 1"
+                          title="Remover do rodízio"
+                          class="w-6 h-6 rounded-xl flex items-center justify-center text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 disabled:opacity-25 disabled:hover:bg-transparent text-[11px] transition-all">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Adicionar Pessoas Disponíveis à Fila -->
+              @let available = getAvailableContactsForRotation();
+              @if (available.length > 0) {
+                <div class="pt-1">
+                  <span class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider block mb-1">Adicionar à sequência:</span>
+                  <div class="flex flex-wrap gap-1.5">
+                    @for (c of available; track c.id) {
+                      <button 
+                        type="button" 
+                        (click)="addToRotation(c.id)"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs transition-all cursor-pointer">
+                        <span class="w-2 h-2 rounded-full" [style.background-color]="c.color"></span>
+                        <span>+ {{ c.name }}</span>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+
+              <!-- Previsão do Rodízio para os Próximos Meses -->
+              <div class="pt-2 border-t border-slate-800">
+                <span class="text-[11px] font-bold text-indigo-300 flex items-center gap-1.5 mb-1.5">
+                  <i class="far fa-calendar-check text-indigo-400"></i>
+                  Previsão da Sequência nos Próximos Meses:
+                </span>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  @for (step of getRotationTimelinePreview(); track step.monthYear) {
+                    <div class="p-2 rounded-lg border text-xs"
+                      [ngClass]="step.isCurrent 
+                        ? 'bg-indigo-950/60 border-indigo-500/60 ring-1 ring-indigo-500/30' 
+                        : 'bg-slate-800/70 border-slate-700/50'">
+                      <div class="flex justify-between items-center text-[10px] text-slate-400 mb-0.5">
+                        <span class="font-bold" [class.text-indigo-300]="step.isCurrent">{{ step.label }}</span>
+                        @if (step.isCurrent) {
+                          <span class="text-[9px] px-1 rounded bg-indigo-500/30 text-indigo-200 font-extrabold uppercase">Atual</span>
+                        }
+                        @if (step.isCycleReset) {
+                          <span class="text-[9px] px-1 rounded bg-emerald-500/20 text-emerald-300 font-extrabold" title="Ciclo reinicia">↺ Ciclo</span>
+                        }
+                      </div>
+                      <div class="flex items-center gap-1 text-white font-semibold text-xs truncate">
+                        <span class="w-2 h-2 rounded-full shrink-0" [style.background-color]="step.color"></span>
+                        <span class="truncate">{{ step.responsibleName }}</span>
+                      </div>
+                      <span class="text-[10px] text-slate-400 block mt-0.5">100% do valor</span>
+                    </div>
+                  }
+                </div>
+              </div>
+
+            </div>
+          }
+
+          <div>
+            <label class="block text-slate-300 font-medium mb-1">Notas / Detalhes:</label>
+            <input 
+              type="text" 
+              [ngModel]="formNotes()" 
+              (ngModelChange)="formNotes.set($event)"
+              placeholder="Ex: Renovação anual em dezembro, dividido entre 3 pessoas"
+              class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-xs sm:text-sm">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-700/60">
+          <button 
+            type="button" 
+            (click)="closeModal()" 
+            class="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-700/50 text-xs sm:text-sm font-medium transition-colors">
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            (click)="saveRecurring()" 
+            class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs sm:text-sm font-medium shadow-md shadow-cyan-600/30 transition-all flex items-center gap-1.5">
+            <i class="fas fa-check"></i>
+            <span>{{ isEditing() ? 'Atualizar Recorrência' : 'Salvar Recorrência' }}</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- Modal Confirmação de Exclusão -->
+  @if (isDeleteModalOpen() && itemToDelete()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-400 mx-auto flex items-center justify-center text-xl shadow-inner">
+          <i class="fas fa-trash-alt"></i>
+        </div>
+        <div>
+          <h4 class="text-lg font-bold text-white">Excluir Assinatura?</h4>
+          <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+            Deseja remover a recorrência de <strong class="text-white">{{ itemToDelete()?.title }}</strong>?
+          </p>
+          <span class="inline-block mt-2 text-[11px] text-slate-400">Ela deixará de ser gerada automaticamente nos próximos ciclos.</span>
+        </div>
+        <div class="flex items-center justify-center gap-2.5 pt-2 border-t border-slate-700/60">
+          <button 
+            type="button" 
+            (click)="cancelDelete()"
+            class="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-700/50 text-xs sm:text-sm font-medium transition-colors">
+            Cancelar
+          </button>
+          <button 
+            type="button" 
+            (click)="executeDelete()"
+            class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-medium shadow-md shadow-rose-600/30 transition-all flex items-center gap-1.5">
+            <i class="fas fa-trash"></i>
+            <span>Sim, Excluir</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

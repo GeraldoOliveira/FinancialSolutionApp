@@ -20,6 +20,54 @@ export const routes: Routes = [
       import('./features/dashboard/dashboard').then((c) => c.Dashboard),
     canActivate: [validateToken],
   },
+  {
+    path: 'cards',
+    loadComponent: () =>
+      import('./features/cards/card-management').then((c) => c.CardManagement),
+    canActivate: [validateToken],
+  },
+  {
+    path: 'settlement',
+    loadComponent: () =>
+      import('./features/settlement/family-settlement').then((c) => c.FamilySettlement),
+    canActivate: [validateToken],
+  },
+  {
+    path: 'settlement/external-debts',
+    loadComponent: () =>
+      import('./features/settlement/external-debts/external-debts').then((c) => c.ExternalDebts),
+    canActivate: [validateToken],
+  },
+  {
+    path: 'incomes',
+    loadComponent: () =>
+      import('./features/income/income-management').then((c) => c.IncomeManagement),
+    canActivate: [validateToken],
+  },
+  {
+    path: 'contacts',
+    loadComponent: () =>
+      import('./features/contacts/contact-management').then((c) => c.ContactManagement),
+    canActivate: [validateToken],
+  },
+  {
+    path: 'recurring',
+    loadComponent: () =>
+      import('./features/recurring/recurring-management').then((c) => c.RecurringManagement),
+    canActivate: [validateToken],
+  },
+  {
+    path: 'budgets',
+    loadComponent: () =>
+      import('./features/budgets/budget-management').then((c) => c.BudgetManagement),
+    canActivate: [validateToken],
+  },
+  {
+    path: 'import',
+    loadComponent: () =>
+      import('./features/import/statement-import').then((c) => c.StatementImport),
+    canActivate: [validateToken],
+  },
 
   {
     path: 'access-denied',

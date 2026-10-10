@@ -11,6 +11,21 @@
 npm-debug.log
 yarn-error.log
 
+# Environment and Secret files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.crt
+
+# Local Mock Database (preserves user state locally, repository uses db.example.json)
+db.json
+!db.example.json
+*.sqlite
+*.sqlite-journal
+
 # IDEs and editors
 .idea/
 .project
@@ -19,6 +34,11 @@ yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
 # Visual Studio Code
 .vscode/*

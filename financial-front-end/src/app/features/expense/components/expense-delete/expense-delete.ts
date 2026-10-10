@@ -1,64 +1,71 @@
-import { Component, DestroyRef, Input } from '@angular/core';
-import { CurrencyPipe, DatePipe } from '@angular/common';
-
+import { Component, DestroyRef, EventEmitter, Input, Output } from '@angular/core';
+import { CurrencyPipe, DatePipe, CommonModule } from '@angular/common';
 import { ExpenseService } from '../../services/expense.service';
-
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Expense } from '../../../../shared/models/expense-transaction';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-expense-delete',
-  imports: [CurrencyPipe, DatePipe],
+  standalone: true,
+  imports: [CommonModule, CurrencyPipe, DatePipe],
   templateUrl: './expense-delete.html',
   styleUrl: './expense-delete.css'
 })
 export class ExpenseDelete {
+  @Input() transaction!: Expense;
+  @Output() confirmed = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
 
-  @Input() transaction: Expense;
-  TOAST_DURATION: number = 1500;
+  isDeleting = false;
+  TOAST_DURATION = 1500;
 
-  constructor(public activeModal: NgbActiveModal,
+  constructor(
     private expenseTransactionService: ExpenseService,
     private destroyRef: DestroyRef,
-    private toastr: ToastrService,
-  ) {
+    private toastr: ToastrService
+  ) {}
 
-    this.destroyRef.onDestroy(() => {
-      console.log('Componente _expenseTransaction está sendo destruído.');
-    });
-
-  }
-
-  confirmDelete() {
+  confirmDelete(): void {
+    if (this.isDeleting) return;
+    this.isDeleting = true;
 
     this.expenseTransactionService.deleteExpense(this.transaction.id.toString())
-      .pipe(
-        takeUntilDestroyed(this.destroyRef)
-      )
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (success) => {
-          this.processSuccess(success)
+          this.processSuccess(success);
+          setTimeout(() => {
+            this.confirmed.emit();
+          }, this.TOAST_DURATION);
         },
         error: (fail) => {
-          this.processFail(fail)
-        },
-        complete: () => {
-          console.log("OK")
+          this.isDeleting = false;
+          this.processFail(fail);
         }
-      })
-    setTimeout(() => {
-      this.activeModal.close(true);
-    }, this.TOAST_DURATION);
-
+      });
   }
 
-  processSuccess(response: any) {
-    this.toastr.success("Exclusão realizada com sucesso", 'Exclusão de transação', { easeTime: 200, timeOut: this.TOAST_DURATION, progressBar: true, closeButton: true });
+  cancel(): void {
+    if (this.isDeleting) return;
+    this.cancelled.emit();
   }
 
-  processFail(fail: any) {
-    this.toastr.error('Ocorreu um erro!', 'Exclusão de transação', { easeTime: 200, timeOut: this.TOAST_DURATION, progressBar: true, closeButton: true });
+  processSuccess(response: any): void {
+    this.toastr.success('Exclusão realizada com sucesso', 'Exclusão de transação', {
+      easeTime: 200,
+      timeOut: this.TOAST_DURATION,
+      progressBar: true,
+      closeButton: true
+    });
+  }
+
+  processFail(fail: any): void {
+    this.toastr.error('Ocorreu um erro ao excluir!', 'Exclusão de transação', {
+      easeTime: 200,
+      timeOut: this.TOAST_DURATION,
+      progressBar: true,
+      closeButton: true
+    });
   }
 }

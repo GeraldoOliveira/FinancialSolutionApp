@@ -1,72 +1,124 @@
+<section class="min-h-[85vh] flex items-center justify-center py-10 px-4 bg-[#0B0F19]">
+  <div class="max-w-md w-full">
+    <div class="fintech-card bg-slate-800/90 border border-slate-700/60 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+      <h3 class="text-2xl font-bold text-white text-center">Criar Nova Conta</h3>
+      <p class="text-slate-400 text-xs sm:text-sm text-center mt-1 mb-6">Preencha os dados abaixo para começar a gerenciar suas finanças</p>
 
-<html lang="pt-br">
+      <form novalidate (ngSubmit)="registerUser()" [formGroup]="registerForm" class="space-y-4">
+        @if (errors().length > 0) {
+          <div class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs space-y-1">
+            <strong class="font-semibold block">Ocorreu um erro ao tentar registrar:</strong>
+            <ul class="list-disc list-inside space-y-0.5">
+              @for (error of errors(); track $index) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          </div>
+        }
 
-<body class="bg-color-actual">
-    <div class="container text-white">
-        <div class="register-container col-md-6 offset-md-3">
-            <h2 class="text-center mb-4 pt-4">Registro de Usuário</h2>
-            <form novalidate (ngSubmit)="registerUser()" [formGroup]="registerForm">
-
-                @if (errors().length > 0) {
-                    <div class="alert alert-danger">
-                        <h3 id="returnMessage">Ocorreu um erro ao tentar registrar:</h3>
-                        <ul>
-                            @for (error of errors(); track $index) {
-                                <li> {{ error }} </li>
-                            }
-                        </ul>
-                    </div>
-                } 
-                <div class="form-group">
-                    <div class="mb-3">
-                        <label for="name" class="col-md-2 control-label">Nome:</label>
-                        <input type="text" class="form-control" id="name" placeholder="Digite seu nome completo" formControlName="name" [ngClass]="{'is-invalid': displayMessage.name } "/>
-                        @if(displayMessage.name) {
-                            <span class="text-danger">
-                                <p [innerHTML]="displayMessage.name"></p>
-                            </span>
-                        }
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email:</label>
-                        <input type="text" class="form-control" id="email" placeholder="Digite seu email" formControlName="email" ngClass="{'is-invalid': displayMessage.email } "/>
-                         @if(displayMessage.email){
-                            <span class="text-danger">
-                                <p [innerHTML]="displayMessage.email"></p>
-                            </span>
-                        }
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="mb-3">
-                        <label class="control-label" for="password">Senha:</label>
-                        <input type="password" class="form-control" id="password" placeholder="Digite sua senha" formControlName="password" ngClass="{'is-invalid': displayMessage.password } "/>
-                         @if(displayMessage.password){
-                            <span class="text-danger">
-                                <p [innerHTML]="displayMessage.password"></p>
-                            </span>
-                        }
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Repita a senha:</label>
-                        <input type="password" class="form-control" id="confirmPassword" placeholder="Digite a senha novamente" formControlName="confirmPassword" ngClass="{'is-invalid': displayMessage.confirmPassword } "/>
-                         @if(displayMessage.confirmPassword) {
-                            <span class="text-danger">
-                                <p [innerHTML]="displayMessage.confirmPassword"></p>
-                            </span>
-                        }
-                    </div>
-                </div>
-                <div class="d-grid mt-4">
-                    <button type="submit" id="submit" class="btn btn-primary" [disabled]="!registerForm.valid">Registrar</button>
-                </div>
-            </form>
+        <!-- Nome Completo -->
+        <div>
+          <label for="name" class="block text-xs sm:text-sm font-medium text-slate-200 mb-1.5">Nome Completo:</label>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-indigo-400 pointer-events-none text-sm">
+              <i class="fas fa-user"></i>
+            </span>
+            <input 
+              type="text" 
+              id="name" 
+              placeholder="Digite seu nome completo" 
+              formControlName="name" 
+              [class.border-rose-500]="displayMessage.name"
+              class="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all" />
+          </div>
+          @if(displayMessage.name) {
+            <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.name"></div>
+          }
         </div>
-    </div>
-</body>
 
-</html>
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-xs sm:text-sm font-medium text-slate-200 mb-1.5">Email:</label>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-indigo-400 pointer-events-none text-sm">
+              <i class="fas fa-envelope"></i>
+            </span>
+            <input 
+              type="email" 
+              id="email" 
+              placeholder="seu.email@exemplo.com" 
+              formControlName="email" 
+              [class.border-rose-500]="displayMessage.email"
+              class="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all" />
+          </div>
+          @if(displayMessage.email){
+            <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.email"></div>
+          }
+        </div>
+
+        <!-- Senha -->
+        <div>
+          <label class="block text-xs sm:text-sm font-medium text-slate-200 mb-1.5" for="password">Senha:</label>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-indigo-400 pointer-events-none text-sm">
+              <i class="fas fa-lock"></i>
+            </span>
+            <input 
+              type="password" 
+              id="password" 
+              placeholder="Senha de 6 a 20 caracteres" 
+              formControlName="password" 
+              [class.border-rose-500]="displayMessage.password"
+              class="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all" />
+          </div>
+          @if(displayMessage.password){
+            <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.password"></div>
+          }
+        </div>
+
+        <!-- Confirmação de Senha -->
+        <div>
+          <label for="confirmPassword" class="block text-xs sm:text-sm font-medium text-slate-200 mb-1.5">Confirmação de Senha:</label>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 text-indigo-400 pointer-events-none text-sm">
+              <i class="fas fa-lock-open"></i>
+            </span>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              placeholder="Digite a senha novamente" 
+              formControlName="confirmPassword" 
+              [class.border-rose-500]="displayMessage.confirmPassword"
+              class="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all" />
+          </div>
+          @if(displayMessage.confirmPassword) {
+            <div class="text-rose-400 text-xs mt-1" [innerHTML]="displayMessage.confirmPassword"></div>
+          }
+        </div>
+
+        <button 
+          type="submit" 
+          id="submit" 
+          [disabled]="!registerForm.valid"
+          class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-indigo-600/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base mt-2">
+          <i class="fas fa-user-plus"></i>
+          <span>Registrar Conta</span>
+        </button>
+      </form>
+
+      <div class="my-6 flex items-center gap-3">
+        <div class="flex-1 h-px bg-slate-700/60"></div>
+        <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">ou</span>
+        <div class="flex-1 h-px bg-slate-700/60"></div>
+      </div>
+
+      <p class="text-center text-slate-400 text-xs mb-3">Já possui uma conta?</p>
+      <a 
+        [routerLink]="['/login']"
+        class="w-full py-2.5 px-4 border border-slate-700 hover:bg-slate-700/50 hover:border-slate-600 text-slate-200 font-medium rounded-xl text-center text-sm transition-all flex items-center justify-center gap-2">
+        <i class="fas fa-sign-in-alt text-indigo-400"></i>
+        <span>Entrar na minha conta</span>
+      </a>
+    </div>
+  </div>
+</section>

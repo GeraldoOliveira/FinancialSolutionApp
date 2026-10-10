@@ -1,15 +1,16 @@
 .footer {
-    background-color: #201f1f; /* Matches bg-cinza-personalizado */
+    background-color: var(--bg-surface);
+    border-top: 1px solid var(--border-subtle);
 }
 
 .footer-link {
-    color: #ffffff;
+    color: var(--primary);
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: color 0.2s ease;
 }
 
 .footer-link:hover {
-    color: #b4121b; /* Matches bg-vermelho-personalizado or a distinct highlight color */
+    color: var(--primary-hover);
     text-decoration: underline;
 }
