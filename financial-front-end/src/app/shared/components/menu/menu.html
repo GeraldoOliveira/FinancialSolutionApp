@@ -288,14 +288,6 @@
           class="lg:hidden w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer">
           <i class="fas" [class.fa-bars]="!isMobileNavOpen()" [class.fa-times]="isMobileNavOpen()"></i>
         </button>
-
-      } @else {
-        <!-- Botão Entrar se não estiver logado -->
-        <a [routerLink]="['/login']" 
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-md shadow-indigo-600/30 transition-all">
-          <i class="fas fa-sign-in-alt"></i>
-          <span>Entrar no Sistema</span>
-        </a>
       }
     </div>
 

@@ -1,23 +1,79 @@
-    body, html {
-        height: 100%;
-        margin: 0;
-        font-family: 'Roboto'; /* Adicionando uma fonte mais moderna se desejar */
-    }
-    .hero-section {
-        min-height: calc(100vh - 56px); /* 100vh menos a altura de um navbar, se houver */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .login-card {
-        box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
-        border-radius: 0.75rem;
-        padding: 2rem;
-    }
-    .login-image {
-        max-height: 500px; /* Limita a altura da imagem */
-        object-fit: contain; /* Garante que a imagem se encaixe sem cortar */
-    }
-    .login-image {
-        border-radius: 0.75rem;
-    }
+/* Login Component Styles */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.login-input-box {
+  display: flex;
+  align-items: center;
+  background-color: rgba(3, 7, 18, 0.75);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+}
+
+.login-input-box:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.35);
+}
+
+.login-input-box.border-rose-500 {
+  border-color: #f43f5e !important;
+}
+
+.login-input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.875rem;
+  padding-right: 0.625rem;
+  color: #818cf8;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.login-input-field {
+  flex: 1 1 auto;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  padding: 0.65rem 0.75rem 0.65rem 0.25rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem;
+  width: 100%;
+}
+
+.login-input-field::placeholder {
+  color: #64748b !important;
+}
+
+.remember-me-label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.remember-me-label:hover {
+  color: #e2e8f0;
+}
+
+.remember-me-checkbox {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  margin-right: 0.5rem;
+  accent-color: #6366f1;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}

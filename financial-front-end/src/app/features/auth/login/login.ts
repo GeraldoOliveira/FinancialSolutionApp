@@ -38,6 +38,8 @@ export class Login {
   public customGoogleName = signal('');
   public customGooglePhone = signal('');
   public isLoggingInOAuth = signal(false);
+  public showPassword = signal(false);
+  public isSubmitting = signal(false);
 
   validationMessages!: ValidationMessages;
   genericValidator!: GenericValidator;
@@ -96,6 +98,7 @@ export class Login {
 
   loginUser() {
     if (this.loginForm.valid) {
+      this.isSubmitting.set(true);
       this.user = Object.assign({}, this.user, this.loginForm.value);
       this.loginService.loginUser(this.user)
         .pipe(
@@ -103,17 +106,24 @@ export class Login {
         )
         .subscribe({
           next: (success) => {
+            this.isSubmitting.set(false);
             this.processSuccess(success);
           },
           error: (fail) => {
+            this.isSubmitting.set(false);
             this.processFail(fail);
           },
           complete: () => {
+            this.isSubmitting.set(false);
           }
         });
     } else {
       this.displayMessage = this.genericValidator.processMessages(this.loginForm);
     }
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword.update(v => !v);
   }
 
   processSuccess(response: User) {
